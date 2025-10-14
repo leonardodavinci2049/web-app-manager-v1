@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Executar procedure baseado no tipo
-    let response;
+    let  response;
 
     switch (type) {
       case "data":

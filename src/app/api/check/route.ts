@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import checkService from "@/services/db-mysql2/check/check.service";
+import type { ResultModel } from "@/services/db-mysql2/utils/result.model";
 
 export async function GET() {
   try {
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { type, ...data } = body;
 
-    let result;
+    let result: ResultModel;
 
     switch (type) {
       case "email":
