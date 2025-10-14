@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model tbl_account {
+  id                    String    @id
+  accountId             String    @db.Text
+  providerId            String    @db.Text
+  userId                String
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?   @db.Text
+  password              String?   @db.Text
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime
+  tbl_user              tbl_user  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "tbl_account_userId_fkey")
+}
+
+model tbl_invitation {
+  id               String           @id
+  organizationId   String
+  email            String           @db.Text
+  role             String?          @db.Text
+  status           String           @db.Text
+  expiresAt        DateTime
+  inviterId        String
+  tbl_user         tbl_user         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+  tbl_organization tbl_organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([inviterId], map: "tbl_invitation_inviterId_fkey")
+  @@index([organizationId], map: "tbl_invitation_organizationId_fkey")
+}
+
+model tbl_member {
+  id               String           @id
+  organizationId   String
+  userId           String
+  role             String           @db.Text
+  createdAt        DateTime
+  tbl_organization tbl_organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  tbl_user         tbl_user         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId], map: "tbl_member_organizationId_fkey")
+  @@index([userId], map: "tbl_member_userId_fkey")
+}
+
+model tbl_organization {
+  id             String           @id
+  name           String           @db.Text
+  slug           String?          @unique
+  logo           String?          @db.Text
+  createdAt      DateTime
+  metadata       String?          @db.Text
+  tbl_invitation tbl_invitation[]
+  tbl_member     tbl_member[]
+}
+
+model tbl_session {
+  id                   String   @id
+  expiresAt            DateTime
+  token                String   @unique
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime
+  ipAddress            String?  @db.Text
+  userAgent            String?  @db.Text
+  userId               String
+  activeOrganizationId String?  @db.Text
+  tbl_user             tbl_user @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "tbl_session_userId_fkey")
+}
+
+model tbl_user {
+  id             String           @id
+  name           String           @db.Text
+  email          String           @unique
+  emailVerified  Boolean          @default(false)
+  image          String?          @db.Text
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now())
+  tbl_account    tbl_account[]
+  tbl_invitation tbl_invitation[]
+  tbl_member     tbl_member[]
+  tbl_session    tbl_session[]
+}
+
+model tbl_verification {
+  id         String   @id
+  identifier String   @db.Text
+  value      String   @db.Text
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+}

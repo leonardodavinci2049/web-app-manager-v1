@@ -1,13 +1,13 @@
 import {
-  Html,
-  Head,
   Body,
-  Container,
-  Section,
-  Text,
   Button,
+  Container,
+  Head,
   Hr,
+  Html,
+  Section,
   Tailwind,
+  Text,
 } from "@react-email/components";
 
 interface VerifyEmailProps {
@@ -73,10 +73,8 @@ const VerifyEmail = (props: VerifyEmailProps) => {
               </Text>
 
               <Text className="m-0 mt-[8px] text-center text-[12px] leading-[16px] text-gray-400">
-                <span className="text-gray-400 underline">
-                  Descadastrar
-                </span>{" "}
-                | © 2026 Nome da Empresa. Todos os direitos reservados.
+                <span className="text-gray-400 underline">Descadastrar</span> |
+                © 2026 Nome da Empresa. Todos os direitos reservados.
               </Text>
             </Section>
           </Container>
