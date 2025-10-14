@@ -8,8 +8,8 @@ import {
   Link,
   Preview,
   Section,
-  Text,
   Tailwind,
+  Text,
 } from "@react-email/components";
 
 interface OrganizationInvitationEmailProps {
@@ -21,7 +21,7 @@ interface OrganizationInvitationEmailProps {
 }
 
 const TemplateOrganizationInvitation = (
-  props: OrganizationInvitationEmailProps
+  props: OrganizationInvitationEmailProps,
 ) => {
   return (
     <Html lang="en" dir="ltr">

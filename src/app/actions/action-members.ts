@@ -1,7 +1,7 @@
 "use server";
 
-import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 import { isAdmin } from "./action-permissions";
 
 export type Role = "owner" | "admin" | "member";
@@ -36,16 +36,14 @@ export const addMember = async (
  * @param memberId - The member ID to remove
  */
 export const removeMember = async (memberId: string) => {
-    const admin = await isAdmin();
+  const admin = await isAdmin();
 
-    if (!admin) {
-        return {
-            success: false,
-            error: "You are not authorized to remove members."
-        }
-    }
-
-
+  if (!admin) {
+    return {
+      success: false,
+      error: "You are not authorized to remove members.",
+    };
+  }
 
   try {
     await prisma.member.delete({

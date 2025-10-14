@@ -7,8 +7,8 @@ import {
   Html,
   Preview,
   Section,
-  Text,
   Tailwind,
+  Text,
 } from "@react-email/components";
 
 interface VerifyEmailProps {
@@ -112,6 +112,5 @@ const TemplateForgotPasswordEmail = (props: VerifyEmailProps) => {
     </Html>
   );
 };
-
 
 export default TemplateForgotPasswordEmail;
