@@ -8,7 +8,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model tbl_account {
+model Account {
   id                    String    @id
   accountId             String    @db.Text
   providerId            String    @db.Text
@@ -22,12 +22,13 @@ model tbl_account {
   password              String?   @db.Text
   createdAt             DateTime  @default(now())
   updatedAt             DateTime
-  tbl_user              tbl_user  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "tbl_account_userId_fkey")
+  @@map("tbl_account")
 }
 
-model tbl_invitation {
+model Invitation {
   id               String           @id
   organizationId   String
   email            String           @db.Text
@@ -35,38 +36,41 @@ model tbl_invitation {
   status           String           @db.Text
   expiresAt        DateTime
   inviterId        String
-  tbl_user         tbl_user         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
-  tbl_organization tbl_organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@index([inviterId], map: "tbl_invitation_inviterId_fkey")
   @@index([organizationId], map: "tbl_invitation_organizationId_fkey")
+  @@map("tbl_invitation")
 }
 
-model tbl_member {
+model Member  {
   id               String           @id
   organizationId   String
   userId           String
   role             String           @db.Text
   createdAt        DateTime
-  tbl_organization tbl_organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  tbl_user         tbl_user         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization     Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([organizationId], map: "tbl_member_organizationId_fkey")
   @@index([userId], map: "tbl_member_userId_fkey")
+  @@map("tbl_member")
 }
 
-model tbl_organization {
+model Organization {
   id             String           @id
   name           String           @db.Text
   slug           String?          @unique
   logo           String?          @db.Text
   createdAt      DateTime
   metadata       String?          @db.Text
-  tbl_invitation tbl_invitation[]
-  tbl_member     tbl_member[]
+  invitations    Invitation[]
+  members        Member[]
+  @@map("tbl_organization")
 }
 
-model tbl_session {
+model Session {
   id                   String   @id
   expiresAt            DateTime
   token                String   @unique
@@ -76,12 +80,13 @@ model tbl_session {
   userAgent            String?  @db.Text
   userId               String
   activeOrganizationId String?  @db.Text
-  tbl_user             tbl_user @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "tbl_session_userId_fkey")
+  @@map("tbl_session")
 }
 
-model tbl_user {
+model User {
   id             String           @id
   name           String           @db.Text
   email          String           @unique
@@ -89,17 +94,20 @@ model tbl_user {
   image          String?          @db.Text
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @default(now())
-  tbl_account    tbl_account[]
-  tbl_invitation tbl_invitation[]
-  tbl_member     tbl_member[]
-  tbl_session    tbl_session[]
+  accounts      Account[]
+  invitations   Invitation[]
+  members       Member[]
+  sessions      Session[]
+   @@map("tbl_user")
+  
 }
 
-model tbl_verification {
+model Verification {
   id         String   @id
   identifier String   @db.Text
   value      String   @db.Text
   expiresAt  DateTime
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now())
+  @@map("tbl_verification")
 }
