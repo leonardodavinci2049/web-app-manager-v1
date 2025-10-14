@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import genericService from "@/services/db-mysql2/generic/generic.service";
+import type { GenericProcedureResponse } from "@/services/db-mysql2/generic/types/generic.types";
 
 /**
  * API route para testar procedures genéricas
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Executar procedure baseado no tipo
-    let  response;
+    let response: GenericProcedureResponse<unknown>;
 
     switch (type) {
       case "data":
@@ -54,7 +55,6 @@ export async function POST(request: NextRequest) {
       case "modify":
         response = await genericService.executeModifyProcedure(procedure);
         break;
-      case "generic":
       default:
         response = await genericService.executeGenericProcedure(procedure);
         break;
