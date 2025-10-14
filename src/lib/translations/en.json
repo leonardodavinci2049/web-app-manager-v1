@@ -1,0 +1,246 @@
+{
+  "auth": {
+    "login": {
+      "title": "Login to your account",
+      "subtitle": "Enter your email below to login to your account",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "forgotPassword": "Forgot your password?",
+      "loginButton": "Login",
+      "loggingIn": "Logging in...",
+      "loginWithGoogle": "Login with Google",
+      "orContinueWith": "Or continue with",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "rememberMe": "Remember me",
+      "errors": {
+        "required": "This field is required",
+        "invalidEmail": "Invalid email",
+        "invalidPassword": "Password must be at least 6 characters",
+        "invalidCredentials": "Invalid email or password",
+        "serverError": "Internal server error"
+      }
+    },
+    "signup": {
+      "title": "Create new account",
+      "subtitle": "Enter your information to create an account",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "Enter your first name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Enter your last name",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "createAccount": "Create Account",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "termsAndConditions": "I accept the terms and conditions",
+      "success": {
+        "title": "Registration Successful!",
+        "subtitle": "Your account has been created! Follow the next steps to activate your account:",
+        "step1": {
+          "title": "Confirm your Email",
+          "message": "We sent a confirmation link to your email. Click the link to verify your email address."
+        },
+        "step2": {
+          "title": "Wait for Approval",
+          "message": "After confirming your email, our team will review your registration. You will receive an email notification when your account is approved."
+        },
+        "emailNote": "Don't forget to check your spam folder if you can't find the confirmation email.",
+        "backToLogin": "Back to Login",
+        "thankYou": "Thank you for registering!"
+      },
+      "errors": {
+        "required": "This field is required",
+        "invalidEmail": "Invalid email",
+        "passwordTooShort": "Password must be at least 6 characters",
+        "passwordsDoNotMatch": "Passwords do not match",
+        "emailAlreadyExists": "This email is already registered",
+        "termsRequired": "You must accept the terms and conditions"
+      }
+    },
+    "forgotPassword": {
+      "title": "Forgot your password?",
+      "subtitle": "Enter your email to receive recovery instructions",
+      "email": "Email",
+      "sendInstructions": "Send instructions",
+      "backToLogin": "Back to login",
+      "checkEmail": "Check your email",
+      "emailSent": "We sent recovery instructions to your email"
+    },
+    "resetPassword": {
+      "title": "Reset password",
+      "subtitle": "Enter your new password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "resetButton": "Reset password",
+      "success": "Password reset successfully",
+      "errors": {
+        "invalidToken": "Invalid or expired recovery link",
+        "passwordsDoNotMatch": "Passwords do not match"
+      }
+    },
+    "logout": {
+      "title": "Logout",
+      "message": "Are you sure you want to logout?",
+      "confirm": "Logout",
+      "cancel": "Cancel"
+    }
+  },
+  "dashboard": {
+    "navigation": {
+      "dashboard": "Dashboard",
+      "products": "Products",
+      "customers": "Customers",
+      "orders": "Orders",
+      "users": "Users",
+      "settings": "Settings",
+      "profile": "Profile",
+      "logout": "Logout",
+      "categories": "Categories",
+      "brands": "Brands",
+      "suppliers": "Suppliers",
+      "carriers": "Carriers",
+      "productEntry": "Product Entry",
+      "reports": "Reports",
+      "analytics": "Analytics"
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "dashboard": "Dashboard",
+      "products": "Products",
+      "customers": "Customers",
+      "orders": "Orders",
+      "users": "Users",
+      "settings": "Settings",
+      "profile": "Profile"
+    },
+    "common": {
+      "loading": "Loading...",
+      "error": "Error",
+      "success": "Success",
+      "warning": "Warning",
+      "info": "Information",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "save": "Save",
+      "edit": "Edit",
+      "delete": "Delete",
+      "add": "Add",
+      "create": "Create",
+      "update": "Update",
+      "view": "View",
+      "search": "Search",
+      "filter": "Filter",
+      "export": "Export",
+      "import": "Import",
+      "refresh": "Refresh",
+      "back": "Back",
+      "next": "Next",
+      "previous": "Previous",
+      "yes": "Yes",
+      "no": "No",
+      "name": "Name",
+      "description": "Description",
+      "status": "Status",
+      "date": "Date",
+      "actions": "Actions",
+      "total": "Total",
+      "noData": "No data found",
+      "selectAll": "Select all",
+      "clearSelection": "Clear selection"
+    },
+    "table": {
+      "rowsPerPage": "Rows per page",
+      "of": "of",
+      "page": "Page",
+      "goToFirstPage": "Go to first page",
+      "goToPreviousPage": "Go to previous page",
+      "goToNextPage": "Go to next page",
+      "goToLastPage": "Go to last page",
+      "sortAscending": "Sort ascending",
+      "sortDescending": "Sort descending",
+      "unsorted": "Unsorted",
+      "filterColumn": "Filter column",
+      "hideColumn": "Hide column",
+      "showColumn": "Show column"
+    },
+    "products": {
+      "title": "Products",
+      "addProduct": "Add Product",
+      "editProduct": "Edit Product",
+      "deleteProduct": "Delete Product",
+      "productName": "Product Name",
+      "productPrice": "Price",
+      "productCategory": "Category",
+      "productStock": "Stock",
+      "productDescription": "Description",
+      "productImage": "Image",
+      "inStock": "In stock",
+      "outOfStock": "Out of stock",
+      "lowStock": "Low stock"
+    },
+    "customers": {
+      "title": "Customers",
+      "addCustomer": "Add Customer",
+      "editCustomer": "Edit Customer",
+      "deleteCustomer": "Delete Customer",
+      "customerName": "Customer Name",
+      "customerEmail": "Email",
+      "customerPhone": "Phone",
+      "customerAddress": "Address",
+      "registrationDate": "Registration Date",
+      "lastOrder": "Last Order",
+      "totalOrders": "Total Orders"
+    },
+    "orders": {
+      "title": "Orders",
+      "orderNumber": "Order Number",
+      "orderDate": "Order Date",
+      "customer": "Customer",
+      "amount": "Amount",
+      "status": "Status",
+      "pending": "Pending",
+      "processing": "Processing",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded"
+    }
+  },
+  "common": {
+    "language": "Language",
+    "theme": "Theme",
+    "welcome": "Welcome",
+    "hello": "Hello, {{name}}!",
+    "version": "Version",
+    "copyright": "All rights reserved",
+    "poweredBy": "Powered by",
+    "selectLanguage": "Select language",
+    "portuguese": "Portuguese",
+    "english": "English",
+    "settings": {
+      "title": "Settings",
+      "general": "General",
+      "appearance": "Appearance",
+      "notifications": "Notifications",
+      "privacy": "Privacy",
+      "account": "Account"
+    },
+    "notifications": {
+      "success": "Operation completed successfully!",
+      "error": "An error occurred. Please try again.",
+      "warning": "Warning! Please check the information.",
+      "info": "Important information.",
+      "saved": "Changes saved successfully!",
+      "deleted": "Item deleted successfully!",
+      "created": "Item created successfully!",
+      "updated": "Item updated successfully!"
+    }
+  }
+}
