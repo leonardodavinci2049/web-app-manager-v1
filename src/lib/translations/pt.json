@@ -1,0 +1,247 @@
+{
+  "auth": {
+    "login": {
+      "title": "Faça login na sua conta",
+      "subtitle": "Digite seu email abaixo para fazer login",
+      "email": "Email",
+      "emailPlaceholder": "Digite seu email",
+      "password": "Senha",
+      "passwordPlaceholder": "Digite sua senha",
+      "forgotPassword": "Esqueceu sua senha?",
+      "loginButton": "Entrar",
+      "loggingIn": "Entrando...",
+      "loginWithGoogle": "Entrar com Google",
+      "orContinueWith": "Ou continue com",
+      "noAccount": "Não tem uma conta?",
+      "signUp": "Cadastre-se",
+      "rememberMe": "Lembrar de mim",
+      "errors": {
+        "required": "Este campo é obrigatório",
+        "invalidEmail": "Email inválido",
+        "invalidPassword": "Senha deve ter pelo menos 6 caracteres",
+        "invalidCredentials": "Email ou senha inválidos",
+        "serverError": "Erro interno do servidor"
+      }
+    },
+    "signup": {
+      "title": "Criar nova conta",
+      "subtitle": "Digite suas informações para criar uma conta",
+      "firstName": "Nome",
+      "firstNamePlaceholder": "Digite seu nome",
+      "lastName": "Sobrenome",
+      "lastNamePlaceholder": "Digite seu sobrenome",
+      "email": "Email",
+      "emailPlaceholder": "Digite seu email",
+      "password": "Senha",
+      "passwordPlaceholder": "Digite sua senha",
+      "confirmPassword": "Confirmar Senha",
+      "confirmPasswordPlaceholder": "Confirme sua senha",
+      "createAccount": "Criar Conta",
+      "hasAccount": "Já tem uma conta?",
+      "signIn": "Faça login",
+      "termsAndConditions": "Aceito os termos e condições",
+      "success": {
+        "title": "Cadastro Realizado com Sucesso!",
+        "subtitle": "Sua conta foi criada! Siga os próximos passos para ativar sua conta:",
+        "step1": {
+          "title": "Confirme seu Email",
+          "message": "Enviamos um link de confirmação para seu email. Clique no link para verificar seu endereço de email."
+        },
+        "step2": {
+          "title": "Aguarde a Aprovação",
+          "message": "Após confirmar seu email, nossa equipe analisará seu cadastro. Você receberá uma notificação por email quando sua conta for aprovada."
+        },
+        "emailNote": "Não esqueça de verificar sua caixa de spam caso não encontre o email de confirmação.",
+        "backToLogin": "Voltar para o Login",
+        "thankYou": "Obrigado por se cadastrar!"
+      },
+      "errors": {
+        "required": "Este campo é obrigatório",
+        "invalidEmail": "Email inválido",
+        "passwordTooShort": "Senha deve ter pelo menos 6 caracteres",
+        "passwordsDoNotMatch": "As senhas não coincidem",
+        "emailAlreadyExists": "Este email já está cadastrado",
+        "termsRequired": "Você deve aceitar os termos e condições"
+      }
+    },
+    "forgotPassword": {
+      "title": "Esqueceu sua senha?",
+      "subtitle": "Digite seu email para receber instruções de recuperação",
+      "email": "Email",
+      "submit": "Enviar instruções",
+      "sendInstructions": "Enviar instruções",
+      "backToLogin": "Voltar ao login",
+      "checkEmail": "Verifique seu email",
+      "emailSent": "Enviamos instruções de recuperação para seu email"
+    },
+    "resetPassword": {
+      "title": "Redefinir senha",
+      "subtitle": "Digite sua nova senha",
+      "newPassword": "Nova senha",
+      "confirmPassword": "Confirmar nova senha",
+      "resetButton": "Redefinir senha",
+      "success": "Senha redefinida com sucesso",
+      "errors": {
+        "invalidToken": "Link de recuperação inválido ou expirado",
+        "passwordsDoNotMatch": "As senhas não coincidem"
+      }
+    },
+    "logout": {
+      "title": "Fazer logout",
+      "message": "Você tem certeza que deseja sair?",
+      "confirm": "Sair",
+      "cancel": "Cancelar"
+    }
+  },
+  "dashboard": {
+    "navigation": {
+      "dashboard": "Dashboard",
+      "products": "Produtos",
+      "customers": "Clientes",
+      "orders": "Pedidos",
+      "users": "Usuários",
+      "settings": "Configurações",
+      "profile": "Perfil",
+      "logout": "Sair",
+      "categories": "Categorias",
+      "brands": "Marcas",
+      "suppliers": "Fornecedores",
+      "carriers": "Transportadoras",
+      "productEntry": "Entrada de Produtos",
+      "reports": "Relatórios",
+      "analytics": "Analytics"
+    },
+    "breadcrumb": {
+      "home": "Início",
+      "dashboard": "Dashboard",
+      "products": "Produtos",
+      "customers": "Clientes",
+      "orders": "Pedidos",
+      "users": "Usuários",
+      "settings": "Configurações",
+      "profile": "Perfil"
+    },
+    "common": {
+      "loading": "Carregando...",
+      "error": "Erro",
+      "success": "Sucesso",
+      "warning": "Atenção",
+      "info": "Informação",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "save": "Salvar",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "add": "Adicionar",
+      "create": "Criar",
+      "update": "Atualizar",
+      "view": "Visualizar",
+      "search": "Pesquisar",
+      "filter": "Filtrar",
+      "export": "Exportar",
+      "import": "Importar",
+      "refresh": "Atualizar",
+      "back": "Voltar",
+      "next": "Próximo",
+      "previous": "Anterior",
+      "yes": "Sim",
+      "no": "Não",
+      "name": "Nome",
+      "description": "Descrição",
+      "status": "Status",
+      "date": "Data",
+      "actions": "Ações",
+      "total": "Total",
+      "noData": "Nenhum dado encontrado",
+      "selectAll": "Selecionar todos",
+      "clearSelection": "Limpar seleção"
+    },
+    "table": {
+      "rowsPerPage": "Linhas por página",
+      "of": "de",
+      "page": "Página",
+      "goToFirstPage": "Ir para primeira página",
+      "goToPreviousPage": "Ir para página anterior",
+      "goToNextPage": "Ir para próxima página",
+      "goToLastPage": "Ir para última página",
+      "sortAscending": "Ordenar crescente",
+      "sortDescending": "Ordenar decrescente",
+      "unsorted": "Não ordenado",
+      "filterColumn": "Filtrar coluna",
+      "hideColumn": "Ocultar coluna",
+      "showColumn": "Mostrar coluna"
+    },
+    "products": {
+      "title": "Produtos",
+      "addProduct": "Adicionar Produto",
+      "editProduct": "Editar Produto",
+      "deleteProduct": "Excluir Produto",
+      "productName": "Nome do Produto",
+      "productPrice": "Preço",
+      "productCategory": "Categoria",
+      "productStock": "Estoque",
+      "productDescription": "Descrição",
+      "productImage": "Imagem",
+      "inStock": "Em estoque",
+      "outOfStock": "Fora de estoque",
+      "lowStock": "Estoque baixo"
+    },
+    "customers": {
+      "title": "Clientes",
+      "addCustomer": "Adicionar Cliente",
+      "editCustomer": "Editar Cliente",
+      "deleteCustomer": "Excluir Cliente",
+      "customerName": "Nome do Cliente",
+      "customerEmail": "Email",
+      "customerPhone": "Telefone",
+      "customerAddress": "Endereço",
+      "registrationDate": "Data de Cadastro",
+      "lastOrder": "Último Pedido",
+      "totalOrders": "Total de Pedidos"
+    },
+    "orders": {
+      "title": "Pedidos",
+      "orderNumber": "Número do Pedido",
+      "orderDate": "Data do Pedido",
+      "customer": "Cliente",
+      "amount": "Valor",
+      "status": "Status",
+      "pending": "Pendente",
+      "processing": "Processando",
+      "shipped": "Enviado",
+      "delivered": "Entregue",
+      "cancelled": "Cancelado",
+      "refunded": "Reembolsado"
+    }
+  },
+  "common": {
+    "language": "Idioma",
+    "theme": "Tema",
+    "welcome": "Bem-vindo",
+    "hello": "Olá, {{name}}!",
+    "version": "Versão",
+    "copyright": "Todos os direitos reservados",
+    "poweredBy": "Desenvolvido com",
+    "selectLanguage": "Selecionar idioma",
+    "portuguese": "Português",
+    "english": "Inglês",
+    "settings": {
+      "title": "Configurações",
+      "general": "Geral",
+      "appearance": "Aparência",
+      "notifications": "Notificações",
+      "privacy": "Privacidade",
+      "account": "Conta"
+    },
+    "notifications": {
+      "success": "Operação realizada com sucesso!",
+      "error": "Ocorreu um erro. Tente novamente.",
+      "warning": "Atenção! Verifique as informações.",
+      "info": "Informação importante.",
+      "saved": "Alterações salvas com sucesso!",
+      "deleted": "Item excluído com sucesso!",
+      "created": "Item criado com sucesso!",
+      "updated": "Item atualizado com sucesso!"
+    }
+  }
+}
