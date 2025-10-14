@@ -9,22 +9,29 @@
  * - Configuração via variáveis de ambiente
  */
 
-import { I18nConfig, type Locale } from "./i18n-config";
+import {
+  getDefaultLocale,
+  getLocaleMetadata,
+  getSupportedLocales,
+  type Locale,
+  logI18nConfig,
+} from "./i18n-config";
 
 // Re-export tipos e configurações
 export type { Locale };
-export const defaultLocale = I18nConfig.defaultLocale;
-export const locales = I18nConfig.supportedLocales;
+export const defaultLocale = getDefaultLocale();
+export const locales = getSupportedLocales();
 
 // Metadados dos idiomas
+const localeMetadata = getLocaleMetadata();
 export const localeNames: Record<Locale, string> = {
-  pt: I18nConfig.getLocaleMetadata().pt.name,
-  en: I18nConfig.getLocaleMetadata().en.name,
+  pt: localeMetadata.pt.name,
+  en: localeMetadata.en.name,
 } as const;
 
 export const localeFlags: Record<Locale, string> = {
-  pt: I18nConfig.getLocaleMetadata().pt.flag,
-  en: I18nConfig.getLocaleMetadata().en.flag,
+  pt: localeMetadata.pt.flag,
+  en: localeMetadata.en.flag,
 } as const;
 
 // Chave para localStorage
@@ -227,7 +234,7 @@ export function createTranslationFunction(
  */
 export function initializeI18nSystem() {
   if (process.env.NODE_ENV === "development") {
-    I18nConfig.logConfig();
+    logI18nConfig();
   }
   return {
     defaultLocale,
