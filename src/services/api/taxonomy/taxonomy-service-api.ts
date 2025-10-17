@@ -8,6 +8,7 @@ import {
   API_STATUS_CODES,
   TAXONOMY_ENDPOINTS,
 } from "@/lib/constants/api-constants";
+
 import type {
   CreateTaxonomyRequest,
   CreateTaxonomyResponse,
@@ -103,11 +104,32 @@ export class TaxonomyServiceApi extends BaseApiService {
         ...params,
       });
 
+      console.log("🚀 [TaxonomyServiceApi] Enviando requisição:", {
+        endpoint: TAXONOMY_ENDPOINTS.FIND,
+        payload: requestBody,
+      });
+      console.log(
+        "📤 [TaxonomyServiceApi] PAYLOAD JSON COMPLETO:",
+        JSON.stringify(requestBody, null, 2),
+      );
+      console.log("🎯 [TaxonomyServiceApi] Parâmetro de busca específico:", {
+        pe_taxonomia: requestBody.pe_taxonomia,
+        pe_id_taxonomy: requestBody.pe_id_taxonomy,
+      });
+
       const data: FindTaxonomyResponse =
         await instance.post<FindTaxonomyResponse>(
           TAXONOMY_ENDPOINTS.FIND,
           requestBody,
         );
+
+      console.log("📦 [TaxonomyServiceApi] Resposta recebida:", {
+        statusCode: data.statusCode,
+        message: data.message,
+        quantity: data.quantity,
+        hasData: !!data.data,
+        dataLength: data.data?.[0]?.length,
+      });
 
       // Verifica se a resposta indica "sem dados encontrados" (código 100422)
       // Aceita tanto "Product not found" quanto "Taxonomy not found" ou mensagens similares
@@ -118,9 +140,13 @@ export class TaxonomyServiceApi extends BaseApiService {
             data.message.includes("não encontrado") ||
             data.message.includes("sem dados")))
       ) {
+        console.log(
+          "ℹ️ [TaxonomyServiceApi] Nenhum resultado encontrado, retornando estrutura vazia",
+        );
         return {
           ...data,
           statusCode: API_STATUS_CODES.SUCCESS, // Tratar como sucesso com dados vazios
+          quantity: 0, // Garantir que quantity seja 0
           data: [
             [],
             {
