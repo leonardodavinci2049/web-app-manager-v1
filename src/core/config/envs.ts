@@ -29,7 +29,7 @@ const envsSchema = z.object({
   // Organization and Member IDs
   ORGANIZATION_ID: z.string().min(1, "ORGANIZATION_ID is required"),
   MEMBER_ID: z.string().min(1, "MEMBER_ID is required"),
-
+  USER_ID: z.string().min(1, "USER_ID is required"),
   // INFO DEVELOPER - Variáveis públicas (disponíveis no cliente)
   // Usadas para exibir informações do desenvolvedor no footer/sobre
   NEXT_PUBLIC_DEVELOPER_NAME: z
@@ -125,7 +125,7 @@ if (typeof window === "undefined") {
     // Organization and Member IDs - não devem ser acessadas no cliente
     ORGANIZATION_ID: "",
     MEMBER_ID: "",
-
+    USER_ID: "",
     // Estas variáveis públicas PODEM ser acessadas no cliente
     NEXT_PUBLIC_DEVELOPER_NAME: process.env.NEXT_PUBLIC_DEVELOPER_NAME || "",
     NEXT_PUBLIC_DEVELOPER_URL: process.env.NEXT_PUBLIC_DEVELOPER_URL || "",
@@ -171,6 +171,7 @@ export const envs = {
   // Organization and Member IDs
   ORGANIZATION_ID: envVars.ORGANIZATION_ID,
   MEMBER_ID: envVars.MEMBER_ID,
+  USER_ID: envVars.USER_ID,
 
   // INFO DEVELOPER
   NEXT_PUBLIC_DEVELOPER_NAME: envVars.NEXT_PUBLIC_DEVELOPER_NAME,
