@@ -104,12 +104,10 @@ export class TaxonomyServiceApi extends BaseApiService {
         ...params,
       });
 
-
       console.log(
         "📤 [TaxonomyServiceApi] PAYLOAD JSON COMPLETO:",
         JSON.stringify(requestBody, null, 2),
       );
- 
 
       const data: FindTaxonomyResponse =
         await instance.post<FindTaxonomyResponse>(
