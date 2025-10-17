@@ -68,15 +68,6 @@ const envsSchema = z.object({
     )
     .default("pt,en"),
 
-  DB_MYSQL_HOST: z.string().min(1, "DB_MYSQL_HOST is required"),
-  DB_MYSQL_PORT: z
-    .string()
-    .transform((val) => parseInt(val, 10))
-    .pipe(z.number().positive("DB_MYSQL_PORT must be a positive number")),
-  DB_MYSQL_USER: z.string().min(1, "DB_MYSQL_USER is required"),
-  DB_MYSQL_PASSWORD: z.string().min(1, "DB_MYSQL_PASSWORD is required"),
-  DB_MYSQL_DATABASE: z.string().min(1, "DB_MYSQL_DATABASE is required"),
-
   BETTER_AUTH_URL: z.string().min(1, "BETTER_AUTH_URL is required"),
 
   // Resend Email Configuration
@@ -137,11 +128,6 @@ if (typeof window === "undefined") {
       | "en",
     SUPPORTED_LOCALES: process.env.NEXT_PUBLIC_SUPPORTED_LOCALES || "pt,en",
 
-    DB_MYSQL_HOST: "",
-    DB_MYSQL_PORT: 0,
-    DB_MYSQL_USER: "",
-    DB_MYSQL_PASSWORD: "",
-    DB_MYSQL_DATABASE: "",
     BETTER_AUTH_URL: "",
 
     // Resend - não devem ser acessadas no cliente
@@ -177,11 +163,6 @@ export const envs = {
   DEFAULT_LOCALE: envVars.DEFAULT_LOCALE,
   SUPPORTED_LOCALES: envVars.SUPPORTED_LOCALES,
 
-  DB_MYSQL_HOST: envVars.DB_MYSQL_HOST,
-  DB_MYSQL_PORT: envVars.DB_MYSQL_PORT,
-  DB_MYSQL_USER: envVars.DB_MYSQL_USER,
-  DB_MYSQL_PASSWORD: envVars.DB_MYSQL_PASSWORD,
-  DB_MYSQL_DATABASE: envVars.DB_MYSQL_DATABASE,
   BETTER_AUTH_URL: envVars.BETTER_AUTH_URL,
 
   // Resend Email Configuration
