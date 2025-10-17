@@ -9,7 +9,7 @@ import {
   mockCategories,
   mockProducts,
 } from "../../../../mock/dashboard/mocked-statistics-data";
-import type { ViewMode } from "../../../../types/dashboard/product/catalog/types";
+import type { ViewMode } from "../../../../types/types";
 
 export default function CatalogoPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");

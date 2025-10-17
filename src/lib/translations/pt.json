@@ -212,6 +212,35 @@
       "delivered": "Entregue",
       "cancelled": "Cancelado",
       "refunded": "Reembolsado"
+    },
+    "taxonomies": {
+      "title": "Taxonomias",
+      "subtitle": "Gerencie as categorias e classificações dos produtos",
+      "addTaxonomy": "Adicionar Taxonomia",
+      "editTaxonomy": "Editar Taxonomia",
+      "deleteTaxonomy": "Excluir Taxonomia",
+      "taxonomyName": "Nome da Taxonomia",
+      "taxonomySlug": "Slug",
+      "taxonomyParent": "Categoria Pai",
+      "taxonomyLevel": "Nível",
+      "taxonomyOrder": "Ordem",
+      "searchPlaceholder": "Buscar por nome ou ID...",
+      "searchByName": "Buscar por nome",
+      "searchById": "Buscar por ID",
+      "clearSearch": "Limpar busca",
+      "noResults": "Nenhuma taxonomia encontrada",
+      "loadingResults": "Carregando taxonomias...",
+      "errorLoading": "Erro ao carregar taxonomias",
+      "foundResults": "{{count}} taxonomia(s) encontrada(s)",
+      "columns": {
+        "id": "ID",
+        "name": "Nome",
+        "slug": "Slug",
+        "parent": "Categoria Pai",
+        "level": "Nível",
+        "order": "Ordem",
+        "actions": "Ações"
+      }
     }
   },
   "common": {

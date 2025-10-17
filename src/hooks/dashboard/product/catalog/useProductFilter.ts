@@ -5,7 +5,7 @@ import type {
   FilterOptions,
   Product,
   SortOption,
-} from "../../../../types/dashboard/product/catalog/types";
+} from "../../../../types/types";
 import { debounce } from "../../../../utils/common-utils";
 
 interface UseProductFilterProps {

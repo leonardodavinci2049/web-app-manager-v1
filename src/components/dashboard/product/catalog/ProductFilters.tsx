@@ -17,7 +17,7 @@ import type {
   FilterOptions,
   SortOption,
   ViewMode,
-} from "../../../../types/dashboard/product/catalog/types";
+} from "../../../../types/types";
 
 interface ProductFiltersProps {
   filters: FilterOptions;
