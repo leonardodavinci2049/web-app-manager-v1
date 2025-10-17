@@ -2,10 +2,7 @@
 
 import { Loader2, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type {
-  Product,
-  ViewMode,
-} from "../../../../types/dashboard/product/catalog/types";
+import type { Product, ViewMode } from "../../../../types/types";
 import { ProductCard } from "./ProductCard";
 import { ProductGridSkeleton } from "./ProductSkeleton";
 

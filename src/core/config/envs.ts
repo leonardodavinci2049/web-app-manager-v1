@@ -26,6 +26,10 @@ const envsSchema = z.object({
     .transform((val) => parseInt(val, 10))
     .pipe(z.number().positive("TYPE_BUSINESS must be a positive number")),
 
+  // Organization and Member IDs
+  ORGANIZATION_ID: z.string().min(1, "ORGANIZATION_ID is required"),
+  MEMBER_ID: z.string().min(1, "MEMBER_ID is required"),
+
   // INFO DEVELOPER - Variáveis públicas (disponíveis no cliente)
   // Usadas para exibir informações do desenvolvedor no footer/sobre
   NEXT_PUBLIC_DEVELOPER_NAME: z
@@ -80,6 +84,13 @@ const envsSchema = z.object({
   // Google OAuth
   GOOGLE_CLIENT_ID: z.string().min(1, "GOOGLE_CLIENT_ID is required"),
   GOOGLE_CLIENT_SECRET: z.string().min(1, "GOOGLE_CLIENT_SECRET is required"),
+
+  // API Configuration
+  API_KEY: z.string().min(1, "API_KEY is required"),
+  API_BASE_URL: z
+    .string()
+    .url("API_BASE_URL must be a valid URL")
+    .default("http://localhost:3333"),
 });
 
 // Inferir o tipo automaticamente a partir do schema
@@ -111,6 +122,10 @@ if (typeof window === "undefined") {
     APP_ID: 0,
     TYPE_BUSINESS: 0,
 
+    // Organization and Member IDs - não devem ser acessadas no cliente
+    ORGANIZATION_ID: "",
+    MEMBER_ID: "",
+
     // Estas variáveis públicas PODEM ser acessadas no cliente
     NEXT_PUBLIC_DEVELOPER_NAME: process.env.NEXT_PUBLIC_DEVELOPER_NAME || "",
     NEXT_PUBLIC_DEVELOPER_URL: process.env.NEXT_PUBLIC_DEVELOPER_URL || "",
@@ -138,6 +153,10 @@ if (typeof window === "undefined") {
     // Google OAuth - não devem ser acessadas no cliente
     GOOGLE_CLIENT_ID: "",
     GOOGLE_CLIENT_SECRET: "",
+
+    // API Configuration - não deve ser acessada no cliente
+    API_KEY: "",
+    API_BASE_URL: "http://localhost:3333",
   };
 }
 
@@ -148,6 +167,10 @@ export const envs = {
   STORE_ID: envVars.STORE_ID,
   APP_ID: envVars.APP_ID,
   TYPE_BUSINESS: envVars.TYPE_BUSINESS,
+
+  // Organization and Member IDs
+  ORGANIZATION_ID: envVars.ORGANIZATION_ID,
+  MEMBER_ID: envVars.MEMBER_ID,
 
   // INFO DEVELOPER
   NEXT_PUBLIC_DEVELOPER_NAME: envVars.NEXT_PUBLIC_DEVELOPER_NAME,
@@ -173,4 +196,8 @@ export const envs = {
   // Google OAuth
   GOOGLE_CLIENT_ID: envVars.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: envVars.GOOGLE_CLIENT_SECRET,
+
+  // API Configuration
+  API_KEY: envVars.API_KEY,
+  API_BASE_URL: envVars.API_BASE_URL,
 };
