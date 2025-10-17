@@ -42,7 +42,7 @@ export class TaxonomyServiceApi extends BaseApiService {
       pe_store_id: envs.STORE_ID,
       pe_organization_id: envs.ORGANIZATION_ID,
       pe_member_id: envs.MEMBER_ID,
-      pe_user_id: "USR-DEFAULT-USER", // Valor padrão
+      pe_user_id: envs.USER_ID, // Valor padrão
       pe_person_id: 29014, // Valor padrão conforme referência
       ...additionalData,
     };
@@ -93,7 +93,7 @@ export class TaxonomyServiceApi extends BaseApiService {
     try {
       const instance = new TaxonomyServiceApi();
       const requestBody = TaxonomyServiceApi.buildBasePayload({
-        pe_id_parent: 0, // Valor padrão - busca da raiz
+        pe_id_parent: -1, // Valor padrão - busca todos níveis
         pe_id_taxonomy: 0, // Valor padrão - sem filtro específico
         pe_taxonomia: "", // Valor padrão - sem filtro por nome
         pe_flag_inativo: 0, // Valor padrão - apenas ativos
@@ -104,18 +104,12 @@ export class TaxonomyServiceApi extends BaseApiService {
         ...params,
       });
 
-      console.log("🚀 [TaxonomyServiceApi] Enviando requisição:", {
-        endpoint: TAXONOMY_ENDPOINTS.FIND,
-        payload: requestBody,
-      });
+
       console.log(
         "📤 [TaxonomyServiceApi] PAYLOAD JSON COMPLETO:",
         JSON.stringify(requestBody, null, 2),
       );
-      console.log("🎯 [TaxonomyServiceApi] Parâmetro de busca específico:", {
-        pe_taxonomia: requestBody.pe_taxonomia,
-        pe_id_taxonomy: requestBody.pe_id_taxonomy,
-      });
+ 
 
       const data: FindTaxonomyResponse =
         await instance.post<FindTaxonomyResponse>(
