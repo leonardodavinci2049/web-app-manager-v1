@@ -3,15 +3,13 @@
  * Centraliza todas as configurações e exporta os clientes apropriados
  */
 
-// Utilitários da API_KEY
-export * from "./api-key-utils";
 // Clientes Axios
 export { default as axiosClient } from "./axios-client";
 
 // Serviço base
 export { BaseApiService } from "./base-api-service";
 // Exemplo de serviço (pode ser removido em produção)
-export { ProductService, productService } from "./product-service-example";
+
 export { default as serverAxiosClient } from "./server-axios-client";
 
 /**

@@ -1,49 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import {
-  isApiKeyConfigured,
-  warnIfApiKeyMissing,
-} from "@/lib/axios/api-key-utils";
-
-/**
- * Hook para verificar e gerenciar o status da API_KEY
- */
-export function useApiKey() {
-  const [isConfigured, setIsConfigured] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
-
-  useEffect(() => {
-    const checkApiKey = () => {
-      const configured = isApiKeyConfigured();
-      setIsConfigured(configured);
-      setIsChecking(false);
-
-      if (!configured) {
-        warnIfApiKeyMissing();
-      }
-    };
-
-    checkApiKey();
-  }, []);
-
-  const recheckApiKey = useCallback(() => {
-    setIsChecking(true);
-    const configured = isApiKeyConfigured();
-    setIsConfigured(configured);
-    setIsChecking(false);
-
-    if (!configured) {
-      warnIfApiKeyMissing();
-    }
-  }, []);
-
-  return {
-    isConfigured,
-    isChecking,
-    recheckApiKey,
-  };
-}
+import { useCallback, useState } from "react";
 
 /**
  * States para operações de API
