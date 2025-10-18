@@ -1,9 +1,9 @@
 import type { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import axios from "axios";
 import {
-  API_BASE_URL,
   API_TIMEOUTS,
   DEFAULT_HEADERS,
+  EXTERNAL_API_BASE_URL,
 } from "@/lib/constants/api-constants";
 
 /**
@@ -27,7 +27,7 @@ class AxiosClient {
 
   constructor() {
     this.instance = axios.create({
-      baseURL: API_BASE_URL,
+      baseURL: EXTERNAL_API_BASE_URL,
       timeout: API_TIMEOUTS.CLIENT_DEFAULT,
       headers: {
         ...DEFAULT_HEADERS,

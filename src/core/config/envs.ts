@@ -86,10 +86,18 @@ const envsSchema = z.object({
 
   // API Configuration
   API_KEY: z.string().min(1, "API_KEY is required"),
-  API_BASE_URL: z
+
+  // External API (NestJS Backend)
+  EXTERNAL_API_BASE_URL: z
     .string()
-    .url("API_BASE_URL must be a valid URL")
-    .default("http://localhost:3333"),
+    .url("EXTERNAL_API_BASE_URL must be a valid URL")
+    .default("http://localhost:3333/api"),
+
+  // Next.js Application Base URL (for BetterAuth and internal references)
+  NEXT_APP_BASE_URL: z
+    .string()
+    .url("NEXT_APP_BASE_URL must be a valid URL")
+    .default("http://localhost:5557"),
 });
 
 // Inferir o tipo automaticamente a partir do schema
@@ -155,7 +163,12 @@ if (typeof window === "undefined") {
 
     // API Configuration - não deve ser acessada no cliente
     API_KEY: "",
-    API_BASE_URL: "http://localhost:3333",
+
+    // External API - não deve ser acessada no cliente (apenas server-side)
+    EXTERNAL_API_BASE_URL: "http://localhost:3333/api",
+
+    // Next.js App URL - pode ser acessada no cliente se necessário
+    NEXT_APP_BASE_URL: "http://localhost:5557",
   };
 }
 
@@ -199,5 +212,10 @@ export const envs = {
 
   // API Configuration
   API_KEY: envVars.API_KEY,
-  API_BASE_URL: envVars.API_BASE_URL,
+
+  // External API (NestJS Backend) - apenas server-side
+  EXTERNAL_API_BASE_URL: envVars.EXTERNAL_API_BASE_URL,
+
+  // Next.js Application Base URL
+  NEXT_APP_BASE_URL: envVars.NEXT_APP_BASE_URL,
 };

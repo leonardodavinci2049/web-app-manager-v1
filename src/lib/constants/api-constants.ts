@@ -2,19 +2,38 @@
  * Constantes da API para endpoints e configurações
  */
 
-// Base URL da API (apenas server-side)
+// URL base da API Externa (Servidor NestJS) - apenas server-side
+// Esta é a URL do backend que fornece os dados via REST API
 // Valida rigorosamente em produção para evitar fallback silencioso
-export const API_BASE_URL = (() => {
-  const url = process.env.API_BASE_URL;
+export const EXTERNAL_API_BASE_URL = (() => {
+  const url = process.env.EXTERNAL_API_BASE_URL;
 
   if (!url) {
     if (process.env.NODE_ENV === "production") {
       throw new Error(
-        "❌ API_BASE_URL must be defined in production environment",
+        "❌ EXTERNAL_API_BASE_URL must be defined in production environment",
       );
     }
-    console.warn("⚠️  Using default API_BASE_URL for development");
-    return "http://localhost:3333";
+    console.warn("⚠️  Using default EXTERNAL_API_BASE_URL for development");
+    return "http://localhost:3333/api";
+  }
+
+  return url;
+})();
+
+// URL base da Aplicação Next.js (Frontend + API Route Handlers)
+// Esta é a URL da nossa aplicação Next.js onde ficam os Route Handlers (/api/*)
+export const NEXT_APP_BASE_URL = (() => {
+  const url = process.env.NEXT_APP_BASE_URL;
+
+  if (!url) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        "❌ NEXT_APP_BASE_URL must be defined in production environment",
+      );
+    }
+    console.warn("⚠️  Using default NEXT_APP_BASE_URL for development");
+    return "http://localhost:5557";
   }
 
   return url;
@@ -66,12 +85,12 @@ export const CHECKOUT_ENDPOINTS = {
 
 // Endpoints de Taxonomy
 export const TAXONOMY_ENDPOINTS = {
-  FIND_MENU: "/api/taxonomy/v2/taxonomy-find-menu",
-  FIND: "/api/taxonomy/v2/taxonomy-find",
-  FIND_BY_ID: "/api/taxonomy/v2/taxonomy-find-id",
-  CREATE: "/api/taxonomy/v2/taxonomy-create",
-  UPDATE: "/api/taxonomy/v2/taxonomy-update",
-  DELETE: "/api/taxonomy/v2/taxonomy-delete",
+  FIND_MENU: "/taxonomy/v2/taxonomy-find-menu",
+  FIND: "/taxonomy/v2/taxonomy-find",
+  FIND_BY_ID: "/taxonomy/v2/taxonomy-find-id",
+  CREATE: "/taxonomy/v2/taxonomy-create",
+  UPDATE: "/taxonomy/v2/taxonomy-update",
+  DELETE: "/taxonomy/v2/taxonomy-delete",
 } as const;
 
 // Endpoints de Account (Dashboard da Conta)
@@ -102,13 +121,13 @@ export const ACCOUNT_ENDPOINTS = {
 
 // Endpoints de Validação (Check if Exists)
 export const CHECK_ENDPOINTS = {
-  STATUS: "/api/check", // Health check endpoint (GET)
-  EMAIL: "/api/check/v2/check-if-email-exists",
-  CPF: "/api/check/v2/check-if-cpf-exists",
-  CNPJ: "/api/check/v2/check-if-cnpj-exists",
-  TAXONOMY_SLUG: "/api/check/v2/check-if-taxonomy-slug-exists",
-  PRODUCT_NAME: "/api/check/v2/check-if-product-name-exists",
-  PRODUCT_SLUG: "/api/check/v2/check-if-product-slug-exists",
+  STATUS: "/check", // Health check endpoint (GET)
+  EMAIL: "/check/v2/check-if-email-exists",
+  CPF: "/check/v2/check-if-cpf-exists",
+  CNPJ: "/check/v2/check-if-cnpj-exists",
+  TAXONOMY_SLUG: "/check/v2/check-if-taxonomy-slug-exists",
+  PRODUCT_NAME: "/check/v2/check-if-product-name-exists",
+  PRODUCT_SLUG: "/check/v2/check-if-product-slug-exists",
 } as const;
 
 // Configurações padrão do sistema

@@ -2,9 +2,9 @@ import type { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import axios from "axios";
 import { envs } from "@/core/config";
 import {
-  API_BASE_URL,
   API_TIMEOUTS,
   DEFAULT_HEADERS,
+  EXTERNAL_API_BASE_URL,
   RETRY_CONFIG,
 } from "@/lib/constants/api-constants";
 
@@ -29,7 +29,7 @@ class ServerAxiosClient {
   private apiKey: string;
 
   constructor() {
-    this.baseURL = API_BASE_URL;
+    this.baseURL = EXTERNAL_API_BASE_URL;
     this.apiKey = envs.API_KEY || "";
 
     if (!this.apiKey) {
