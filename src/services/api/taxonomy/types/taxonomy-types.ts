@@ -121,6 +121,31 @@ export interface DeleteTaxonomyRequest extends BaseTaxonomyRequest {
 }
 
 /**
+ * Requisição para criar relacionamento entre taxonomia e produto
+ */
+export interface CreateTaxonomyRelRequest extends BaseTaxonomyRequest {
+  pe_id_taxonomy: number;
+  pe_id_produto: number;
+}
+
+/**
+ * Requisição para listar produtos de uma taxonomia
+ */
+export interface FindTaxonomyRelProdutoRequest extends BaseTaxonomyRequest {
+  pe_id_taxonomy: number;
+  pe_qt_registros?: number;
+  pe_pagina_id?: number;
+}
+
+/**
+ * Requisição para deletar relacionamento entre taxonomia e produto
+ */
+export interface DeleteTaxonomyRelRequest extends BaseTaxonomyRequest {
+  pe_id_taxonomy: number;
+  pe_id_produto: number;
+}
+
+/**
  * Estrutura de dados da taxonomy
  */
 export interface TaxonomyData {
@@ -210,5 +235,40 @@ export interface UpdateTaxonomyResponse extends BaseTaxonomyResponse {
  * Resposta da exclusão de taxonomy
  */
 export interface DeleteTaxonomyResponse extends BaseTaxonomyResponse {
+  data: [[StoredProcedureResponse], MySQLMetadata];
+}
+
+/**
+ * Estrutura de dados de produto relacionado
+ */
+export interface TaxonomyProductData {
+  ID_PRODUTO: number;
+  PRODUTO: string;
+  SLUG?: string | null;
+  PATH_IMAGEM?: string | null;
+  PRECO?: number | null;
+  PRECO_PROMOCIONAL?: number | null;
+  QT_ESTOQUE?: number | null;
+  INATIVO?: number;
+}
+
+/**
+ * Resposta da criação de relacionamento
+ */
+export interface CreateTaxonomyRelResponse extends BaseTaxonomyResponse {
+  data: [[StoredProcedureResponse], MySQLMetadata];
+}
+
+/**
+ * Resposta da listagem de produtos relacionados
+ */
+export interface FindTaxonomyRelProdutoResponse extends BaseTaxonomyResponse {
+  data: [TaxonomyProductData[], MySQLMetadata];
+}
+
+/**
+ * Resposta da exclusão de relacionamento
+ */
+export interface DeleteTaxonomyRelResponse extends BaseTaxonomyResponse {
   data: [[StoredProcedureResponse], MySQLMetadata];
 }

@@ -109,6 +109,9 @@ export const TAXONOMY_ENDPOINTS = {
   CREATE: "/taxonomy/v2/taxonomy-create",
   UPDATE: "/taxonomy/v2/taxonomy-update",
   DELETE: "/taxonomy/v2/taxonomy-delete",
+  REL_CREATE: "/taxonomy/v2/taxonomy-rel-create",
+  REL_PRODUTO: "/taxonomy/v2/taxonomy-rel-produto",
+  REL_DELETE: "/taxonomy/v2/taxonomy-rel-delete",
 } as const;
 
 // Endpoints de Account (Dashboard da Conta)
