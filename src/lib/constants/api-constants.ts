@@ -3,7 +3,22 @@
  */
 
 // Base URL da API (apenas server-side)
-export const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3333";
+// Valida rigorosamente em produção para evitar fallback silencioso
+export const API_BASE_URL = (() => {
+  const url = process.env.API_BASE_URL;
+
+  if (!url) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        "❌ API_BASE_URL must be defined in production environment",
+      );
+    }
+    console.warn("⚠️  Using default API_BASE_URL for development");
+    return "http://localhost:3333";
+  }
+
+  return url;
+})();
 
 // Configurações de timeout (em milissegundos)
 export const API_TIMEOUTS = {
@@ -114,10 +129,67 @@ export const RETRY_CONFIG = {
 } as const;
 
 // Tipos de resposta da API
+/**
+ * Códigos de status da API externa (NestJS)
+ * ATENÇÃO: São diferentes dos códigos HTTP padrão
+ * A API retorna códigos customizados no formato 100XXX
+ */
 export const API_STATUS_CODES = {
-  SUCCESS: 100200,
+  SUCCESS: 100200, // Operação bem-sucedida
   EMPTY_RESULT: 100204, // Busca válida mas sem resultados
-  ERROR: 100400,
+  ERROR: 100400, // Erro de validação ou regra de negócio
   NOT_FOUND: 100404, // Recurso não encontrado
   UNPROCESSABLE: 100422, // Entidade não processável (deprecated - usar NOT_FOUND)
 } as const;
+
+/**
+ * Mapeia os códigos de status customizados da API para códigos HTTP padrão
+ * Útil para integração com bibliotecas que esperam status HTTP convencionais
+ *
+ * @param apiStatus - Código de status da API (100XXX)
+ * @returns Código HTTP padrão correspondente
+ *
+ * @example
+ * ```typescript
+ * const httpStatus = mapApiStatusToHttp(100200); // 200
+ * const notFoundStatus = mapApiStatusToHttp(100404); // 404
+ * ```
+ */
+export function mapApiStatusToHttp(apiStatus: number): number {
+  switch (apiStatus) {
+    case API_STATUS_CODES.SUCCESS:
+      return 200;
+    case API_STATUS_CODES.EMPTY_RESULT:
+      return 204;
+    case API_STATUS_CODES.NOT_FOUND:
+    case API_STATUS_CODES.UNPROCESSABLE:
+      return 404;
+    case API_STATUS_CODES.ERROR:
+      return 400;
+    default:
+      return 500;
+  }
+}
+
+/**
+ * Verifica se um código de status da API representa sucesso
+ *
+ * @param apiStatus - Código de status da API
+ * @returns true se for código de sucesso
+ */
+export function isApiSuccess(apiStatus: number): boolean {
+  return (
+    apiStatus === API_STATUS_CODES.SUCCESS ||
+    apiStatus === API_STATUS_CODES.EMPTY_RESULT
+  );
+}
+
+/**
+ * Verifica se um código de status da API representa erro
+ *
+ * @param apiStatus - Código de status da API
+ * @returns true se for código de erro
+ */
+export function isApiError(apiStatus: number): boolean {
+  return !isApiSuccess(apiStatus);
+}

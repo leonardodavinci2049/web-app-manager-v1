@@ -1,6 +1,10 @@
 import type { AxiosResponse } from "axios";
 import { AxiosError } from "axios";
-import { API_STATUS_CODES } from "@/lib/constants/api-constants";
+import {
+  API_STATUS_CODES,
+  isApiError,
+  isApiSuccess,
+} from "@/lib/constants/api-constants";
 import serverAxiosClient from "./server-axios-client";
 
 /**
@@ -206,8 +210,8 @@ export abstract class BaseApiService {
         return response.data;
       }
 
-      // Verifica se o statusCode indica sucesso
-      if (apiResponse.statusCode !== API_STATUS_CODES.SUCCESS) {
+      // Verifica se o statusCode indica sucesso usando função utilitária
+      if (isApiError(apiResponse.statusCode)) {
         throw new Error(apiResponse.message || "Erro na resposta da API");
       }
     }
@@ -308,7 +312,7 @@ export abstract class BaseApiService {
    * Valida se uma resposta da API é válida
    */
   protected isValidApiResponse<T>(response: ApiResponse<T>): boolean {
-    return response.statusCode === API_STATUS_CODES.SUCCESS;
+    return isApiSuccess(response.statusCode);
   }
 
   /**
