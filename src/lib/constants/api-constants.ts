@@ -50,8 +50,26 @@ export const API_TIMEOUTS = {
 
 // Endpoints de Produto
 export const PRODUCT_ENDPOINTS = {
-  FIND_PRODUCTS: "/product/v1/find-product",
-  FIND_BY_ID: "/product/v1/find-product-id",
+  // Query endpoints
+  FIND_BY_ID: "/product/v2/product-find-id",
+  FIND: "/product/v2/product-find",
+
+  // Create endpoint
+  CREATE: "/product/v2/product-create",
+
+  // Update endpoints
+  UPDATE_GENERAL: "/product/v2/product-upd-general",
+  UPDATE_NAME: "/product/v2/product-upd-name",
+  UPDATE_TYPE: "/product/v2/product-upd-type",
+  UPDATE_BRAND: "/product/v2/product-upd-brand",
+  UPDATE_STOCK: "/product/v2/product-upd-stock",
+  UPDATE_PRICE: "/product/v2/product-upd-price",
+  UPDATE_FLAGS: "/product/v2/product-upd-flags",
+  UPDATE_CHARACTERISTICS: "/product/v2/product-upd-caracteristics",
+  UPDATE_TAX_VALUES: "/product/v2/product-upd-tax-values",
+  UPDATE_SHORT_DESCRIPTION: "/product/v2/product-upd-short-description",
+  UPDATE_DESCRIPTION: "/product/v2/product-upd-description",
+  UPDATE_VARIOUS: "/product/v2/product-upd-variou",
 } as const;
 
 // Endpoints de Carrinho
