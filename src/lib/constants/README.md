@@ -73,17 +73,28 @@ if (isApiError(response.statusCode)) {
 
 ## API Base URL Validation
 
-A constante `API_BASE_URL` agora possui validação rigorosa:
+As constantes de URL agora possuem nomenclatura melhorada e validação rigorosa:
 
-- **Em produção**: Lança erro se `API_BASE_URL` não estiver definida
-- **Em desenvolvimento**: Mostra warning e usa `http://localhost:3333` como fallback
+### EXTERNAL_API_BASE_URL (API Externa - NestJS)
+- **Em produção**: Lança erro se `EXTERNAL_API_BASE_URL` não estiver definida
+- **Em desenvolvimento**: Mostra warning e usa `http://localhost:3333/api` como fallback
+- **Uso**: Para requisições ao servidor NestJS (backend REST API)
+
+### NEXT_APP_BASE_URL (Aplicação Next.js)
+- **Em produção**: Lança erro se `NEXT_APP_BASE_URL` não estiver definida  
+- **Em desenvolvimento**: Mostra warning e usa `http://localhost:5557` como fallback
+- **Uso**: Para BetterAuth, API Route Handlers (/api/*) e referências internas
 
 **Exemplo de uso correto:**
 ```typescript
-import { API_BASE_URL } from './api-constants';
+import { EXTERNAL_API_BASE_URL, NEXT_APP_BASE_URL } from './api-constants';
 
-const fullUrl = `${API_BASE_URL}${TAXONOMY_ENDPOINTS.FIND}`;
-const response = await fetch(fullUrl);
+// Requisição para API externa (NestJS)
+const externalApiUrl = `${EXTERNAL_API_BASE_URL}${TAXONOMY_ENDPOINTS.FIND}`;
+const response = await fetch(externalApiUrl);
+
+// URL da aplicação Next.js para callbacks
+const authCallback = `${NEXT_APP_BASE_URL}/api/auth/callback`;
 ```
 
 ## Environment Variables
@@ -93,8 +104,11 @@ const response = await fetch(fullUrl);
 Adicionadas ao `.env.example`:
 
 ```bash
-# NestJS API Base URL
-API_BASE_URL=http://localhost:3333
+# ===== API EXTERNA (Servidor NestJS) =====
+EXTERNAL_API_BASE_URL=http://localhost:3333/api
+
+# ===== APLICAÇÃO NEXT.JS =====  
+NEXT_APP_BASE_URL=http://localhost:5557
 
 # API Authentication Key
 API_KEY=your_api_key_here_minimum_32_characters_long_secret
