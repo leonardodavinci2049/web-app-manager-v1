@@ -69,6 +69,31 @@ export const DeleteTaxonomySchema = z.object({
 });
 
 /**
+ * Schema para criar relacionamento entre taxonomia e produto
+ */
+export const CreateTaxonomyRelSchema = z.object({
+  pe_id_taxonomy: z.number().int().positive(),
+  pe_id_produto: z.number().int().positive(),
+});
+
+/**
+ * Schema para listar produtos de uma taxonomia
+ */
+export const FindTaxonomyRelProdutoSchema = z.object({
+  pe_id_taxonomy: z.number().int().positive(),
+  pe_qt_registros: z.number().int().min(1).max(100).optional(),
+  pe_pagina_id: z.number().int().min(0).optional(),
+});
+
+/**
+ * Schema para deletar relacionamento entre taxonomia e produto
+ */
+export const DeleteTaxonomyRelSchema = z.object({
+  pe_id_taxonomy: z.number().int().positive(),
+  pe_id_produto: z.number().int().positive(),
+});
+
+/**
  * Tipos inferidos dos schemas
  */
 export type FindTaxonomyMenuInput = z.infer<typeof FindTaxonomyMenuSchema>;
@@ -77,3 +102,8 @@ export type FindTaxonomyByIdInput = z.infer<typeof FindTaxonomyByIdSchema>;
 export type CreateTaxonomyInput = z.infer<typeof CreateTaxonomySchema>;
 export type UpdateTaxonomyInput = z.infer<typeof UpdateTaxonomySchema>;
 export type DeleteTaxonomyInput = z.infer<typeof DeleteTaxonomySchema>;
+export type CreateTaxonomyRelInput = z.infer<typeof CreateTaxonomyRelSchema>;
+export type FindTaxonomyRelProdutoInput = z.infer<
+  typeof FindTaxonomyRelProdutoSchema
+>;
+export type DeleteTaxonomyRelInput = z.infer<typeof DeleteTaxonomyRelSchema>;

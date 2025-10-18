@@ -1,0 +1,382 @@
+/**
+ * TypeScript types and interfaces for Product API Service
+ * Based on API Reference: .github/api-reference/api-product-reference.md
+ */
+
+/**
+ * Custom error class for product-related errors
+ */
+export class ProductError extends Error {
+  constructor(
+    message: string,
+    public readonly code?: string,
+    public readonly statusCode?: number,
+  ) {
+    super(message);
+    this.name = "ProductError";
+    Object.setPrototypeOf(this, ProductError.prototype);
+  }
+}
+
+/**
+ * Error thrown when product is not found
+ */
+export class ProductNotFoundError extends ProductError {
+  constructor(params?: Record<string, unknown>) {
+    const message = params
+      ? `Produto não encontrado com os parâmetros: ${JSON.stringify(params)}`
+      : "Produto não encontrado";
+    super(message, "PRODUCT_NOT_FOUND", 100404);
+    this.name = "ProductNotFoundError";
+    Object.setPrototypeOf(this, ProductNotFoundError.prototype);
+  }
+}
+
+/**
+ * Error thrown when product validation fails
+ */
+export class ProductValidationError extends ProductError {
+  constructor(
+    message: string,
+    public readonly validationErrors?: Record<string, string[]>,
+  ) {
+    super(message, "PRODUCT_VALIDATION_ERROR", 100400);
+    this.name = "ProductValidationError";
+    Object.setPrototypeOf(this, ProductValidationError.prototype);
+  }
+}
+
+// ========================================
+// BASE INTERFACES
+// ========================================
+
+/**
+ * Base request interface with common parameters
+ */
+interface BaseProductRequest {
+  pe_app_id: number;
+  pe_system_client_id: number;
+  pe_store_id: number;
+  pe_organization_id: string;
+  pe_member_id: string;
+  pe_user_id: string;
+  pe_person_id: number;
+}
+
+/**
+ * Stored procedure response structure
+ */
+export interface StoredProcedureResponse {
+  sp_return_id: number;
+  sp_message: string;
+  sp_error_id: number;
+}
+
+/**
+ * MySQL metadata structure
+ */
+export interface MySQLMetadata {
+  fieldCount: number;
+  affectedRows: number;
+  insertId: number;
+  info: string;
+  serverStatus: number;
+  warningStatus: number;
+  changedRows: number;
+}
+
+/**
+ * Base response interface
+ */
+interface BaseProductResponse {
+  statusCode: number;
+  message: string;
+  recordId: number;
+  quantity: number;
+  info1: string;
+}
+
+// ========================================
+// DATA TYPES
+// ========================================
+
+/**
+ * Product detail data structure (ENDPOINT 1)
+ */
+export interface ProductDetail {
+  ID_TBL_PRODUTO: number;
+  PRODUTO: string;
+  REF: string;
+  MODELO: string;
+  ETIQUETA: string;
+  DESCRICAO_TAB: string;
+  ID_FORNECEDOR: number;
+  ID_TIPO: number;
+  ID_MARCA: number;
+  ID_FAMILIA: number;
+  ID_GRUPO: number;
+  ID_SUBGRUPO: number;
+  PESO_GR: number;
+  COMPRIMENTO_MM: number;
+  LARGURA_MM: number;
+  ALTURA_MM: number;
+  DIAMETRO_MM: number;
+  TEMPODEGARANTIA_MES: number;
+  VL_VENDA_ATACADO: number;
+  VL_VENDA_VAREJO: number;
+  VL_CORPORATIVO: number;
+  QT_ESTOQUE: number;
+  FLAG_WEBSITE_OFF: number;
+  FLAG_IMPORTADO: number;
+  INATIVO: number;
+  SLUG: string;
+  META_TITLE: string;
+  META_DESCRIPTION: string;
+  DATADOCADASTRO: string;
+  DT_UPDATE: string;
+}
+
+/**
+ * Product list item data structure (ENDPOINT 2)
+ */
+export interface ProductListItem {
+  ID_TBL_PRODUTO: number;
+  PRODUTO: string;
+  REF: string;
+  MODELO: string;
+  VL_VENDA_VAREJO: number;
+  QT_ESTOQUE: number;
+  INATIVO: number;
+  SLUG: string;
+  ID_MARCA: number;
+  MARCA: string;
+  PATH_IMAGEM: string | null;
+}
+
+// ========================================
+// REQUEST TYPES - QUERY ENDPOINTS
+// ========================================
+
+/**
+ * Request for finding product by ID (ENDPOINT 1)
+ */
+export interface FindProductByIdRequest extends BaseProductRequest {
+  pe_type_business: number; // 1 = B2B, 2 = B2C
+  pe_id_produto: number;
+  pe_slug_produto: string;
+}
+
+/**
+ * Request for listing products (ENDPOINT 2)
+ */
+export interface FindProductsRequest extends BaseProductRequest {
+  pe_id_taxonomy?: number;
+  pe_id_produto?: number;
+  pe_produto?: string;
+  pe_flag_estoque?: number;
+  pe_flag_inativo?: number;
+  pe_qt_registros?: number;
+  pe_pagina_id?: number;
+  pe_coluna_id?: number;
+  pe_ordem_id?: number;
+}
+
+// ========================================
+// REQUEST TYPES - CREATE ENDPOINT
+// ========================================
+
+/**
+ * Request for creating a new product (ENDPOINT 6)
+ */
+export interface CreateProductRequest extends BaseProductRequest {
+  pe_type_business: number;
+  pe_nome_produto: string;
+  pe_descricao_tab?: string;
+  pe_etiqueta?: string;
+  pe_ref?: string;
+  pe_modelo?: string;
+  pe_id_fornecedor?: number;
+  pe_id_tipo?: number;
+  pe_id_marca?: number;
+  pe_id_familia?: number;
+  pe_id_grupo?: number;
+  pe_id_subgrupo?: number;
+  pe_peso_gr?: number;
+  pe_comprimento_mm?: number;
+  pe_largura_mm?: number;
+  pe_altura_mm?: number;
+  pe_diametro_mm?: number;
+  pe_tempodegarantia_mes?: number;
+  pe_vl_venda_atacado?: number;
+  pe_vl_venda_varejo?: number;
+  pe_vl_corporativo?: number;
+  pe_qt_estoque?: number;
+  pe_flag_website_off?: number;
+  pe_flag_importado?: number;
+  pe_info?: string;
+}
+
+// ========================================
+// REQUEST TYPES - UPDATE ENDPOINTS
+// ========================================
+
+/**
+ * Request for updating general product data (ENDPOINT 7)
+ */
+export interface UpdateProductGeneralRequest extends BaseProductRequest {
+  pe_id_produto: number;
+  pe_nome_produto: string;
+  pe_ref: string;
+  pe_modelo: string;
+  pe_etiqueta: string;
+  pe_descricao_tab: string;
+}
+
+/**
+ * Request for updating product name (ENDPOINT 8)
+ */
+export interface UpdateProductNameRequest extends BaseProductRequest {
+  pe_id_produto: number;
+  pe_nome_produto: string;
+}
+
+/**
+ * Request for updating product type (ENDPOINT 9)
+ */
+export interface UpdateProductTypeRequest extends BaseProductRequest {
+  pe_id_produto: number;
+  pe_id_tipo: number;
+}
+
+/**
+ * Request for updating product brand (ENDPOINT 10)
+ */
+export interface UpdateProductBrandRequest extends BaseProductRequest {
+  pe_id_produto: number;
+  pe_id_marca: number;
+}
+
+/**
+ * Request for updating product stock (ENDPOINT 11)
+ */
+export interface UpdateProductStockRequest extends BaseProductRequest {
+  pe_id_produto: number;
+  pe_qt_estoque: number;
+  pe_qt_minimo: number;
+}
+
+/**
+ * Request for updating product prices (ENDPOINT 12)
+ */
+export interface UpdateProductPriceRequest extends BaseProductRequest {
+  pe_id_produto: number;
+  pe_preco_venda_atac: number;
+  pe_preco_venda_corporativo: number;
+  pe_preco_venda_vare: number;
+}
+
+/**
+ * Request for updating product flags (ENDPOINT 13)
+ */
+export interface UpdateProductFlagsRequest extends BaseProductRequest {
+  pe_id_produto: number;
+  pe_flag_inativo: number;
+  pe_flag_importado: number;
+  pe_flag_controle_fisico: number;
+  pe_flag_controle_estoque: number;
+  pe_flag_destaque: number;
+  pe_flag_promocao: number;
+  pe_flag_descontinuado: number;
+  pe_flag_servico: number;
+  pe_flag_website_off: number;
+}
+
+/**
+ * Request for updating product characteristics (ENDPOINT 14)
+ */
+export interface UpdateProductCharacteristicsRequest
+  extends BaseProductRequest {
+  pe_id_produto: number;
+  pe_peso_gr: number;
+  pe_comprimento_mm: number;
+  pe_largura_mm: number;
+  pe_altura_mm: number;
+  pe_diametro_mm: number;
+  pe_tempodegarantia_dia: number;
+  pe_tempodegarantia_mes: number;
+}
+
+/**
+ * Request for updating product tax values (ENDPOINT 15)
+ */
+export interface UpdateProductTaxValuesRequest extends BaseProductRequest {
+  pe_id_produto: number;
+  pe_cfop: string;
+  pe_cst: string;
+  pe_ean: string;
+  pe_nbm: string;
+  pe_ncm: number;
+  pe_ppb: number;
+  pe_temp: number;
+}
+
+/**
+ * Request for updating product short description (ENDPOINT 16)
+ */
+export interface UpdateProductShortDescriptionRequest
+  extends BaseProductRequest {
+  pe_id_produto: number;
+  pe_descricao_venda: string;
+}
+
+/**
+ * Request for updating product full description (ENDPOINT 17)
+ */
+export interface UpdateProductDescriptionRequest extends BaseProductRequest {
+  pe_id_produto: number;
+  pe_produto_descricao: string;
+}
+
+/**
+ * Request for updating various product data (ENDPOINT 18)
+ */
+export interface UpdateProductVariousRequest extends BaseProductRequest {
+  pe_id_produto: number;
+  pe_nome_produto: string;
+}
+
+// ========================================
+// RESPONSE TYPES - QUERY ENDPOINTS
+// ========================================
+
+/**
+ * Response for finding product by ID (ENDPOINT 1)
+ */
+export interface FindProductByIdResponse extends BaseProductResponse {
+  data: [ProductDetail[], MySQLMetadata];
+}
+
+/**
+ * Response for listing products (ENDPOINT 2)
+ */
+export interface FindProductsResponse extends BaseProductResponse {
+  data: [ProductListItem[], MySQLMetadata];
+}
+
+// ========================================
+// RESPONSE TYPES - CREATE/UPDATE ENDPOINTS
+// ========================================
+
+/**
+ * Response for creating a product (ENDPOINT 6)
+ */
+export interface CreateProductResponse extends BaseProductResponse {
+  data: [[StoredProcedureResponse], MySQLMetadata];
+}
+
+/**
+ * Response for updating product (ENDPOINTS 7-18)
+ */
+export interface UpdateProductResponse extends BaseProductResponse {
+  data: [[StoredProcedureResponse], MySQLMetadata];
+}

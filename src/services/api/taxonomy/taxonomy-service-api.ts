@@ -13,27 +13,37 @@ import {
 import { createLogger } from "@/lib/logger";
 
 import type {
+  CreateTaxonomyRelRequest,
+  CreateTaxonomyRelResponse,
   CreateTaxonomyRequest,
   CreateTaxonomyResponse,
+  DeleteTaxonomyRelRequest,
+  DeleteTaxonomyRelResponse,
   DeleteTaxonomyRequest,
   DeleteTaxonomyResponse,
   FindTaxonomyByIdRequest,
   FindTaxonomyByIdResponse,
   FindTaxonomyMenuRequest,
   FindTaxonomyMenuResponse,
+  FindTaxonomyRelProdutoRequest,
+  FindTaxonomyRelProdutoResponse,
   FindTaxonomyRequest,
   FindTaxonomyResponse,
   StoredProcedureResponse,
   TaxonomyData,
+  TaxonomyProductData,
   UpdateTaxonomyRequest,
   UpdateTaxonomyResponse,
 } from "./types/taxonomy-types";
 
 import {
+  CreateTaxonomyRelSchema,
   CreateTaxonomySchema,
+  DeleteTaxonomyRelSchema,
   DeleteTaxonomySchema,
   FindTaxonomyByIdSchema,
   FindTaxonomyMenuSchema,
+  FindTaxonomyRelProdutoSchema,
   FindTaxonomySchema,
   UpdateTaxonomySchema,
 } from "./validation/taxonomy-schemas";
@@ -389,6 +399,137 @@ export class TaxonomyServiceApi extends BaseApiService {
     }
   }
 
+  /**
+   * Endpoint 07 - Cria relacionamento entre taxonomia e produto
+   * @param params - Parâmetros com IDs de taxonomia e produto
+   * @returns Promise com resposta da criação do relacionamento
+   */
+  static async createTaxonomyRel(
+    params: Partial<CreateTaxonomyRelRequest> & {
+      pe_id_taxonomy: number;
+      pe_id_produto: number;
+    },
+  ): Promise<CreateTaxonomyRelResponse> {
+    try {
+      // Validar parâmetros
+      const validatedParams = CreateTaxonomyRelSchema.parse({
+        pe_id_taxonomy: params.pe_id_taxonomy,
+        pe_id_produto: params.pe_id_produto,
+      });
+
+      const instance = new TaxonomyServiceApi();
+      const requestBody = TaxonomyServiceApi.buildBasePayload(validatedParams);
+
+      const data: CreateTaxonomyRelResponse =
+        await instance.post<CreateTaxonomyRelResponse>(
+          TAXONOMY_ENDPOINTS.REL_CREATE,
+          requestBody,
+        );
+
+      // Verifica se a criação foi bem-sucedida usando função utilitária
+      if (isApiError(data.statusCode)) {
+        throw new Error(
+          data.message || "Erro ao criar relacionamento taxonomy-produto",
+        );
+      }
+
+      return data;
+    } catch (error) {
+      logger.error(
+        "Erro no serviço de criação de relacionamento taxonomy-produto",
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Endpoint 08 - Lista produtos relacionados a uma taxonomia
+   * @param params - Parâmetros com ID da taxonomia e paginação
+   * @returns Promise com lista de produtos
+   */
+  static async findTaxonomyRelProduto(
+    params: Partial<FindTaxonomyRelProdutoRequest> & {
+      pe_id_taxonomy: number;
+    },
+  ): Promise<FindTaxonomyRelProdutoResponse> {
+    try {
+      // Validar parâmetros
+      const validatedParams = FindTaxonomyRelProdutoSchema.parse({
+        pe_id_taxonomy: params.pe_id_taxonomy,
+        pe_qt_registros: params.pe_qt_registros,
+        pe_pagina_id: params.pe_pagina_id,
+      });
+
+      const instance = new TaxonomyServiceApi();
+      const requestBody = TaxonomyServiceApi.buildBasePayload({
+        pe_qt_registros: 20, // Valor padrão - 20 registros por página
+        pe_pagina_id: 1, // Valor padrão - primeira página
+        ...validatedParams,
+      });
+
+      const data: FindTaxonomyRelProdutoResponse =
+        await instance.post<FindTaxonomyRelProdutoResponse>(
+          TAXONOMY_ENDPOINTS.REL_PRODUTO,
+          requestBody,
+        );
+
+      // Verifica se a busca foi bem-sucedida usando função utilitária
+      if (isApiError(data.statusCode)) {
+        throw new Error(data.message || "Erro ao buscar produtos da taxonomy");
+      }
+
+      return data;
+    } catch (error) {
+      logger.error("Erro no serviço de busca de produtos da taxonomy", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Endpoint 09 - Deleta relacionamento entre taxonomia e produto
+   * @param params - Parâmetros com IDs de taxonomia e produto
+   * @returns Promise com resposta da exclusão do relacionamento
+   */
+  static async deleteTaxonomyRel(
+    params: Partial<DeleteTaxonomyRelRequest> & {
+      pe_id_taxonomy: number;
+      pe_id_produto: number;
+    },
+  ): Promise<DeleteTaxonomyRelResponse> {
+    try {
+      // Validar parâmetros
+      const validatedParams = DeleteTaxonomyRelSchema.parse({
+        pe_id_taxonomy: params.pe_id_taxonomy,
+        pe_id_produto: params.pe_id_produto,
+      });
+
+      const instance = new TaxonomyServiceApi();
+      const requestBody = TaxonomyServiceApi.buildBasePayload(validatedParams);
+
+      const data: DeleteTaxonomyRelResponse =
+        await instance.post<DeleteTaxonomyRelResponse>(
+          TAXONOMY_ENDPOINTS.REL_DELETE,
+          requestBody,
+        );
+
+      // Verifica se a exclusão foi bem-sucedida usando função utilitária
+      if (isApiError(data.statusCode)) {
+        throw new Error(
+          data.message || "Erro ao deletar relacionamento taxonomy-produto",
+        );
+      }
+
+      return data;
+    } catch (error) {
+      logger.error(
+        "Erro no serviço de exclusão de relacionamento taxonomy-produto",
+        error,
+      );
+      throw error;
+    }
+  }
+
   // ========================================
   // UTILITY METHODS
   // ========================================
@@ -451,6 +592,41 @@ export class TaxonomyServiceApi extends BaseApiService {
   ): number | null {
     const spResponse =
       TaxonomyServiceApi.extractStoredProcedureResponse(response);
+    return spResponse ? spResponse.sp_return_id : null;
+  }
+
+  /**
+   * Extrai lista de produtos relacionados da resposta da API
+   * @param response - Resposta da API
+   * @returns Lista de produtos ou array vazio
+   */
+  static extractTaxonomyProductList(
+    response: FindTaxonomyRelProdutoResponse,
+  ): TaxonomyProductData[] {
+    return response.data?.[0] ?? [];
+  }
+
+  /**
+   * Extrai resposta da stored procedure de relacionamento
+   * @param response - Resposta da API com stored procedure
+   * @returns Resposta da stored procedure ou null
+   */
+  static extractRelStoredProcedureResponse(
+    response: CreateTaxonomyRelResponse | DeleteTaxonomyRelResponse,
+  ): StoredProcedureResponse | null {
+    return response.data?.[0]?.[0] ?? null;
+  }
+
+  /**
+   * Extrai ID do relacionamento criado/deletado
+   * @param response - Resposta da API
+   * @returns ID do relacionamento ou null
+   */
+  static extractRelRecordId(
+    response: CreateTaxonomyRelResponse | DeleteTaxonomyRelResponse,
+  ): number | null {
+    const spResponse =
+      TaxonomyServiceApi.extractRelStoredProcedureResponse(response);
     return spResponse ? spResponse.sp_return_id : null;
   }
 
@@ -534,6 +710,50 @@ export class TaxonomyServiceApi extends BaseApiService {
   ): boolean {
     const spResponse =
       TaxonomyServiceApi.extractStoredProcedureResponse(response);
+    return spResponse ? spResponse.sp_error_id === 0 : false;
+  }
+
+  /**
+   * Valida se a resposta de listagem de produtos relacionados é válida
+   * @param response - Resposta da API
+   * @returns true se válida, false caso contrário
+   */
+  static isValidTaxonomyProductResponse(
+    response: FindTaxonomyRelProdutoResponse,
+  ): boolean {
+    return (
+      isApiSuccess(response.statusCode) &&
+      response.data &&
+      Array.isArray(response.data[0])
+    );
+  }
+
+  /**
+   * Valida se a resposta de operação de relacionamento (create/delete) é válida
+   * @param response - Resposta da API
+   * @returns true se válida, false caso contrário
+   */
+  static isValidRelOperationResponse(
+    response: CreateTaxonomyRelResponse | DeleteTaxonomyRelResponse,
+  ): boolean {
+    return (
+      isApiSuccess(response.statusCode) &&
+      response.data &&
+      response.data[0] &&
+      response.data[0][0] !== undefined
+    );
+  }
+
+  /**
+   * Verifica se a operação de relacionamento foi bem-sucedida baseado na stored procedure
+   * @param response - Resposta da API
+   * @returns true se bem-sucedida, false caso contrário
+   */
+  static isRelOperationSuccessful(
+    response: CreateTaxonomyRelResponse | DeleteTaxonomyRelResponse,
+  ): boolean {
+    const spResponse =
+      TaxonomyServiceApi.extractRelStoredProcedureResponse(response);
     return spResponse ? spResponse.sp_error_id === 0 : false;
   }
 }
