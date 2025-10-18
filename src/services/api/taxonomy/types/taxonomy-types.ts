@@ -1,6 +1,49 @@
 // Tipos para o serviço de taxonomias
 
 /**
+ * Custom error class for taxonomy-related errors
+ */
+export class TaxonomyError extends Error {
+  constructor(
+    message: string,
+    public readonly code?: string,
+    public readonly statusCode?: number,
+  ) {
+    super(message);
+    this.name = "TaxonomyError";
+    Object.setPrototypeOf(this, TaxonomyError.prototype);
+  }
+}
+
+/**
+ * Error thrown when taxonomy is not found
+ */
+export class TaxonomyNotFoundError extends TaxonomyError {
+  constructor(params?: Record<string, unknown>) {
+    const message = params
+      ? `Taxonomy não encontrada com os parâmetros: ${JSON.stringify(params)}`
+      : "Taxonomy não encontrada";
+    super(message, "TAXONOMY_NOT_FOUND", 100404);
+    this.name = "TaxonomyNotFoundError";
+    Object.setPrototypeOf(this, TaxonomyNotFoundError.prototype);
+  }
+}
+
+/**
+ * Error thrown when taxonomy validation fails
+ */
+export class TaxonomyValidationError extends TaxonomyError {
+  constructor(
+    message: string,
+    public readonly validationErrors?: Record<string, string[]>,
+  ) {
+    super(message, "TAXONOMY_VALIDATION_ERROR", 100400);
+    this.name = "TaxonomyValidationError";
+    Object.setPrototypeOf(this, TaxonomyValidationError.prototype);
+  }
+}
+
+/**
  * Base request interface with common parameters
  */
 interface BaseTaxonomyRequest {

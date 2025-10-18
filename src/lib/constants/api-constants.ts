@@ -116,6 +116,8 @@ export const RETRY_CONFIG = {
 // Tipos de resposta da API
 export const API_STATUS_CODES = {
   SUCCESS: 100200,
+  EMPTY_RESULT: 100204, // Busca válida mas sem resultados
   ERROR: 100400,
-  NOT_FOUND: 100422, // Quando não há dados encontrados
+  NOT_FOUND: 100404, // Recurso não encontrado
+  UNPROCESSABLE: 100422, // Entidade não processável (deprecated - usar NOT_FOUND)
 } as const;

@@ -25,17 +25,9 @@ export async function searchTaxonomiesAction(
   error?: string;
 }> {
   try {
-    console.log("🔄 [Server Action] Executando busca de taxonomias:", params);
-
     // Chama o serviço no servidor
     const response: FindTaxonomyResponse =
       await TaxonomyServiceApi.findTaxonomies(params);
-
-    console.log("✅ [Server Action] Resposta recebida:", {
-      statusCode: response.statusCode,
-      message: response.message,
-      quantity: response.quantity,
-    });
 
     // Extrai as taxonomias da resposta
     const taxonomyList = TaxonomyServiceApi.extractTaxonomyList(response);

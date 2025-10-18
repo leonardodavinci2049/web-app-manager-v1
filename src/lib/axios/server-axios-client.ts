@@ -74,18 +74,6 @@ class ServerAxiosClient {
           config.headers.Authorization = `Bearer ${this.apiKey}`;
         }
 
-        // Log estruturado para servidor
-        if (process.env.NODE_ENV === "development") {
-          console.log(
-            `[${new Date().toISOString()}] 🚀 [SERVER ${config.method?.toUpperCase()}] ${config.url}`,
-            {
-              params: config.params,
-              data: config.data,
-              retryCount: config.metadata.retryCount,
-            },
-          );
-        }
-
         return config;
       },
       (error) => {
@@ -100,25 +88,6 @@ class ServerAxiosClient {
     // Interceptor para respostas
     instance.interceptors.response.use(
       (response: AxiosResponse) => {
-        // Calcular duração da requisição
-        const duration = response.config.metadata?.startTime
-          ? Date.now() - response.config.metadata.startTime
-          : null;
-
-        if (process.env.NODE_ENV === "development") {
-          console.log(
-            `[${new Date().toISOString()}] ✅ [SERVER ${response.status}] ${response.config.url}`,
-            {
-              duration: duration ? `${duration}ms` : "unknown",
-              dataSize: JSON.stringify(response.data).length,
-              retryCount: response.config.metadata?.retryCount || 0,
-            },
-          );
-          console.log(
-            "📥 [RESPONSE DATA]:",
-            JSON.stringify(response.data, null, 2),
-          );
-        }
         return response;
       },
       async (error: AxiosError) => {
