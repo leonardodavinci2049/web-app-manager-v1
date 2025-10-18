@@ -102,13 +102,13 @@ export const ACCOUNT_ENDPOINTS = {
 
 // Endpoints de Validação (Check if Exists)
 export const CHECK_ENDPOINTS = {
-  STATUS: "/check", // Health check endpoint (GET)
-  EMAIL: "/check/v2/check-if-email-exists",
-  CPF: "/check/v2/check-if-cpf-exists",
-  CNPJ: "/check/v2/check-if-cnpj-exists",
-  TAXONOMY_SLUG: "/check/v2/check-if-taxonomy-slug-exists",
-  PRODUCT_NAME: "/check/v2/check-if-product-name-exists",
-  PRODUCT_SLUG: "/check/v2/check-if-product-slug-exists",
+  STATUS: "/api/check", // Health check endpoint (GET)
+  EMAIL: "/api/check/v2/check-if-email-exists",
+  CPF: "/api/check/v2/check-if-cpf-exists",
+  CNPJ: "/api/check/v2/check-if-cnpj-exists",
+  TAXONOMY_SLUG: "/api/check/v2/check-if-taxonomy-slug-exists",
+  PRODUCT_NAME: "/api/check/v2/check-if-product-name-exists",
+  PRODUCT_SLUG: "/api/check/v2/check-if-product-slug-exists",
 } as const;
 
 // Configurações padrão do sistema
