@@ -1,7 +1,61 @@
 import type { AxiosResponse } from "axios";
 import { AxiosError } from "axios";
-import { API_STATUS_CODES } from "@/lib/constants/api-constants";
+import {
+  API_STATUS_CODES,
+  isApiError,
+  isApiSuccess,
+} from "@/lib/constants/api-constants";
 import serverAxiosClient from "./server-axios-client";
+
+/**
+ * Custom API Error classes for better error handling
+ */
+export class ApiConnectionError extends Error {
+  constructor(message = "Não foi possível conectar à API") {
+    super(message);
+    this.name = "ApiConnectionError";
+    Object.setPrototypeOf(this, ApiConnectionError.prototype);
+  }
+}
+
+export class ApiValidationError extends Error {
+  constructor(
+    message = "Parâmetros inválidos",
+    public readonly validationErrors?: Record<string, string[]>,
+  ) {
+    super(message);
+    this.name = "ApiValidationError";
+    Object.setPrototypeOf(this, ApiValidationError.prototype);
+  }
+}
+
+export class ApiAuthenticationError extends Error {
+  constructor(message = "Não autorizado") {
+    super(message);
+    this.name = "ApiAuthenticationError";
+    Object.setPrototypeOf(this, ApiAuthenticationError.prototype);
+  }
+}
+
+export class ApiNotFoundError extends Error {
+  constructor(message = "Recurso não encontrado") {
+    super(message);
+    this.name = "ApiNotFoundError";
+    Object.setPrototypeOf(this, ApiNotFoundError.prototype);
+  }
+}
+
+export class ApiServerError extends Error {
+  constructor(
+    message = "Erro interno do servidor",
+    public readonly statusCode?: number,
+  ) {
+    super(message);
+    this.name = "ApiServerError";
+    Object.setPrototypeOf(this, ApiServerError.prototype);
+  }
+}
+
 /**
  * Interface para resposta padrão da API
  */
@@ -156,8 +210,8 @@ export abstract class BaseApiService {
         return response.data;
       }
 
-      // Verifica se o statusCode indica sucesso
-      if (apiResponse.statusCode !== API_STATUS_CODES.SUCCESS) {
+      // Verifica se o statusCode indica sucesso usando função utilitária
+      if (isApiError(apiResponse.statusCode)) {
         throw new Error(apiResponse.message || "Erro na resposta da API");
       }
     }
@@ -177,21 +231,48 @@ export abstract class BaseApiService {
 
         // Se a resposta tem estrutura da API
         if (data && typeof data === "object" && "message" in data) {
-          return new Error(data.message || "Erro na API");
+          // Retorna erro específico baseado no status
+          switch (status) {
+            case 400:
+              return new ApiValidationError(
+                data.message || "Requisição inválida",
+              );
+            case 401:
+            case 403:
+              return new ApiAuthenticationError(
+                data.message || "Não autorizado",
+              );
+            case 404:
+              return new ApiNotFoundError(
+                data.message || "Recurso não encontrado",
+              );
+            case 500:
+            case 502:
+            case 503:
+            case 504:
+              return new ApiServerError(
+                data.message || "Erro interno do servidor",
+                status,
+              );
+            default:
+              return new Error(data.message || "Erro na API");
+          }
         }
 
-        // Mensagens padrão por código de status
+        // Mensagens padrão por código de status (sem estrutura da API)
         switch (status) {
           case 400:
-            return new Error("Requisição inválida");
+            return new ApiValidationError("Requisição inválida");
           case 401:
-            return new Error("Não autorizado");
           case 403:
-            return new Error("Acesso negado");
+            return new ApiAuthenticationError("Não autorizado");
           case 404:
-            return new Error("Recurso não encontrado");
+            return new ApiNotFoundError("Recurso não encontrado");
           case 500:
-            return new Error("Erro interno do servidor");
+          case 502:
+          case 503:
+          case 504:
+            return new ApiServerError("Erro interno do servidor", status);
           default:
             return new Error(`Erro HTTP ${status}`);
         }
@@ -199,7 +280,7 @@ export abstract class BaseApiService {
 
       // Erro de requisição (sem resposta)
       if (error.request) {
-        return new Error("Erro de conexão com a API");
+        return new ApiConnectionError("Erro de conexão com a API");
       }
 
       // Erro de configuração
@@ -231,7 +312,7 @@ export abstract class BaseApiService {
    * Valida se uma resposta da API é válida
    */
   protected isValidApiResponse<T>(response: ApiResponse<T>): boolean {
-    return response.statusCode === API_STATUS_CODES.SUCCESS;
+    return isApiSuccess(response.statusCode);
   }
 
   /**

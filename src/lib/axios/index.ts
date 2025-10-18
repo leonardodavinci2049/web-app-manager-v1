@@ -5,10 +5,15 @@
 
 // Clientes Axios
 export { default as axiosClient } from "./axios-client";
-
-// Serviço base
-export { BaseApiService } from "./base-api-service";
-// Exemplo de serviço (pode ser removido em produção)
+// Classes de erro personalizadas
+export {
+  ApiAuthenticationError,
+  ApiConnectionError,
+  ApiNotFoundError,
+  ApiServerError,
+  ApiValidationError,
+  BaseApiService,
+} from "./base-api-service";
 
 export { default as serverAxiosClient } from "./server-axios-client";
 

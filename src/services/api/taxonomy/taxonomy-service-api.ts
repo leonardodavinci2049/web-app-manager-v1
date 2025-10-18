@@ -6,6 +6,8 @@ import { envs } from "@/core/config";
 import { BaseApiService } from "@/lib/axios/base-api-service";
 import {
   API_STATUS_CODES,
+  isApiError,
+  isApiSuccess,
   TAXONOMY_ENDPOINTS,
 } from "@/lib/constants/api-constants";
 import { createLogger } from "@/lib/logger";
@@ -86,8 +88,8 @@ export class TaxonomyServiceApi extends BaseApiService {
           requestBody,
         );
 
-      // Verifica se a busca foi bem-sucedida
-      if (data.statusCode !== API_STATUS_CODES.SUCCESS) {
+      // Verifica se a busca foi bem-sucedida usando função utilitária
+      if (isApiError(data.statusCode)) {
         throw new Error(data.message || "Erro ao buscar taxonomias para menu");
       }
 
@@ -204,8 +206,8 @@ export class TaxonomyServiceApi extends BaseApiService {
       };
     }
 
-    // Verifica se a busca foi bem-sucedida
-    if (data.statusCode !== API_STATUS_CODES.SUCCESS) {
+    // Verifica se a busca foi bem-sucedida usando função utilitária
+    if (isApiError(data.statusCode)) {
       throw new Error(data.message || "Erro ao buscar taxonomias");
     }
 
@@ -239,8 +241,8 @@ export class TaxonomyServiceApi extends BaseApiService {
           requestBody,
         );
 
-      // Verifica se a busca foi bem-sucedida
-      if (data.statusCode !== API_STATUS_CODES.SUCCESS) {
+      // Verifica se a busca foi bem-sucedida usando função utilitária
+      if (isApiError(data.statusCode)) {
         throw new Error(data.message || "Erro ao buscar taxonomy por ID");
       }
 
@@ -281,8 +283,8 @@ export class TaxonomyServiceApi extends BaseApiService {
           requestBody,
         );
 
-      // Verifica se a criação foi bem-sucedida
-      if (data.statusCode !== API_STATUS_CODES.SUCCESS) {
+      // Verifica se a criação foi bem-sucedida usando função utilitária
+      if (isApiError(data.statusCode)) {
         throw new Error(data.message || "Erro ao criar taxonomy");
       }
 
@@ -338,8 +340,8 @@ export class TaxonomyServiceApi extends BaseApiService {
           requestBody,
         );
 
-      // Verifica se a atualização foi bem-sucedida
-      if (data.statusCode !== API_STATUS_CODES.SUCCESS) {
+      // Verifica se a atualização foi bem-sucedida usando função utilitária
+      if (isApiError(data.statusCode)) {
         throw new Error(data.message || "Erro ao atualizar taxonomy");
       }
 
@@ -375,8 +377,8 @@ export class TaxonomyServiceApi extends BaseApiService {
           requestBody,
         );
 
-      // Verifica se a exclusão foi bem-sucedida
-      if (data.statusCode !== API_STATUS_CODES.SUCCESS) {
+      // Verifica se a exclusão foi bem-sucedida usando função utilitária
+      if (isApiError(data.statusCode)) {
         throw new Error(data.message || "Erro ao excluir taxonomy");
       }
 
@@ -465,7 +467,7 @@ export class TaxonomyServiceApi extends BaseApiService {
     response: FindTaxonomyMenuResponse,
   ): boolean {
     return (
-      response.statusCode === API_STATUS_CODES.SUCCESS &&
+      isApiSuccess(response.statusCode) &&
       response.data &&
       Array.isArray(response.data[0])
     );
@@ -478,7 +480,7 @@ export class TaxonomyServiceApi extends BaseApiService {
    */
   static isValidTaxonomyResponse(response: FindTaxonomyResponse): boolean {
     return (
-      response.statusCode === API_STATUS_CODES.SUCCESS &&
+      isApiSuccess(response.statusCode) &&
       response.data &&
       Array.isArray(response.data[0])
     );
@@ -493,7 +495,7 @@ export class TaxonomyServiceApi extends BaseApiService {
     response: FindTaxonomyByIdResponse,
   ): boolean {
     return (
-      response.statusCode === API_STATUS_CODES.SUCCESS &&
+      isApiSuccess(response.statusCode) &&
       response.data &&
       response.data[0] &&
       response.data[0][0] !== undefined
@@ -512,7 +514,7 @@ export class TaxonomyServiceApi extends BaseApiService {
       | DeleteTaxonomyResponse,
   ): boolean {
     return (
-      response.statusCode === API_STATUS_CODES.SUCCESS &&
+      isApiSuccess(response.statusCode) &&
       response.data &&
       response.data[0] &&
       response.data[0][0] !== undefined
