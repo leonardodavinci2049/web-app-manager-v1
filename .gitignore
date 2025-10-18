@@ -45,7 +45,6 @@ next-env.d.ts
 tasks-project-next.md
 ecosystem.config.js
 /generated/prisma
-.github/copilot-instructions.md
-.github/api-reference
+.github/
 
 /generated/prisma
