@@ -26,7 +26,10 @@ const envsSchema = z.object({
     .transform((val) => parseInt(val, 10))
     .pipe(z.number().positive("TYPE_BUSINESS must be a positive number")),
 
-  // Organization and Member IDs
+  // Organization, Member and User IDs
+  // ⚠️ DEVELOPMENT ONLY: Em produção, estes valores devem vir da sessão do usuário
+  // Não devem ser fixos no .env, pois cada usuário tem seus próprios IDs
+  // TODO: Migrar para obtenção via getUserSession() em produção
   ORGANIZATION_ID: z.string().min(1, "ORGANIZATION_ID is required"),
   MEMBER_ID: z.string().min(1, "MEMBER_ID is required"),
   USER_ID: z.string().min(1, "USER_ID is required"),
@@ -46,19 +49,15 @@ const envsSchema = z.object({
     .min(1, "NEXT_PUBLIC_COMPANY_NAME is required"),
   NEXT_PUBLIC_COMPANY_PHONE: z
     .string()
-    .regex(
-      /^\(\d{2}\) \d{4}-\d{4}$/,
-      "NEXT_PUBLIC_COMPANY_PHONE must be in format (XX) XXXX-XXXX",
-    ),
+    .min(10, "NEXT_PUBLIC_COMPANY_PHONE must have at least 10 characters")
+    .max(20, "NEXT_PUBLIC_COMPANY_PHONE must have at most 20 characters"),
   NEXT_PUBLIC_COMPANY_EMAIL: z
     .string()
     .email("NEXT_PUBLIC_COMPANY_EMAIL must be a valid email"),
   NEXT_PUBLIC_COMPANY_WHATSAPP: z
     .string()
-    .regex(
-      /^55\d{11}$/,
-      "NEXT_PUBLIC_COMPANY_WHATSAPP must be in format 55XXXXXXXXXXX (country code + area code + number)",
-    ),
+    .min(10, "NEXT_PUBLIC_COMPANY_WHATSAPP must have at least 10 characters")
+    .max(20, "NEXT_PUBLIC_COMPANY_WHATSAPP must have at most 20 characters"),
   // Internacionalização (i18n)
   DEFAULT_LOCALE: z
     .string()
