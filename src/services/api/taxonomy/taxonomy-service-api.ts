@@ -8,6 +8,7 @@ import {
   API_STATUS_CODES,
   TAXONOMY_ENDPOINTS,
 } from "@/lib/constants/api-constants";
+import { createLogger } from "@/lib/logger";
 
 import type {
   CreateTaxonomyRequest,
@@ -25,6 +26,18 @@ import type {
   UpdateTaxonomyRequest,
   UpdateTaxonomyResponse,
 } from "./types/taxonomy-types";
+
+import {
+  CreateTaxonomySchema,
+  DeleteTaxonomySchema,
+  FindTaxonomyByIdSchema,
+  FindTaxonomyMenuSchema,
+  FindTaxonomySchema,
+  UpdateTaxonomySchema,
+} from "./validation/taxonomy-schemas";
+
+// Logger instance
+const logger = createLogger("TaxonomyService");
 
 /**
  * Serviço para operações relacionadas a taxonomias
@@ -57,11 +70,14 @@ export class TaxonomyServiceApi extends BaseApiService {
     params: Partial<FindTaxonomyMenuRequest> = {},
   ): Promise<FindTaxonomyMenuResponse> {
     try {
+      // Validar parâmetros
+      const validatedParams = FindTaxonomyMenuSchema.partial().parse(params);
+
       const instance = new TaxonomyServiceApi();
       const requestBody = TaxonomyServiceApi.buildBasePayload({
         pe_id_tipo: 1, // Valor padrão conforme referência
         pe_parent_id: 0, // Valor padrão - busca da raiz
-        ...params,
+        ...validatedParams,
       });
 
       const data: FindTaxonomyMenuResponse =
@@ -77,7 +93,7 @@ export class TaxonomyServiceApi extends BaseApiService {
 
       return data;
     } catch (error) {
-      console.error("Erro no serviço de taxonomias (menu):", error);
+      logger.error("Erro no serviço de taxonomias (menu)", error);
       throw error;
     }
   }
@@ -91,79 +107,109 @@ export class TaxonomyServiceApi extends BaseApiService {
     params: Partial<FindTaxonomyRequest> = {},
   ): Promise<FindTaxonomyResponse> {
     try {
-      const instance = new TaxonomyServiceApi();
-      const requestBody = TaxonomyServiceApi.buildBasePayload({
-        pe_id_parent: -1, // Valor padrão - busca todos níveis
-        pe_id_taxonomy: 0, // Valor padrão - sem filtro específico
-        pe_taxonomia: "", // Valor padrão - sem filtro por nome
-        pe_flag_inativo: 0, // Valor padrão - apenas ativos
-        pe_qt_registros: 20, // Valor padrão - 20 registros por página
-        pe_pagina_id: 0, // Valor padrão - primeira página (MySQL começa em 0)
-        pe_coluna_id: 2, // Valor padrão - ordenação por nome
-        pe_ordem_id: 1, // Valor padrão - ordem crescente
-        ...params,
-      });
+      const validatedParams = TaxonomyServiceApi.validateSearchParams(params);
+      const requestBody =
+        TaxonomyServiceApi.buildSearchPayload(validatedParams);
 
-      console.log(
-        "📤 [TaxonomyServiceApi] PAYLOAD JSON COMPLETO:",
-        JSON.stringify(requestBody, null, 2),
-      );
+      const response =
+        await TaxonomyServiceApi.executeTaxonomySearch(requestBody);
 
-      const data: FindTaxonomyResponse =
-        await instance.post<FindTaxonomyResponse>(
-          TAXONOMY_ENDPOINTS.FIND,
-          requestBody,
-        );
-
-      console.log("📦 [TaxonomyServiceApi] Resposta recebida:", {
-        statusCode: data.statusCode,
-        message: data.message,
-        quantity: data.quantity,
-        hasData: !!data.data,
-        dataLength: data.data?.[0]?.length,
-      });
-
-      // Verifica se a resposta indica "sem dados encontrados" (código 100422)
-      // Aceita tanto "Product not found" quanto "Taxonomy not found" ou mensagens similares
-      if (
-        data.statusCode === 100422 ||
-        (data.message &&
-          (data.message.includes("not found") ||
-            data.message.includes("não encontrado") ||
-            data.message.includes("sem dados")))
-      ) {
-        console.log(
-          "ℹ️ [TaxonomyServiceApi] Nenhum resultado encontrado, retornando estrutura vazia",
-        );
-        return {
-          ...data,
-          statusCode: API_STATUS_CODES.SUCCESS, // Tratar como sucesso com dados vazios
-          quantity: 0, // Garantir que quantity seja 0
-          data: [
-            [],
-            {
-              fieldCount: 0,
-              affectedRows: 0,
-              insertId: 0,
-              info: "",
-              serverStatus: 0,
-              warningStatus: 0,
-              changedRows: 0,
-            },
-          ], // Estrutura padrão vazia com metadata correto
-        };
-      }
-
-      // Verifica se a busca foi bem-sucedida
-      if (data.statusCode !== API_STATUS_CODES.SUCCESS) {
-        throw new Error(data.message || "Erro ao buscar taxonomias");
-      }
-
-      return data;
+      return TaxonomyServiceApi.handleSearchResponse(response);
     } catch (error) {
-      console.error("Erro no serviço de taxonomias (busca):", error);
+      logger.error("Erro no serviço de taxonomias (busca)", error);
       throw error;
     }
+  }
+
+  /**
+   * Valida parâmetros de busca
+   * @private
+   */
+  private static validateSearchParams(
+    params: Partial<FindTaxonomyRequest>,
+  ): Partial<FindTaxonomyRequest> {
+    try {
+      return FindTaxonomySchema.partial().parse(params);
+    } catch (error) {
+      logger.error("Erro na validação de parâmetros de busca", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Constrói payload de busca com valores padrão
+   * @private
+   */
+  private static buildSearchPayload(
+    params: Partial<FindTaxonomyRequest>,
+  ): Record<string, unknown> {
+    const payload = TaxonomyServiceApi.buildBasePayload({
+      pe_id_parent: -1, // Valor padrão - busca todos níveis
+      pe_id_taxonomy: 0, // Valor padrão - sem filtro específico
+      pe_taxonomia: "", // Valor padrão - sem filtro por nome
+      pe_flag_inativo: 0, // Valor padrão - apenas ativos
+      pe_qt_registros: 20, // Valor padrão - 20 registros por página
+      pe_pagina_id: 0, // Valor padrão - primeira página (MySQL começa em 0)
+      pe_coluna_id: 2, // Valor padrão - ordenação por nome
+      pe_ordem_id: 1, // Valor padrão - ordem crescente
+      ...params,
+    });
+
+    return payload;
+  }
+
+  /**
+   * Executa busca de taxonomias na API
+   * @private
+   */
+  private static async executeTaxonomySearch(
+    requestBody: Record<string, unknown>,
+  ): Promise<FindTaxonomyResponse> {
+    const instance = new TaxonomyServiceApi();
+    return await instance.post<FindTaxonomyResponse>(
+      TAXONOMY_ENDPOINTS.FIND,
+      requestBody,
+    );
+  }
+
+  /**
+   * Trata resposta da busca de taxonomias
+   * @private
+   */
+  private static handleSearchResponse(
+    data: FindTaxonomyResponse,
+  ): FindTaxonomyResponse {
+    // Verifica se é código de resultado vazio ou não encontrado
+    if (
+      data.statusCode === API_STATUS_CODES.EMPTY_RESULT ||
+      data.statusCode === API_STATUS_CODES.NOT_FOUND ||
+      data.statusCode === API_STATUS_CODES.UNPROCESSABLE
+    ) {
+      return {
+        ...data,
+        statusCode: API_STATUS_CODES.SUCCESS,
+        quantity: 0,
+        data: [
+          [],
+          {
+            fieldCount: 0,
+            affectedRows: 0,
+            insertId: 0,
+            info: "",
+            serverStatus: 0,
+            warningStatus: 0,
+            changedRows: 0,
+          },
+        ],
+      };
+    }
+
+    // Verifica se a busca foi bem-sucedida
+    if (data.statusCode !== API_STATUS_CODES.SUCCESS) {
+      throw new Error(data.message || "Erro ao buscar taxonomias");
+    }
+
+    return data;
   }
 
   /**
@@ -175,10 +221,16 @@ export class TaxonomyServiceApi extends BaseApiService {
     params: Partial<FindTaxonomyByIdRequest> & { pe_id_taxonomy: number },
   ): Promise<FindTaxonomyByIdResponse> {
     try {
+      // Validar parâmetros
+      const validatedParams = FindTaxonomyByIdSchema.parse({
+        pe_id_taxonomy: params.pe_id_taxonomy,
+        pe_slug_taxonomy: params.pe_slug_taxonomy,
+      });
+
       const instance = new TaxonomyServiceApi();
       const requestBody = TaxonomyServiceApi.buildBasePayload({
         pe_slug_taxonomy: "", // Valor padrão - busca por ID
-        ...params,
+        ...validatedParams,
       });
 
       const data: FindTaxonomyByIdResponse =
@@ -194,7 +246,7 @@ export class TaxonomyServiceApi extends BaseApiService {
 
       return data;
     } catch (error) {
-      console.error("Erro no serviço de taxonomy por ID:", error);
+      logger.error("Erro no serviço de taxonomy por ID", error);
       throw error;
     }
   }
@@ -211,13 +263,17 @@ export class TaxonomyServiceApi extends BaseApiService {
     },
   ): Promise<CreateTaxonomyResponse> {
     try {
-      const instance = new TaxonomyServiceApi();
-      const requestBody = TaxonomyServiceApi.buildBasePayload({
-        pe_id_tipo: 2, // Valor padrão conforme referência
-        pe_parent_id: 0, // Valor padrão - raiz
-        pe_level: 1, // Valor padrão - primeiro nível
-        ...params,
+      // Validar parâmetros
+      const validatedParams = CreateTaxonomySchema.parse({
+        pe_id_tipo: params.pe_id_tipo ?? 2,
+        pe_parent_id: params.pe_parent_id ?? 0,
+        pe_taxonomia: params.pe_taxonomia,
+        pe_slug: params.pe_slug,
+        pe_level: params.pe_level ?? 1,
       });
+
+      const instance = new TaxonomyServiceApi();
+      const requestBody = TaxonomyServiceApi.buildBasePayload(validatedParams);
 
       const data: CreateTaxonomyResponse =
         await instance.post<CreateTaxonomyResponse>(
@@ -232,7 +288,7 @@ export class TaxonomyServiceApi extends BaseApiService {
 
       return data;
     } catch (error) {
-      console.error("Erro no serviço de criação de taxonomy:", error);
+      logger.error("Erro no serviço de criação de taxonomy", error);
       throw error;
     }
   }
@@ -249,6 +305,20 @@ export class TaxonomyServiceApi extends BaseApiService {
     },
   ): Promise<UpdateTaxonomyResponse> {
     try {
+      // Validar parâmetros
+      const validatedParams = UpdateTaxonomySchema.parse({
+        pe_id_taxonomy: params.pe_id_taxonomy,
+        pe_taxonomia: params.pe_taxonomia,
+        pe_parent_id: params.pe_parent_id,
+        pe_slug: params.pe_slug,
+        pe_path_imagem: params.pe_path_imagem,
+        pe_ordem: params.pe_ordem,
+        pe_meta_title: params.pe_meta_title,
+        pe_meta_description: params.pe_meta_description,
+        pe_inativo: params.pe_inativo,
+        pe_info: params.pe_info,
+      });
+
       const instance = new TaxonomyServiceApi();
       const requestBody = TaxonomyServiceApi.buildBasePayload({
         pe_parent_id: 0, // Valor padrão - raiz
@@ -259,7 +329,7 @@ export class TaxonomyServiceApi extends BaseApiService {
         pe_meta_description: "", // Valor padrão - sem meta description
         pe_inativo: 0, // Valor padrão - ativo
         pe_info: "", // Valor padrão - sem informações extras
-        ...params,
+        ...validatedParams,
       });
 
       const data: UpdateTaxonomyResponse =
@@ -275,7 +345,7 @@ export class TaxonomyServiceApi extends BaseApiService {
 
       return data;
     } catch (error) {
-      console.error("Erro no serviço de atualização de taxonomy:", error);
+      logger.error("Erro no serviço de atualização de taxonomy", error);
       throw error;
     }
   }
@@ -289,9 +359,14 @@ export class TaxonomyServiceApi extends BaseApiService {
     params: Partial<DeleteTaxonomyRequest> & { pe_id_taxonomy: number },
   ): Promise<DeleteTaxonomyResponse> {
     try {
+      // Validar parâmetros
+      const validatedParams = DeleteTaxonomySchema.parse({
+        pe_id_taxonomy: params.pe_id_taxonomy,
+      });
+
       const instance = new TaxonomyServiceApi();
       const requestBody = TaxonomyServiceApi.buildBasePayload({
-        ...params,
+        ...validatedParams,
       });
 
       const data: DeleteTaxonomyResponse =
@@ -307,7 +382,7 @@ export class TaxonomyServiceApi extends BaseApiService {
 
       return data;
     } catch (error) {
-      console.error("Erro no serviço de exclusão de taxonomy:", error);
+      logger.error("Erro no serviço de exclusão de taxonomy", error);
       throw error;
     }
   }

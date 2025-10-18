@@ -5,11 +5,13 @@
 // Base URL da API (apenas server-side)
 export const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3333";
 
-// Configurações de timeout
+// Configurações de timeout (em milissegundos)
 export const API_TIMEOUTS = {
-  CLIENT: 15000, // 15 segundos para cliente
-  SERVER: 30000, // 30 segundos para servidor
-  UPLOAD: 60000, // 60 segundos para uploads
+  CLIENT_DEFAULT: 15000, // 15 segundos para requisições normais do cliente
+  CLIENT_UPLOAD: 60000, // 60 segundos para uploads de arquivos
+  SERVER_DEFAULT: 30000, // 30 segundos para requisições normais do servidor
+  SERVER_LONG_RUNNING: 120000, // 120 segundos para operações longas (relatórios, exports)
+  SERVER_UPLOAD: 180000, // 180 segundos para uploads grandes no servidor
 } as const;
 
 // Endpoints de Produto
@@ -114,6 +116,8 @@ export const RETRY_CONFIG = {
 // Tipos de resposta da API
 export const API_STATUS_CODES = {
   SUCCESS: 100200,
+  EMPTY_RESULT: 100204, // Busca válida mas sem resultados
   ERROR: 100400,
-  NOT_FOUND: 100422, // Quando não há dados encontrados
+  NOT_FOUND: 100404, // Recurso não encontrado
+  UNPROCESSABLE: 100422, // Entidade não processável (deprecated - usar NOT_FOUND)
 } as const;

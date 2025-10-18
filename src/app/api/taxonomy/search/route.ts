@@ -11,8 +11,6 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    console.log("🌐 [API Route] Recebendo requisição de busca:", body);
-
     // Validação básica dos parâmetros
     const params: Partial<FindTaxonomyRequest> = {
       pe_id_parent: body.pe_id_parent ? Number(body.pe_id_parent) : undefined,
@@ -38,12 +36,6 @@ export async function POST(request: NextRequest) {
     // Calcula informações adicionais
     const qtdRegistros = params.pe_qt_registros || 20;
     const totalPages = Math.ceil((response.quantity || 0) / qtdRegistros);
-
-    console.log("✅ [API Route] Resposta processada:", {
-      statusCode: response.statusCode,
-      quantity: response.quantity,
-      taxonomiesCount: taxonomyList.length,
-    });
 
     return NextResponse.json({
       success: true,
