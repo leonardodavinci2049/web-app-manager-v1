@@ -1,6 +1,22 @@
 import type { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import axios from "axios";
-import { API_BASE_URL, DEFAULT_HEADERS } from "@/lib/constants/api-constants";
+import {
+  API_BASE_URL,
+  API_TIMEOUTS,
+  DEFAULT_HEADERS,
+} from "@/lib/constants/api-constants";
+
+/**
+ * Extensão do tipo InternalAxiosRequestConfig para incluir metadata
+ */
+declare module "axios" {
+  export interface InternalAxiosRequestConfig {
+    metadata?: {
+      startTime: number;
+      retryCount?: number;
+    };
+  }
+}
 
 /**
  * Cliente Axios configurado para todas as requisições da API
@@ -8,14 +24,11 @@ import { API_BASE_URL, DEFAULT_HEADERS } from "@/lib/constants/api-constants";
  */
 class AxiosClient {
   private instance: AxiosInstance;
-  private apiKey: string;
 
   constructor() {
-    this.apiKey = process.env.NEXT_PUBLIC_API_KEY || process.env.API_KEY || "";
-
     this.instance = axios.create({
       baseURL: API_BASE_URL,
-      timeout: 15000, // 15 segundos - aumentado para melhor estabilidade
+      timeout: API_TIMEOUTS.CLIENT_DEFAULT,
       headers: {
         ...DEFAULT_HEADERS,
         Accept: "application/json",
@@ -33,38 +46,27 @@ class AxiosClient {
     // Interceptor para requisições
     this.instance.interceptors.request.use(
       (config) => {
-        // Adicionar API_KEY ao body das requisições POST/PUT/PATCH
-        if (
-          config.method &&
-          ["post", "put", "patch"].includes(config.method.toLowerCase())
-        ) {
-          const data = config.data || {};
-          config.data = {
-            ...data,
-            API_KEY: this.apiKey,
-          };
-        }
+        // Adicionar timestamp de início da requisição
+        config.metadata = { startTime: Date.now() };
 
-        // Adicionar API_KEY aos parâmetros para requisições GET/DELETE
-        if (
-          config.method &&
-          ["get", "delete"].includes(config.method.toLowerCase())
-        ) {
-          config.params = {
-            ...config.params,
-            API_KEY: this.apiKey,
-          };
-        }
-
-        // Log apenas em desenvolvimento
+        // Log apenas em desenvolvimento com timestamp
         if (process.env.NODE_ENV === "development") {
-          console.log(`🚀 [${config.method?.toUpperCase()}] ${config.url}`);
+          console.log(
+            `[${new Date().toISOString()}] 🚀 ${config.method?.toUpperCase()} ${config.url}`,
+            {
+              params: config.params,
+              headers: config.headers,
+            },
+          );
         }
 
         return config;
       },
       (error) => {
-        console.error("❌ [Request Error]", error);
+        console.error(
+          `[${new Date().toISOString()}] ❌ [Request Error]`,
+          error,
+        );
         return Promise.reject(error);
       },
     );
@@ -72,13 +74,41 @@ class AxiosClient {
     // Interceptor para respostas
     this.instance.interceptors.response.use(
       (response: AxiosResponse) => {
-        // Log apenas em desenvolvimento
+        // Calcular duração da requisição
+        const duration = response.config.metadata?.startTime
+          ? Date.now() - response.config.metadata.startTime
+          : null;
+
+        // Log apenas em desenvolvimento com timestamp e duração
         if (process.env.NODE_ENV === "development") {
-          console.log(`✅ [${response.status}] ${response.config.url}`);
+          console.log(
+            `[${new Date().toISOString()}] ✅ ${response.status} ${response.config.url}`,
+            {
+              duration: duration ? `${duration}ms` : "unknown",
+              dataSize: JSON.stringify(response.data).length,
+            },
+          );
         }
         return response;
       },
       (error: AxiosError) => {
+        // Calcular duração da requisição com erro
+        const duration = error.config?.metadata?.startTime
+          ? Date.now() - error.config.metadata.startTime
+          : null;
+
+        // Log estruturado de erros
+        if (process.env.NODE_ENV === "development") {
+          console.error(
+            `[${new Date().toISOString()}] ❌ ${error.response?.status || "NO_STATUS"} ${error.config?.url}`,
+            {
+              duration: duration ? `${duration}ms` : "unknown",
+              message: error.message,
+              data: error.response?.data,
+            },
+          );
+        }
+
         // Tratamento global de erros
         this.handleResponseError(error);
         return Promise.reject(error);
@@ -91,15 +121,6 @@ class AxiosClient {
    */
   private handleResponseError(error: AxiosError): void {
     const status = error.response?.status;
-    const url = error.config?.url;
-
-    // Log estruturado do erro
-    if (process.env.NODE_ENV === "development") {
-      console.error(`❌ [${status}] ${url}:`, {
-        message: error.message,
-        data: error.response?.data,
-      });
-    }
 
     // Tratamento específico por código de status
     switch (status) {
@@ -107,11 +128,11 @@ class AxiosClient {
         console.warn("Requisição inválida - verifique os dados enviados");
         break;
       case 401:
-        console.warn("API_KEY inválida ou ausente");
+        console.warn("Não autorizado - autenticação necessária");
         this.handleUnauthorized();
         break;
       case 403:
-        console.warn("Acesso negado - API_KEY sem permissões suficientes");
+        console.warn("Acesso negado - permissões insuficientes");
         break;
       case 404:
         console.warn("Endpoint não encontrado");
@@ -135,31 +156,17 @@ class AxiosClient {
   }
 
   /**
-   * Obtém a API_KEY configurada
-   */
-  public getApiKey(): string {
-    return this.apiKey;
-  }
-
-  /**
-   * Verifica se a API_KEY está configurada
-   */
-  public isApiKeyConfigured(): boolean {
-    return Boolean(this.apiKey && this.apiKey.length > 0);
-  }
-
-  /**
-   * Trata erro de API_KEY inválida
+   * Trata erro de não autorizado
    */
   private handleUnauthorized(): void {
     console.warn(
-      "API_KEY inválida ou ausente. Verifique as variáveis de ambiente.",
+      "Acesso não autorizado. Faça login novamente ou verifique suas permissões.",
     );
 
     // Em desenvolvimento, mostrar dica útil
     if (process.env.NODE_ENV === "development") {
       console.info(
-        "💡 Dica: Verifique se a variável API_KEY está definida no arquivo .env",
+        "💡 Dica: Requisições do cliente devem passar por API Routes ou Server Actions que gerenciam autenticação",
       );
     }
   }

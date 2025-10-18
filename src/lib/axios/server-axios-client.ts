@@ -1,7 +1,24 @@
 import type { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import axios from "axios";
 import { envs } from "@/core/config";
-import { API_BASE_URL, DEFAULT_HEADERS } from "@/lib/constants/api-constants";
+import {
+  API_BASE_URL,
+  API_TIMEOUTS,
+  DEFAULT_HEADERS,
+  RETRY_CONFIG,
+} from "@/lib/constants/api-constants";
+
+/**
+ * Extensão do tipo InternalAxiosRequestConfig para incluir metadata
+ */
+declare module "axios" {
+  export interface InternalAxiosRequestConfig {
+    metadata?: {
+      startTime: number;
+      retryCount?: number;
+    };
+  }
+}
 
 /**
  * Cliente Axios configurado para uso no servidor (Server Components e API Routes)
@@ -26,7 +43,7 @@ class ServerAxiosClient {
   private createInstance(): AxiosInstance {
     const instance = axios.create({
       baseURL: this.baseURL,
-      timeout: 30000, // 30 segundos (maior timeout para servidor)
+      timeout: API_TIMEOUTS.SERVER_DEFAULT,
       headers: {
         ...DEFAULT_HEADERS,
         Accept: "application/json",
@@ -46,6 +63,12 @@ class ServerAxiosClient {
     // Interceptor para requisições
     instance.interceptors.request.use(
       (config) => {
+        // Adicionar timestamp de início e contagem de retry
+        config.metadata = {
+          startTime: Date.now(),
+          retryCount: config.metadata?.retryCount || 0,
+        };
+
         // Adicionar API_KEY ao header Authorization
         if (this.apiKey) {
           config.headers.Authorization = `Bearer ${this.apiKey}`;
@@ -54,14 +77,22 @@ class ServerAxiosClient {
         // Log estruturado para servidor
         if (process.env.NODE_ENV === "development") {
           console.log(
-            `🚀 [SERVER ${config.method?.toUpperCase()}] ${config.url}`,
+            `[${new Date().toISOString()}] 🚀 [SERVER ${config.method?.toUpperCase()}] ${config.url}`,
+            {
+              params: config.params,
+              data: config.data,
+              retryCount: config.metadata.retryCount,
+            },
           );
         }
 
         return config;
       },
       (error) => {
-        console.error("[Server Request Error]", error);
+        console.error(
+          `[${new Date().toISOString()}] [Server Request Error]`,
+          error,
+        );
         return Promise.reject(error);
       },
     );
@@ -69,8 +100,20 @@ class ServerAxiosClient {
     // Interceptor para respostas
     instance.interceptors.response.use(
       (response: AxiosResponse) => {
+        // Calcular duração da requisição
+        const duration = response.config.metadata?.startTime
+          ? Date.now() - response.config.metadata.startTime
+          : null;
+
         if (process.env.NODE_ENV === "development") {
-          console.log(`✅ [SERVER ${response.status}] ${response.config.url}`);
+          console.log(
+            `[${new Date().toISOString()}] ✅ [SERVER ${response.status}] ${response.config.url}`,
+            {
+              duration: duration ? `${duration}ms` : "unknown",
+              dataSize: JSON.stringify(response.data).length,
+              retryCount: response.config.metadata?.retryCount || 0,
+            },
+          );
           console.log(
             "📥 [RESPONSE DATA]:",
             JSON.stringify(response.data, null, 2),
@@ -78,16 +121,51 @@ class ServerAxiosClient {
         }
         return response;
       },
-      (error: AxiosError) => {
+      async (error: AxiosError) => {
+        // Calcular duração da requisição com erro
+        const duration = error.config?.metadata?.startTime
+          ? Date.now() - error.config.metadata.startTime
+          : null;
+
         // Log estruturado de erros do servidor
-        console.error("[Server API Error]", {
+        console.error(`[${new Date().toISOString()}] [Server API Error]`, {
           status: error.response?.status,
           message: error.message,
           url: error.config?.url,
           method: error.config?.method?.toUpperCase(),
+          duration: duration ? `${duration}ms` : "unknown",
           data: error.response?.data,
-          timestamp: new Date().toISOString(),
+          retryCount: error.config?.metadata?.retryCount || 0,
         });
+
+        // Implementar retry logic
+        const retryCount = error.config?.metadata?.retryCount || 0;
+        const shouldRetry =
+          error.config &&
+          retryCount < RETRY_CONFIG.MAX_RETRIES &&
+          this.shouldRetryRequest(error);
+
+        if (shouldRetry && error.config) {
+          // Incrementar contagem de retry
+          error.config.metadata = {
+            ...error.config.metadata,
+            startTime: Date.now(),
+            retryCount: retryCount + 1,
+          };
+
+          // Calcular delay exponencial: 1s, 2s, 4s, etc.
+          const delay = RETRY_CONFIG.RETRY_DELAY * 2 ** retryCount;
+
+          console.warn(
+            `[${new Date().toISOString()}] 🔄 Retry ${retryCount + 1}/${RETRY_CONFIG.MAX_RETRIES} em ${delay}ms para ${error.config.url}`,
+          );
+
+          // Aguardar antes de fazer retry
+          await new Promise((resolve) => setTimeout(resolve, delay));
+
+          // Fazer retry da requisição
+          return instance.request(error.config);
+        }
 
         return Promise.reject(error);
       },
@@ -149,6 +227,28 @@ class ServerAxiosClient {
 
   public isApiKeyConfigured(): boolean {
     return Boolean(this.apiKey && this.apiKey.length > 0);
+  }
+
+  /**
+   * Determina se deve fazer retry da requisição
+   */
+  private shouldRetryRequest(error: AxiosError): boolean {
+    // Retry apenas para métodos idempotentes
+    const idempotentMethods = ["GET", "HEAD", "OPTIONS", "PUT", "DELETE"];
+    const method = error.config?.method?.toUpperCase();
+
+    if (!method || !idempotentMethods.includes(method)) {
+      return false;
+    }
+
+    // Retry para erros de rede (sem resposta)
+    if (!error.response) {
+      return true;
+    }
+
+    // Retry para códigos de status específicos
+    const status = error.response.status;
+    return (RETRY_CONFIG.RETRY_CODES as readonly number[]).includes(status);
   }
 }
 
