@@ -9,7 +9,7 @@ import { z } from "zod";
  */
 export const FindTaxonomyMenuSchema = z.object({
   pe_id_tipo: z.number().int().positive().optional(),
-  pe_parent_id: z.number().int().min(0).optional(),
+  pe_parent_id: z.number().int().min(-1).optional(), // -1 para carregar todos os níveis hierárquicos
 });
 
 /**

@@ -73,13 +73,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: Bot,
         items: [
           {
+            title: "Visão Geral de Categorias",
+            url: "/dashboard/category/category-overviews",
+          },
+          {
             title: "Lista de Categorias",
             url: "/dashboard/category/category-list",
           },
-          {
-            title: "Detalhes da Categoria",
-            url: "/dashboard/category/category-details",
-          },
+
           {
             title: "Nova Categoria",
             url: "/dashboard/category/new-category",
