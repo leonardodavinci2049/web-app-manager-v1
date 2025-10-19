@@ -211,6 +211,41 @@
       "delivered": "Delivered",
       "cancelled": "Cancelled",
       "refunded": "Refunded"
+    },
+    "category": {
+      "list": {
+        "title": "Categories",
+        "subtitle": "Manage product categories",
+        "searchPlaceholder": "Search category...",
+        "searchByName": "Search by Name",
+        "searchById": "Search by ID",
+        "buttonSearch": "Search",
+        "buttonClear": "Clear",
+        "buttonLoadMore": "Load More",
+        "sortBy": "Sort by",
+        "sortNameAsc": "Name (A-Z)",
+        "sortNameDesc": "Name (Z-A)",
+        "sortIdAsc": "ID Ascending",
+        "sortIdDesc": "ID Descending",
+        "filterStatus": "Status",
+        "statusAll": "All",
+        "statusActive": "Active",
+        "statusInactive": "Inactive",
+        "viewMode": "View",
+        "viewModeGrid": "Grid view",
+        "viewModeList": "List view",
+        "emptyState": "No categories found",
+        "emptyStateDescription": "Try adjusting filters or search",
+        "loading": "Loading...",
+        "errorLoading": "Error loading categories",
+        "cardId": "ID",
+        "cardSlug": "Slug",
+        "cardParent": "Parent Category",
+        "cardLevel": "Level",
+        "cardProducts": "Products",
+        "noImage": "No image",
+        "rootCategory": "Root"
+      }
     }
   },
   "common": {
