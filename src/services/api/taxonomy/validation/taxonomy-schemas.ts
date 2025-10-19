@@ -23,7 +23,7 @@ export const FindTaxonomySchema = z.object({
   pe_qt_registros: z.number().int().min(1).max(100).optional(),
   pe_pagina_id: z.number().int().min(0).optional(),
   pe_coluna_id: z.number().int().optional(),
-  pe_ordem_id: z.number().int().min(0).max(1).optional(),
+  pe_ordem_id: z.number().int().min(1).max(2).optional(), // 1 = ASC, 2 = DESC
 });
 
 /**
