@@ -6,9 +6,18 @@
  * Exibe informações da categoria em formato de card
  */
 
-import { FolderOpen, Layers, Package, Tag } from "lucide-react";
+import {
+  ChevronRight,
+  FolderOpen,
+  Layers,
+  Package,
+  Tag,
+  Trash2,
+} from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -24,6 +33,7 @@ interface CategoryCardProps {
 }
 
 export function CategoryCard({ category }: CategoryCardProps) {
+  const router = useRouter();
   const { t } = useTranslation();
 
   // Determinar se é categoria raiz
@@ -32,6 +42,12 @@ export function CategoryCard({ category }: CategoryCardProps) {
   // Formatar informações da categoria
   const categoryLevel = category.LEVEL || 1;
   const productCount = category.QT_RECORDS || 0;
+
+  const handleViewDetails = () => {
+    router.push(
+      `/dashboard/category/category-details?id=${category.ID_TAXONOMY}`,
+    );
+  };
 
   return (
     <Card className="group overflow-hidden transition-all hover:shadow-lg">
@@ -113,6 +129,21 @@ export function CategoryCard({ category }: CategoryCardProps) {
             {category.ANOTACOES}
           </p>
         )}
+
+        {/* Botões de Ação */}
+        <div className="flex gap-2 pt-2">
+          <Button
+            size="sm"
+            className="flex-1 gap-2"
+            onClick={handleViewDetails}
+          >
+            <ChevronRight className="h-4 w-4" />
+            {t("dashboard.category.list.buttonDetail")}
+          </Button>
+          <Button size="sm" variant="outline" className="gap-2" disabled>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

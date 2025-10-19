@@ -222,6 +222,7 @@
         "buttonSearch": "Search",
         "buttonClear": "Clear",
         "buttonLoadMore": "Load More",
+        "buttonDetail": "Detail",
         "sortBy": "Sort by",
         "sortNameAsc": "Name (A-Z)",
         "sortNameDesc": "Name (Z-A)",
@@ -248,6 +249,54 @@
         "showing": "Showing {{displayed}} of {{total}} categories",
         "allLoaded": "All categories have been loaded",
         "activeFilters": "{{count}} filter{{plural}} active{{plural}}"
+      },
+      "fields": {
+        "name": "Category Name",
+        "slug": "Slug (URL-friendly)",
+        "parent": "Parent Category",
+        "order": "Order",
+        "imagePath": "Image Path",
+        "metaTitle": "Meta Title (SEO)",
+        "metaDescription": "Meta Description (SEO)",
+        "notes": "Notes",
+        "status": "Status"
+      },
+      "placeholders": {
+        "name": "Ex: Electronics",
+        "slug": "ex-electronics",
+        "imagePath": "/images/categories/electronics.jpg",
+        "metaTitle": "Electronics and Technology - Best Products",
+        "metaDescription": "Discover our wide range of electronic products",
+        "notes": "Additional information about the category"
+      },
+      "help": {
+        "name": "Unique and descriptive category name",
+        "slug": "URL-friendly slug, use hyphens to separate words",
+        "parent": "Parent category ID (0 for root category)",
+        "order": "Display order in the list",
+        "imagePath": "Relative path to the category image",
+        "metaTitle": "Maximum 60 characters for best display",
+        "metaDescription": "Maximum 160 characters for best display",
+        "notes": "Internal notes about the category",
+        "status": "Mark as inactive to hide the category"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "buttons": {
+        "save": "Save",
+        "saving": "Saving...",
+        "cancel": "Cancel",
+        "detail": "Detail"
+      },
+      "errors": {
+        "nameRequired": "Category name is required",
+        "updateFailed": "Failed to update category",
+        "unexpectedError": "Unexpected error while processing form"
+      },
+      "messages": {
+        "updatedSuccess": "Category updated successfully!"
       }
     }
   },
