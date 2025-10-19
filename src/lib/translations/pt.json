@@ -241,6 +241,41 @@
         "order": "Ordem",
         "actions": "Ações"
       }
+    },
+    "category": {
+      "list": {
+        "title": "Categorias",
+        "subtitle": "Gerencie categorias de produtos",
+        "searchPlaceholder": "Buscar categoria...",
+        "searchByName": "Buscar por Nome",
+        "searchById": "Buscar por ID",
+        "buttonSearch": "Buscar",
+        "buttonClear": "Limpar",
+        "buttonLoadMore": "Carregar Mais",
+        "sortBy": "Ordenar por",
+        "sortNameAsc": "Nome (A-Z)",
+        "sortNameDesc": "Nome (Z-A)",
+        "sortIdAsc": "ID Crescente",
+        "sortIdDesc": "ID Decrescente",
+        "filterStatus": "Status",
+        "statusAll": "Todos",
+        "statusActive": "Ativos",
+        "statusInactive": "Inativos",
+        "viewMode": "Visualização",
+        "viewModeGrid": "Visualização em grade",
+        "viewModeList": "Visualização em lista",
+        "emptyState": "Nenhuma categoria encontrada",
+        "emptyStateDescription": "Tente ajustar os filtros ou busca",
+        "loading": "Carregando...",
+        "errorLoading": "Erro ao carregar categorias",
+        "cardId": "ID",
+        "cardSlug": "Slug",
+        "cardParent": "Categoria Pai",
+        "cardLevel": "Nível",
+        "cardProducts": "Produtos",
+        "noImage": "Sem imagem",
+        "rootCategory": "Raiz"
+      }
     }
   },
   "common": {
