@@ -23,7 +23,6 @@ export interface CategoryFilterOptions {
   searchType: "name" | "id";
   sortColumn: number;
   sortOrder: number;
-  filterStatus: number;
 }
 
 /**
@@ -36,7 +35,6 @@ export function useCategoryFilter() {
     searchType: "name",
     sortColumn: 2, // Coluna nome
     sortOrder: 1, // Ordem crescente (A-Z)
-    filterStatus: 0, // Apenas ativos
   });
 
   // Estado dos dados
@@ -58,33 +56,45 @@ export function useCategoryFilter() {
 
       startTransition(async () => {
         try {
-          const params: FindCategoriesParams = {
-            searchTerm: filters.searchTerm,
-            searchType: filters.searchType,
-            sortColumn: filters.sortColumn,
-            sortOrder: filters.sortOrder,
-            filterStatus: filters.filterStatus,
-            page: pageToFetch,
-            perPage: 20,
-          };
+          // Captura os filtros atuais no momento da execução
+          setFilters((currentFilters) => {
+            const params: FindCategoriesParams = {
+              searchTerm: currentFilters.searchTerm,
+              searchType: currentFilters.searchType,
+              sortColumn: currentFilters.sortColumn,
+              sortOrder: currentFilters.sortOrder,
+              filterStatus: 0, // Sempre buscar apenas categorias ativas
+              page: pageToFetch,
+              perPage: 20,
+            };
 
-          const response = await findCategories(params);
+            findCategories(params)
+              .then((response) => {
+                if (response.success) {
+                  if (resetPagination) {
+                    setCategories(response.data);
+                    setCurrentPage(0);
+                  } else {
+                    setCategories((prev) => [...prev, ...response.data]);
+                  }
 
-          if (response.success) {
-            if (resetPagination) {
-              setCategories(response.data);
-              setCurrentPage(0);
-            } else {
-              setCategories((prev) => [...prev, ...response.data]);
-            }
+                  setHasMore(response.hasMore);
+                  setTotalCategories(response.total);
+                } else {
+                  toast.error(response.error || "Erro ao carregar categorias");
+                  setCategories([]);
+                  setHasMore(false);
+                }
+              })
+              .catch((error) => {
+                toast.error("Erro inesperado ao carregar categorias");
+                console.error("Erro ao buscar categorias:", error);
+                setCategories([]);
+                setHasMore(false);
+              });
 
-            setHasMore(response.hasMore);
-            setTotalCategories(response.total);
-          } else {
-            toast.error(response.error || "Erro ao carregar categorias");
-            setCategories([]);
-            setHasMore(false);
-          }
+            return currentFilters;
+          });
         } catch (error) {
           toast.error("Erro inesperado ao carregar categorias");
           console.error("Erro ao buscar categorias:", error);
@@ -93,7 +103,7 @@ export function useCategoryFilter() {
         }
       });
     },
-    [filters, currentPage],
+    [currentPage],
   );
 
   /**
@@ -107,12 +117,22 @@ export function useCategoryFilter() {
     try {
       const nextPage = currentPage + 1;
 
+      // Captura os filtros atuais no momento da execução
+      const currentFilters = await new Promise<CategoryFilterOptions>(
+        (resolve) => {
+          setFilters((filters) => {
+            resolve(filters);
+            return filters;
+          });
+        },
+      );
+
       const params: FindCategoriesParams = {
-        searchTerm: filters.searchTerm,
-        searchType: filters.searchType,
-        sortColumn: filters.sortColumn,
-        sortOrder: filters.sortOrder,
-        filterStatus: filters.filterStatus,
+        searchTerm: currentFilters.searchTerm,
+        searchType: currentFilters.searchType,
+        sortColumn: currentFilters.sortColumn,
+        sortOrder: currentFilters.sortOrder,
+        filterStatus: 0, // Sempre buscar apenas categorias ativas
         page: nextPage,
         perPage: 20,
       };
@@ -132,18 +152,16 @@ export function useCategoryFilter() {
     } finally {
       setIsLoadingMore(false);
     }
-  }, [currentPage, hasMore, isLoadingMore, filters]);
+  }, [currentPage, hasMore, isLoadingMore]);
 
   /**
-   * Atualiza filtros e recarrega dados
+   * Atualiza filtros sem recarregar dados automaticamente
    */
   const updateFilters = useCallback(
     (newFilters: Partial<CategoryFilterOptions>) => {
       setFilters((prev) => ({ ...prev, ...newFilters }));
-      // Aguardar próximo render para buscar com novos filtros
-      setTimeout(() => fetchCategories(true), 0);
     },
-    [fetchCategories],
+    [],
   );
 
   /**
@@ -155,10 +173,8 @@ export function useCategoryFilter() {
       searchType: "name",
       sortColumn: 2,
       sortOrder: 1,
-      filterStatus: 0,
     });
-    setTimeout(() => fetchCategories(true), 0);
-  }, [fetchCategories]);
+  }, []);
 
   /**
    * Executa busca (ao clicar no botão buscar)
@@ -168,10 +184,11 @@ export function useCategoryFilter() {
   }, [fetchCategories]);
 
   /**
-   * Limpa busca e recarrega
+   * Limpa busca e recarrega automaticamente
    */
   const clearSearch = useCallback(() => {
     setFilters((prev) => ({ ...prev, searchTerm: "" }));
+    // Busca automaticamente após limpar para mostrar todos os resultados
     setTimeout(() => fetchCategories(true), 0);
   }, [fetchCategories]);
 

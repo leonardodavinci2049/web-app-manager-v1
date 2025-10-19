@@ -6,11 +6,9 @@
  * Fornece busca, ordenação e filtros de status para categorias
  */
 
-import { Filter, Grid3X3, List, RotateCcw, Search } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Grid3X3, List, RotateCcw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -45,14 +43,6 @@ const sortOptions = [
   { column: 1, order: 2, key: "sortIdDesc" }, // ID Decrescente
 ] as const;
 
-/**
- * Opções de status
- */
-const statusOptions = [
-  { value: 0, key: "statusActive" }, // Ativos
-  { value: 1, key: "statusInactive" }, // Inativos
-] as const;
-
 export function CategoryFilters({
   filters,
   onFiltersChange,
@@ -70,13 +60,14 @@ export function CategoryFilters({
   const activeFiltersCount = [
     filters.searchTerm && filters.searchTerm.trim() !== "",
     filters.sortColumn !== 2 || filters.sortOrder !== 1, // Não é ordenação padrão
-    filters.filterStatus !== 0, // Não é status padrão (ativos)
   ].filter(Boolean).length;
 
   // Handler para mudança de ordenação
   const handleSortChange = (value: string) => {
     const [column, order] = value.split("-").map(Number);
     onFiltersChange({ sortColumn: column, sortOrder: order });
+    // Busca automaticamente ao mudar ordenação (usando queueMicrotask para evitar loop)
+    queueMicrotask(() => onSearch());
   };
 
   // Valor atual de ordenação para o Select
@@ -85,79 +76,67 @@ export function CategoryFilters({
   return (
     <div className="space-y-6">
       {/* Barra de Busca Principal */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
-        {/* Campo de Busca */}
-        <div className="flex-1 space-y-2">
-          <Label htmlFor="search-input">
-            {t("dashboard.category.list.searchPlaceholder")}
-          </Label>
-          <div className="relative">
-            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-            <Input
-              id="search-input"
-              placeholder={t("dashboard.category.list.searchPlaceholder")}
-              value={filters.searchTerm}
-              onChange={(e) => onFiltersChange({ searchTerm: e.target.value })}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  onSearch();
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
+        {/* Espaçador para empurrar busca para direita em telas grandes */}
+        <div className="hidden lg:block lg:flex-1" />
+
+        {/* Container de Busca - 33% em telas grandes */}
+        <div className="flex items-end gap-2 lg:w-1/3">
+          {/* Campo de Busca */}
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Input
+                id="search-input"
+                placeholder={t("dashboard.category.list.searchPlaceholder")}
+                value={filters.searchTerm}
+                onChange={(e) =>
+                  onFiltersChange({ searchTerm: e.target.value })
                 }
-              }}
-              className="pl-10"
-              disabled={isLoading}
-            />
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    onSearch();
+                  }
+                }}
+                className="pl-10"
+                disabled={isLoading}
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Tipo de Busca - Badges como Radio */}
-        <div className="space-y-2">
-          <Label>{t("dashboard.category.list.buttonSearch")}</Label>
+          {/* Botões de Ação */}
           <div className="flex gap-2">
-            <Badge
-              variant={filters.searchType === "name" ? "default" : "outline"}
-              className="cursor-pointer transition-colors hover:bg-primary hover:text-primary-foreground"
-              onClick={() => onFiltersChange({ searchType: "name" })}
+            <Button
+              onClick={onSearch}
+              disabled={isLoading}
+              size="icon"
+              title={t("dashboard.category.list.buttonSearch")}
             >
-              {t("dashboard.category.list.searchByName")}
-            </Badge>
-            <Badge
-              variant={filters.searchType === "id" ? "default" : "outline"}
-              className="cursor-pointer transition-colors hover:bg-primary hover:text-primary-foreground"
-              onClick={() => onFiltersChange({ searchType: "id" })}
-            >
-              {t("dashboard.category.list.searchById")}
-            </Badge>
+              <Search className="h-4 w-4" />
+            </Button>
+            {filters.searchTerm && filters.searchTerm.trim() !== "" && (
+              <Button
+                variant="outline"
+                onClick={onClear}
+                disabled={isLoading}
+                size="icon"
+                title={t("dashboard.category.list.buttonClear")}
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            )}
           </div>
-        </div>
-
-        {/* Botões de Ação */}
-        <div className="flex gap-2">
-          <Button onClick={onSearch} disabled={isLoading} className="gap-2">
-            <Search className="h-4 w-4" />
-            {t("dashboard.category.list.buttonSearch")}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={onClear}
-            disabled={isLoading}
-            className="gap-2"
-          >
-            <RotateCcw className="h-4 w-4" />
-            {t("dashboard.category.list.buttonClear")}
-          </Button>
         </div>
       </div>
 
       {/* Filtros Secundários */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        {/* Ordenação */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <Label className="text-sm font-medium">
-              {t("dashboard.category.list.sortBy")}
-            </Label>
-          </div>
+        {/* Espaçador vazio para empurrar controles para a direita */}
+        <div className="flex-1" />
+
+        {/* Ordenação e Visualização - Alinhados à direita */}
+        <div className="flex items-center justify-end gap-3">
+          {/* Select de Ordenação */}
           <Select
             value={currentSortValue}
             onValueChange={handleSortChange}
@@ -172,67 +151,34 @@ export function CategoryFilters({
                   key={`${option.column}-${option.order}`}
                   value={`${option.column}-${option.order}`}
                 >
-                  {t(`category.list.${option.key}`)}
+                  {t(`dashboard.category.list.${option.key}`)}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-        </div>
-
-        {/* Container de Filtro de Status e Modo de Visualização */}
-        <div className="flex items-center gap-6">
-          {/* Filtro de Status */}
-          <div className="flex items-center gap-2">
-            <Label className="text-sm font-medium">
-              {t("dashboard.category.list.filterStatus")}:
-            </Label>
-            <div className="flex gap-2">
-              {statusOptions.map((status) => (
-                <Badge
-                  key={status.value}
-                  variant={
-                    filters.filterStatus === status.value
-                      ? "default"
-                      : "outline"
-                  }
-                  className="cursor-pointer transition-colors hover:bg-primary hover:text-primary-foreground"
-                  onClick={() =>
-                    onFiltersChange({ filterStatus: status.value })
-                  }
-                >
-                  {t(`category.list.${status.key}`)}
-                </Badge>
-              ))}
-            </div>
-          </div>
 
           {/* Botões de Modo de Visualização */}
-          <div className="flex items-center gap-2 border-l pl-6">
-            <Label className="text-sm font-medium">
-              {t("dashboard.category.list.viewMode")}:
-            </Label>
-            <div className="flex gap-1">
-              <Button
-                variant={viewMode === "grid" ? "default" : "outline"}
-                size="sm"
-                onClick={() => onViewModeChange("grid")}
-                disabled={isLoading}
-                className="h-8 w-8 p-0"
-                title={t("dashboard.category.list.viewModeGrid")}
-              >
-                <Grid3X3 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "outline"}
-                size="sm"
-                onClick={() => onViewModeChange("list")}
-                disabled={isLoading}
-                className="h-8 w-8 p-0"
-                title={t("dashboard.category.list.viewModeList")}
-              >
-                <List className="h-4 w-4" />
-              </Button>
-            </div>
+          <div className="flex gap-1">
+            <Button
+              variant={viewMode === "grid" ? "default" : "outline"}
+              size="sm"
+              onClick={() => onViewModeChange("grid")}
+              disabled={isLoading}
+              className="h-9 w-9 p-0"
+              title={t("dashboard.category.list.viewModeGrid")}
+            >
+              <Grid3X3 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "list" ? "default" : "outline"}
+              size="sm"
+              onClick={() => onViewModeChange("list")}
+              disabled={isLoading}
+              className="h-9 w-9 p-0"
+              title={t("dashboard.category.list.viewModeList")}
+            >
+              <List className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
