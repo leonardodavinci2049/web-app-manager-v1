@@ -13,6 +13,7 @@ import {
   findCategoryById,
   getCategoryParentName,
 } from "@/app/actions/action-categories";
+import { PageTitleSection } from "@/components/common/page-title-section";
 import { CategoryDetailsForm } from "@/components/forms/category-details-form";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -51,12 +52,19 @@ async function CategoryDetailsContent({ categoryId }: { categoryId: number }) {
 
   return (
     <div className="space-y-6 py-6">
+      {/* Título da Página */}
+      <PageTitleSection
+        titleKey="dashboard.category.details.title"
+        subtitleKey="dashboard.category.details.subtitle"
+        className="space-y-2"
+      />
+
       {/* Informações do Header */}
-      <div className="flex flex-col gap-4 px-4 lg:px-6">
+      <div className="flex flex-col gap-4">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h2 className="text-xl font-semibold tracking-tight">
             {category.TAXONOMIA}
-          </h1>
+          </h2>
           <p className="text-sm text-muted-foreground">
             Editar detalhes da categoria ID: {category.ID_TAXONOMY}
           </p>
@@ -94,7 +102,7 @@ async function CategoryDetailsContent({ categoryId }: { categoryId: number }) {
       <Separator className="my-4" />
 
       {/* Card com Formulário */}
-      <div className="px-4 lg:px-6">
+      <div className="w-full lg:w-[40%]">
         <Card className="p-6">
           <div className="mb-6">
             <h2 className="text-xl font-semibold">Editar Categoria</h2>
@@ -127,7 +135,7 @@ function CategoryDetailsLoadingFallback() {
 
   return (
     <div className="space-y-6 py-6">
-      <div className="flex flex-col gap-4 px-4 lg:px-6">
+      <div className="flex flex-col gap-4">
         <div className="h-10 w-32 animate-pulse rounded-md bg-muted" />
         <div className="space-y-2">
           <div className="h-9 w-64 animate-pulse rounded-md bg-muted" />
@@ -143,20 +151,18 @@ function CategoryDetailsLoadingFallback() {
         </div>
       </div>
 
-      <div className="px-4 lg:px-6">
-        <div className="space-y-6 rounded-lg border p-6">
-          <div className="space-y-4">
-            {formFields.map((field) => (
-              <div key={field} className="space-y-2">
-                <div className="h-4 w-24 animate-pulse rounded-md bg-muted" />
-                <div className="h-10 w-full animate-pulse rounded-md bg-muted" />
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-3 pt-6">
-            <div className="h-10 flex-1 animate-pulse rounded-md bg-muted" />
-            <div className="h-10 w-24 animate-pulse rounded-md bg-muted" />
-          </div>
+      <div className="space-y-6 rounded-lg border p-6">
+        <div className="space-y-4">
+          {formFields.map((field) => (
+            <div key={field} className="space-y-2">
+              <div className="h-4 w-24 animate-pulse rounded-md bg-muted" />
+              <div className="h-10 w-full animate-pulse rounded-md bg-muted" />
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-3 pt-6">
+          <div className="h-10 flex-1 animate-pulse rounded-md bg-muted" />
+          <div className="h-10 w-24 animate-pulse rounded-md bg-muted" />
         </div>
       </div>
     </div>
@@ -179,16 +185,18 @@ export default async function CategoryDetailsPage({ searchParams }: PageProps) {
   }
 
   return (
-    <>
-      {/* Header com Breadcrumb - Será preenchido após buscar dados */}
-      <Suspense fallback={null}>
-        <CategoryDetailsHeaderLoader categoryId={id} />
-      </Suspense>
+    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+      <div className="container mx-auto max-w-4xl">
+        {/* Header com Breadcrumb - Será preenchido após buscar dados */}
+        <Suspense fallback={null}>
+          <CategoryDetailsHeaderLoader categoryId={id} />
+        </Suspense>
 
-      {/* Conteúdo Principal com Suspense */}
-      <Suspense fallback={<CategoryDetailsLoadingFallback />}>
-        <CategoryDetailsContent categoryId={id} />
-      </Suspense>
-    </>
+        {/* Conteúdo Principal com Suspense */}
+        <Suspense fallback={<CategoryDetailsLoadingFallback />}>
+          <CategoryDetailsContent categoryId={id} />
+        </Suspense>
+      </div>
+    </div>
   );
 }

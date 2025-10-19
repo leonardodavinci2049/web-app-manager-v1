@@ -280,10 +280,34 @@
         "allLoaded": "Todas as categorias foram carregadas",
         "activeFilters": "{{count}} filtro{{plural}} ativo{{plural}}"
       },
+      "new": {
+        "title": "Nova Categoria",
+        "subtitle": "Criar uma nova categoria de produtos",
+        "breadcrumb": {
+          "dashboard": "Dashboard",
+          "categories": "Categorias",
+          "new": "Nova Categoria"
+        },
+        "sections": {
+          "basicInfo": "Informações Básicas",
+          "basicInfoDesc": "Dados principais da categoria",
+          "settings": "Configurações",
+          "settingsDesc": "Ordem e configurações visuais",
+          "seo": "SEO",
+          "seoDesc": "Otimização para motores de busca",
+          "notes": "Notas",
+          "notesDesc": "Informações adicionais"
+        },
+        "loading": "Criando categoria...",
+        "success": "Categoria criada com sucesso!",
+        "successRedirect": "Redirecionando...",
+        "backToList": "Voltar para lista"
+      },
       "fields": {
         "name": "Nome da Categoria",
         "slug": "Slug (URL amigável)",
         "parent": "Categoria Pai",
+        "level": "Nível",
         "order": "Ordem",
         "imagePath": "Caminho da Imagem",
         "metaTitle": "Meta Title (SEO)",
@@ -294,6 +318,8 @@
       "placeholders": {
         "name": "Ex: Eletrônicos",
         "slug": "ex-eletronicos",
+        "selectParent": "Selecione a categoria pai",
+        "order": "1",
         "imagePath": "/images/categories/electronics.jpg",
         "metaTitle": "Eletrônicos e Tecnologia - Melhores Produtos",
         "metaDescription": "Descubra nossa ampla linha de produtos eletrônicos",
@@ -302,13 +328,29 @@
       "help": {
         "name": "Nome único e descritivo da categoria",
         "slug": "Slug para URL amigável, use hífen para separar palavras",
-        "parent": "ID da categoria pai (0 para categoria raiz)",
+        "parent": "Selecione a categoria pai ou deixe vazio para categoria raiz",
+        "level": "Nível hierárquico (calculado automaticamente)",
         "order": "Ordem de exibição na lista",
         "imagePath": "Caminho relativo da imagem da categoria",
         "metaTitle": "Máximo 60 caracteres para melhor exibição",
         "metaDescription": "Máximo 160 caracteres para melhor exibição",
         "notes": "Notas internas sobre a categoria",
         "status": "Marque como inativo para ocultar a categoria"
+      },
+      "validation": {
+        "nameRequired": "Nome da categoria é obrigatório",
+        "nameMinLength": "Nome deve ter pelo menos 2 caracteres",
+        "nameMaxLength": "Nome não pode ter mais de 100 caracteres",
+        "slugRequired": "Slug é obrigatório",
+        "slugMinLength": "Slug deve ter pelo menos 2 caracteres",
+        "slugMaxLength": "Slug não pode ter mais de 100 caracteres",
+        "slugFormat": "Slug deve conter apenas letras, números e hífens",
+        "parentIdInvalid": "ID da categoria pai inválido",
+        "levelInvalid": "Nível deve estar entre 1 e 5",
+        "orderInvalid": "Ordem deve ser um número positivo",
+        "imagePathMaxLength": "Caminho da imagem não pode ter mais de 500 caracteres",
+        "metaTitleMaxLength": "Meta title não pode ter mais de 60 caracteres",
+        "metaDescriptionMaxLength": "Meta description não pode ter mais de 160 caracteres"
       },
       "status": {
         "active": "Ativo",
@@ -317,16 +359,33 @@
       "buttons": {
         "save": "Salvar",
         "saving": "Salvando...",
+        "create": "Criar Categoria",
+        "creating": "Criando...",
         "cancel": "Cancelar",
         "detail": "Detalhe"
       },
       "errors": {
         "nameRequired": "Nome da categoria é obrigatório",
+        "createFailed": "Falha ao criar categoria",
         "updateFailed": "Falha ao atualizar categoria",
-        "unexpectedError": "Erro inesperado ao processar formulário"
+        "unexpectedError": "Erro inesperado ao processar formulário",
+        "loadCategoriesFailed": "Erro ao carregar lista de categorias"
       },
       "messages": {
+        "createdSuccess": "Categoria criada com sucesso!",
         "updatedSuccess": "Categoria atualizada com sucesso!"
+      },
+      "options": {
+        "rootCategory": "Categoria Raiz",
+        "loading": "Carregando opções..."
+      },
+      "overviews": {
+        "title": "Visão Geral das Categorias",
+        "subtitle": "Visualize a estrutura hierárquica de categorias de produtos"
+      },
+      "details": {
+        "title": "Detalhes da Categoria",
+        "subtitle": "Visualize e edite informações detalhadas da categoria"
       }
     }
   },
