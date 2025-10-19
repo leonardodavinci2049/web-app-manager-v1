@@ -203,3 +203,113 @@ export async function getCategoryParentName(parentId: number): Promise<string> {
     return `ID ${parentId}`;
   }
 }
+
+/**
+ * Interface para parâmetros de atualização de categoria
+ */
+export interface UpdateCategoryParams {
+  id: number;
+  name: string;
+  slug?: string;
+  parentId?: number;
+  metaTitle?: string;
+  metaDescription?: string;
+  notes?: string;
+  order?: number;
+  imagePath?: string;
+  status?: number;
+}
+
+/**
+ * Interface para resposta de atualização de categoria
+ */
+export interface UpdateCategoryResponse {
+  success: boolean;
+  message: string;
+  data?: TaxonomyData;
+  error?: string;
+}
+
+/**
+ * Atualiza uma categoria existente
+ *
+ * @param params - Parâmetros de atualização
+ * @returns Resultado da atualização
+ */
+export async function updateCategory(
+  params: UpdateCategoryParams,
+): Promise<UpdateCategoryResponse> {
+  try {
+    // Verificar autenticação
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      logger.error("Usuário não autenticado");
+      return {
+        success: false,
+        message: "Usuário não autenticado",
+        error: "Usuário não autenticado",
+      };
+    }
+
+    const {
+      id,
+      name,
+      slug = "",
+      parentId = 0,
+      metaTitle = "",
+      metaDescription = "",
+      notes = "",
+      order = 1,
+      imagePath = "",
+      status = 0,
+    } = params;
+
+    // Chamar serviço da API para atualizar
+    const response = await TaxonomyServiceApi.updateTaxonomy({
+      pe_id_taxonomy: id,
+      pe_taxonomia: name,
+      pe_slug: slug,
+      pe_parent_id: parentId,
+      pe_meta_title: metaTitle,
+      pe_meta_description: metaDescription,
+      pe_info: notes,
+      pe_ordem: order,
+      pe_path_imagem: imagePath,
+      pe_inativo: status,
+    });
+
+    // Validar resposta
+    if (!TaxonomyServiceApi.isValidOperationResponse(response)) {
+      throw new Error("Resposta inválida da API");
+    }
+
+    // Verificar se a operação foi bem-sucedida
+    if (!TaxonomyServiceApi.isOperationSuccessful(response)) {
+      throw new Error("Falha ao atualizar categoria na API");
+    }
+
+    // Buscar dados atualizados
+    const updatedCategory = await findCategoryById(id);
+
+    logger.info(`Categoria ${id} atualizada com sucesso`);
+
+    return {
+      success: true,
+      message: "Categoria atualizada com sucesso",
+      data: updatedCategory || undefined,
+    };
+  } catch (error) {
+    logger.error("Erro ao atualizar categoria", error);
+    return {
+      success: false,
+      message: "Erro ao atualizar categoria",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Erro desconhecido ao atualizar categoria",
+    };
+  }
+}
