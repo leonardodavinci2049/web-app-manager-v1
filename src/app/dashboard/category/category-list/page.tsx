@@ -1,102 +1,156 @@
-"use client";
-
 /**
- * Página de Listagem de Categorias
+ * Página de Listagem de Categorias - Server Component
  *
- * Exibe listagem completa de categorias com filtros, busca e paginação
+ * Renderiza a página principal de categorias como Server Component
+ * Busca dados no servidor e passa para Client Component isolado
+ *
  * Localização: /dashboard/category/category-list
  */
 
-import { useEffect, useState } from "react";
-import { CategoryFilters } from "@/components/dashboard/category/list/CategoryFilters";
-import { CategoryGrid } from "@/components/dashboard/category/list/CategoryGrid";
-import { SiteHeaderWithBreadcrumb } from "@/components/dashboard/header/site-header-with-breadcrumb";
-import { useCategoryFilter } from "@/hooks/dashboard/category/use-category-filter";
-import { useTranslation } from "@/hooks/use-translation";
+import { Suspense } from "react";
+import { findCategories } from "@/app/actions/action-categories";
+import { CategoryListClient } from "./category-list-client";
+import { CategoryListHeaderClient } from "./category-list-header";
 
 type ViewMode = "grid" | "list";
 
-export default function CategoryListPage() {
-  const { t } = useTranslation();
+interface PageProps {
+  searchParams: Promise<{
+    search?: string;
+    sort?: string;
+    view?: ViewMode;
+  }>;
+}
 
-  // Estado do modo de visualização (default: list)
-  const [viewMode, setViewMode] = useState<ViewMode>("list");
+async function CategoryListContent({
+  searchParams,
+}: {
+  searchParams: {
+    search?: string;
+    sort?: string;
+    view?: ViewMode;
+  };
+}) {
+  // Extrair parâmetros
+  const search = searchParams.search || "";
+  const sort = searchParams.sort || "2-1";
+  const view = (searchParams.view || "list") as ViewMode;
 
-  // Hook customizado para gerenciar filtros e estado
-  const {
-    filters,
-    categories,
-    hasMore,
-    totalCategories,
-    displayedCategories,
-    isLoading,
-    isLoadingMore,
-    updateFilters,
-    handleSearch,
-    clearSearch,
-    loadMore,
-    fetchCategories,
-  } = useCategoryFilter();
+  // Parse sort
+  const [sortColumn, sortOrder] = sort.includes("-")
+    ? sort.split("-").map(Number)
+    : [2, 1];
 
-  // Carregar categorias iniciais ao montar o componente
-  useEffect(() => {
-    fetchCategories(true);
-  }, [fetchCategories]);
+  // Buscar categorias no servidor
+  const result = await findCategories({
+    searchTerm: search,
+    searchType: "name",
+    sortColumn,
+    sortOrder,
+    filterStatus: 0,
+    page: 0,
+    perPage: 20,
+  });
+
+  if (!result.success) {
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg font-semibold text-red-600">
+            Erro ao carregar categorias
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {result.error || "Tente novamente"}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <CategoryListClient
+      initialCategories={result.data}
+      totalCategories={result.total}
+      currentSearch={search}
+      currentSort={sort}
+      currentView={view}
+    />
+  );
+}
+
+export default async function CategoryListPage({ searchParams }: PageProps) {
+  const resolvedSearchParams = await searchParams;
+
+  // Criar key dinâmica para forçar re-render quando searchParams mudam
+  const searchParamsKey = `${resolvedSearchParams.search || ""}-${resolvedSearchParams.sort || ""}-${resolvedSearchParams.view || ""}`;
 
   return (
     <>
-      {/* Header com Breadcrumb */}
-      <SiteHeaderWithBreadcrumb
-        title={t("dashboard.category.list.title")}
-        breadcrumbItems={[
-          { label: t("dashboard.breadcrumb.dashboard"), href: "/dashboard" },
-          { label: t("dashboard.category.list.title"), isActive: true },
-        ]}
-      />
+      {/* Header com Breadcrumb - Client Component com i18n */}
+      <CategoryListHeaderClient />
 
-      {/* Conteúdo Principal */}
-      <div className="flex flex-1 flex-col">
-        <div className="@container/main flex flex-1 flex-col gap-6">
-          <div className="flex flex-col gap-6 py-6">
-            <div className="px-4 lg:px-6">
-              <div className="space-y-6">
-                {/* Cabeçalho da Página */}
-                <div>
-                  <h1 className="text-3xl font-bold">
-                    {t("dashboard.category.list.title")}
-                  </h1>
-                  <p className="mt-2 text-muted-foreground">
-                    {t("dashboard.category.list.subtitle")}
-                  </p>
+      {/* Conteúdo Principal com Suspense */}
+      <Suspense
+        key={searchParamsKey}
+        fallback={<CategoryListLoadingFallback />}
+      >
+        <CategoryListContent searchParams={resolvedSearchParams} />
+      </Suspense>
+    </>
+  );
+}
+
+/**
+ * Fallback UI enquanto dados carregam
+ */
+function CategoryListLoadingFallback() {
+  return (
+    <div className="flex flex-1 flex-col">
+      <div className="@container/main flex flex-1 flex-col gap-6">
+        <div className="flex flex-col gap-6 py-6">
+          <div className="px-4 lg:px-6">
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <div className="h-9 w-48 animate-pulse rounded-md bg-muted" />
+                <div className="h-5 w-64 animate-pulse rounded-md bg-muted" />
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
+                  <div className="hidden lg:block lg:flex-1" />
+                  <div className="flex items-end gap-2 lg:w-1/3">
+                    <div className="h-10 flex-1 animate-pulse rounded-md bg-muted" />
+                    <div className="h-10 w-10 animate-pulse rounded-md bg-muted" />
+                  </div>
                 </div>
 
-                {/* Filtros */}
-                <CategoryFilters
-                  filters={filters}
-                  onFiltersChange={updateFilters}
-                  onSearch={handleSearch}
-                  onClear={clearSearch}
-                  totalCategories={totalCategories}
-                  displayedCategories={displayedCategories}
-                  isLoading={isLoading}
-                  viewMode={viewMode}
-                  onViewModeChange={setViewMode}
-                />
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div className="flex-1" />
+                  <div className="flex items-center justify-end gap-3">
+                    <div className="h-10 w-40 animate-pulse rounded-md bg-muted" />
+                    <div className="h-10 w-20 animate-pulse rounded-md bg-muted" />
+                  </div>
+                </div>
 
-                {/* Grid de Categorias */}
-                <CategoryGrid
-                  categories={categories}
-                  isLoading={isLoading}
-                  isLoadingMore={isLoadingMore}
-                  hasMore={hasMore}
-                  onLoadMore={loadMore}
-                  viewMode={viewMode}
-                />
+                <div className="h-4 w-64 animate-pulse rounded-md bg-muted" />
+              </div>
+
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {Array.from({ length: 8 }).map((_item, index) => (
+                  <div
+                    key={`skeleton-loading-${Date.now()}-${index}`}
+                    className="space-y-3"
+                  >
+                    <div className="aspect-square w-full animate-pulse rounded-lg bg-muted" />
+                    <div className="h-4 w-3/4 animate-pulse rounded-md bg-muted" />
+                    <div className="h-4 w-1/2 animate-pulse rounded-md bg-muted" />
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

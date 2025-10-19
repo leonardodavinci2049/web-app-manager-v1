@@ -274,7 +274,10 @@
         "cardLevel": "Nível",
         "cardProducts": "Produtos",
         "noImage": "Sem imagem",
-        "rootCategory": "Raiz"
+        "rootCategory": "Raiz",
+        "showing": "Mostrando {{displayed}} de {{total}} categorias",
+        "allLoaded": "Todas as categorias foram carregadas",
+        "activeFilters": "{{count}} filtro{{plural}} ativo{{plural}}"
       }
     }
   },

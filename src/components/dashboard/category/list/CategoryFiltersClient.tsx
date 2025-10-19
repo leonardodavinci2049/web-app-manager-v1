@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Componente de filtros para listagem de categorias
+ * Componente de filtros para listagem de categorias (Client Component)
  *
  * Fornece busca, ordenação e filtros de status para categorias
  * Com debounce implementado para otimizar requisições de busca
@@ -18,21 +18,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { CategoryFilterOptions } from "@/hooks/dashboard/category/use-category-filter";
 import { useTranslation } from "@/hooks/use-translation";
 
 export type ViewMode = "grid" | "list";
 
-interface CategoryFiltersProps {
-  filters: CategoryFilterOptions;
-  onFiltersChange: (filters: Partial<CategoryFilterOptions>) => void;
-  onSearch: () => void;
+interface CategoryFiltersClientProps {
+  currentSearch: string;
+  currentSort: string;
+  onSearch: (term: string) => void;
+  onSort: (column: string, order: string) => void;
   onClear: () => void;
+  onViewChange: (mode: ViewMode) => void;
   totalCategories: number;
   displayedCategories: number;
-  isLoading?: boolean;
   viewMode: ViewMode;
-  onViewModeChange: (mode: ViewMode) => void;
 }
 
 /**
@@ -45,59 +44,55 @@ const sortOptions = [
   { column: 1, order: 2, key: "sortIdDesc" }, // ID Decrescente
 ] as const;
 
-export function CategoryFilters({
-  filters,
-  onFiltersChange,
+export function CategoryFiltersClient({
+  currentSearch,
+  currentSort,
   onSearch,
+  onSort,
   onClear,
+  onViewChange,
   totalCategories,
   displayedCategories,
-  isLoading = false,
   viewMode,
-  onViewModeChange,
-}: CategoryFiltersProps) {
+}: CategoryFiltersClientProps) {
   const { t } = useTranslation();
 
-  // Ref para debounce de busca (300ms)
-  const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Ref para capturar valor atual do input
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Handler para mudança de busca com debounce
-  const handleSearchChange = useCallback(
-    (value: string) => {
-      onFiltersChange({ searchTerm: value });
+  // Handle clique no botão de busca - pega valor atual do input
+  const handleSearchButtonClick = useCallback(() => {
+    const value = searchInputRef.current?.value || "";
+    onSearch(value);
+  }, [onSearch]);
 
-      // Limpar timeout anterior
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
+  // Handle Enter no input de busca
+  const handleSearchInputKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        handleSearchButtonClick();
       }
-
-      // Agendar busca com debounce de 300ms
-      debounceTimeoutRef.current = setTimeout(() => {
-        onSearch();
-      }, 300);
     },
-    [onFiltersChange, onSearch],
+    [handleSearchButtonClick],
   );
 
   // Contar filtros ativos
   const activeFiltersCount = [
-    filters.searchTerm && filters.searchTerm.trim() !== "",
-    filters.sortColumn !== 2 || filters.sortOrder !== 1, // Não é ordenação padrão
+    currentSearch && currentSearch.trim() !== "",
+    currentSort && currentSort !== "2-1", // Não é ordenação padrão
   ].filter(Boolean).length;
 
   // Handler para mudança de ordenação
   const handleSortChange = useCallback(
     (value: string) => {
-      const [column, order] = value.split("-").map(Number);
-      onFiltersChange({ sortColumn: column, sortOrder: order });
-      // Busca automaticamente ao mudar ordenação (usando queueMicrotask para evitar loop)
-      queueMicrotask(() => onSearch());
+      const [column, order] = value.split("-");
+      onSort(column, order);
     },
-    [onFiltersChange, onSearch],
+    [onSort],
   );
 
   // Valor atual de ordenação para o Select
-  const currentSortValue = `${filters.sortColumn}-${filters.sortOrder}`;
+  const currentSortValue = currentSort || "2-1";
 
   return (
     <div className="space-y-6">
@@ -111,19 +106,14 @@ export function CategoryFilters({
           {/* Campo de Busca */}
           <div className="flex-1">
             <div className="relative">
-              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
+                ref={searchInputRef}
                 id="search-input"
                 placeholder={t("dashboard.category.list.searchPlaceholder")}
-                value={filters.searchTerm}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    onSearch();
-                  }
-                }}
+                defaultValue={currentSearch}
+                onKeyDown={handleSearchInputKeyDown}
                 className="pl-10"
-                disabled={isLoading}
               />
             </div>
           </div>
@@ -131,18 +121,16 @@ export function CategoryFilters({
           {/* Botões de Ação */}
           <div className="flex gap-2">
             <Button
-              onClick={onSearch}
-              disabled={isLoading}
+              onClick={handleSearchButtonClick}
               size="icon"
               title={t("dashboard.category.list.buttonSearch")}
             >
               <Search className="h-4 w-4" />
             </Button>
-            {filters.searchTerm && filters.searchTerm.trim() !== "" && (
+            {currentSearch && currentSearch.trim() !== "" && (
               <Button
                 variant="outline"
                 onClick={onClear}
-                disabled={isLoading}
                 size="icon"
                 title={t("dashboard.category.list.buttonClear")}
               >
@@ -161,11 +149,7 @@ export function CategoryFilters({
         {/* Ordenação e Visualização - Alinhados à direita */}
         <div className="flex items-center justify-end gap-3">
           {/* Select de Ordenação */}
-          <Select
-            value={currentSortValue}
-            onValueChange={handleSortChange}
-            disabled={isLoading}
-          >
+          <Select value={currentSortValue} onValueChange={handleSortChange}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder={t("dashboard.category.list.sortBy")} />
             </SelectTrigger>
@@ -186,8 +170,7 @@ export function CategoryFilters({
             <Button
               variant={viewMode === "grid" ? "default" : "outline"}
               size="sm"
-              onClick={() => onViewModeChange("grid")}
-              disabled={isLoading}
+              onClick={() => onViewChange("grid")}
               className="h-9 w-9 p-0"
               title={t("dashboard.category.list.viewModeGrid")}
             >
@@ -196,8 +179,7 @@ export function CategoryFilters({
             <Button
               variant={viewMode === "list" ? "default" : "outline"}
               size="sm"
-              onClick={() => onViewModeChange("list")}
-              disabled={isLoading}
+              onClick={() => onViewChange("list")}
               className="h-9 w-9 p-0"
               title={t("dashboard.category.list.viewModeList")}
             >
@@ -212,7 +194,6 @@ export function CategoryFilters({
             variant="outline"
             size="sm"
             onClick={onClear}
-            disabled={isLoading}
             className="gap-2"
           >
             <RotateCcw className="h-4 w-4" />
