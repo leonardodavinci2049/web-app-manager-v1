@@ -119,7 +119,7 @@ export function CategoryGrid({
       {!isLoadingMore && !hasMore && categories.length > 0 && (
         <div className="py-6 text-center">
           <p className="text-sm text-muted-foreground">
-            Todas as categorias foram carregadas
+            {t("dashboard.category.list.allLoaded")}
           </p>
         </div>
       )}
