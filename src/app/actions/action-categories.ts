@@ -313,3 +313,170 @@ export async function updateCategory(
     };
   }
 }
+
+/**
+ * Interface para parâmetros de criação de categoria
+ */
+export interface CreateCategoryParams {
+  name: string;
+  slug: string;
+  parentId?: number;
+  level?: number;
+  type?: number;
+  order?: number;
+  imagePath?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  notes?: string;
+}
+
+/**
+ * Interface para resposta de criação de categoria
+ */
+export interface CreateCategoryResponse {
+  success: boolean;
+  message: string;
+  recordId?: number;
+  data?: TaxonomyData;
+  error?: string;
+}
+
+/**
+ * Busca categorias para usar como opções de categoria pai
+ *
+ * @returns Lista de categorias para seleção
+ */
+export async function getCategoryOptions(): Promise<TaxonomyData[]> {
+  try {
+    // Verificar autenticação
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      logger.error("Usuário não autenticado");
+      return [];
+    }
+
+    // Buscar todas as categorias ativas ordenadas por nome
+    const response = await TaxonomyServiceApi.findTaxonomies({
+      pe_id_parent: -1, // Todos os níveis
+      pe_flag_inativo: 0, // Apenas ativas
+      pe_qt_registros: 100, // Limite alto para pegar todas
+      pe_pagina_id: 0,
+      pe_coluna_id: 2, // Ordenar por nome
+      pe_ordem_id: 1, // Ordem crescente
+      pe_taxonomia: "", // Sem filtro de nome
+      pe_id_taxonomy: 0, // Sem filtro de ID
+    });
+
+    // Extrair lista de taxonomias
+    const categories = TaxonomyServiceApi.extractTaxonomyList(response);
+
+    logger.info(`Opções de categorias carregadas: ${categories.length}`);
+
+    return categories;
+  } catch (error) {
+    logger.error("Erro ao buscar opções de categorias", error);
+    return [];
+  }
+}
+export async function createCategory(
+  params: CreateCategoryParams,
+): Promise<CreateCategoryResponse> {
+  try {
+    // Verificar autenticação
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      logger.error("Usuário não autenticado");
+      return {
+        success: false,
+        message: "Usuário não autenticado",
+        error: "Usuário não autenticado",
+      };
+    }
+
+    const {
+      name,
+      slug,
+      parentId = 0,
+      level = 1,
+      type = 2, // Valor padrão conforme API reference
+      order = 1,
+      imagePath = "",
+      metaTitle = "",
+      metaDescription = "",
+      notes = "",
+    } = params;
+
+    // Chamar serviço da API para criar
+    const response = await TaxonomyServiceApi.createTaxonomy({
+      pe_taxonomia: name,
+      pe_slug: slug,
+      pe_parent_id: parentId,
+      pe_level: level,
+      pe_id_tipo: type,
+    });
+
+    // Validar resposta
+    if (!TaxonomyServiceApi.isValidOperationResponse(response)) {
+      throw new Error("Resposta inválida da API");
+    }
+
+    // Verificar se a operação foi bem-sucedida
+    if (!TaxonomyServiceApi.isOperationSuccessful(response)) {
+      const errorMsg =
+        TaxonomyServiceApi.extractStoredProcedureResponse(response)
+          ?.sp_message || "Falha ao criar categoria na API";
+      throw new Error(errorMsg);
+    }
+
+    // Extrair ID do registro criado
+    const recordId = TaxonomyServiceApi.extractRecordId(response);
+
+    if (!recordId) {
+      throw new Error("ID do registro criado não foi retornado");
+    }
+
+    // Se há campos opcionais, atualizar a categoria recém-criada
+    if (order !== 1 || imagePath || metaTitle || metaDescription || notes) {
+      await TaxonomyServiceApi.updateTaxonomy({
+        pe_id_taxonomy: recordId,
+        pe_taxonomia: name,
+        pe_slug: slug,
+        pe_parent_id: parentId,
+        pe_ordem: order,
+        pe_path_imagem: imagePath,
+        pe_meta_title: metaTitle,
+        pe_meta_description: metaDescription,
+        pe_info: notes,
+        pe_inativo: 0,
+      });
+    }
+
+    // Buscar dados da categoria criada
+    const createdCategory = await findCategoryById(recordId);
+
+    logger.info(`Categoria criada com sucesso: ID ${recordId}, Nome: ${name}`);
+
+    return {
+      success: true,
+      message: "Categoria criada com sucesso",
+      recordId,
+      data: createdCategory || undefined,
+    };
+  } catch (error) {
+    logger.error("Erro ao criar categoria", error);
+    return {
+      success: false,
+      message: "Erro ao criar categoria",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Erro desconhecido ao criar categoria",
+    };
+  }
+}

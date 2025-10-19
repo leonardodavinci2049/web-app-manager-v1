@@ -285,14 +285,14 @@ export function CategoryDetailsForm({ category }: CategoryDetailsFormProps) {
       </div>
 
       {/* Botões de Ação */}
-      <div className="flex gap-3 pt-6">
-        <Button type="submit" disabled={isPending} className="flex-1">
+      <div className="flex justify-end gap-3 pt-6">
+        <Button type="button" variant="outline" disabled={isPending}>
+          {t("dashboard.category.buttons.cancel")}
+        </Button>
+        <Button type="submit" disabled={isPending}>
           {isPending
             ? t("dashboard.category.buttons.saving")
             : t("dashboard.category.buttons.save")}
-        </Button>
-        <Button type="button" variant="outline" disabled={isPending}>
-          {t("dashboard.category.buttons.cancel")}
         </Button>
       </div>
     </Form>
