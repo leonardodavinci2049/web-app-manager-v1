@@ -8,12 +8,12 @@
  */
 
 import { FolderOpen, Loader2 } from "lucide-react";
+import { CategoryCard } from "@/components/dashboard/category/list/CategoryCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/hooks/use-translation";
 import type { TaxonomyData } from "@/services/api/taxonomy/types/taxonomy-types";
 import { CategoryList } from "./CategoryList";
-import { CategoryCard } from "@/components/dashboard/category/list/CategoryCard";
 
 type ViewMode = "grid" | "list";
 

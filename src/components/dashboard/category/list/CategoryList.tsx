@@ -1,11 +1,11 @@
 "use client";
 
-import { useTranslation } from "@/hooks/use-translation";
-import type { TaxonomyData } from "@/services/api/taxonomy/types/taxonomy-types";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import Image from "next/image";
+import { useTranslation } from "@/hooks/use-translation";
+import type { TaxonomyData } from "@/services/api/taxonomy/types/taxonomy-types";
 
 /**
  * Props for CategoryList Component
