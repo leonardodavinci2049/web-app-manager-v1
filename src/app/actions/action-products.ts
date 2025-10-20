@@ -18,7 +18,7 @@ function convertApiProductToAppProduct(
   index?: number,
 ): Product {
   // Safely handle potential null/undefined values
-  const productId = apiProduct?.ID_TBL_PRODUTO;
+  const productId = apiProduct?.ID_PRODUTO;
   const id =
     productId?.toString() || `temp-${Date.now()}-${index || Math.random()}`;
   const name = apiProduct?.PRODUTO || "Produto sem nome";
@@ -26,9 +26,10 @@ function convertApiProductToAppProduct(
   const sku = ref || `SKU-${id}`;
   const image =
     apiProduct?.PATH_IMAGEM || "/images/product/default-product.png";
-  const normalPrice = apiProduct?.VL_VENDA_VAREJO || 0;
-  const stock = apiProduct?.QT_ESTOQUE || 0;
-  const category = apiProduct?.MARCA || "Sem Categoria";
+  // Convert string price to number
+  const normalPrice = parseFloat(apiProduct?.VL_VAREJO || "0") || 0;
+  const stock = apiProduct?.ESTOQUE_LOJA || 0;
+  const category = apiProduct?.MARCA_NOME || "Sem Categoria";
 
   return {
     id,
