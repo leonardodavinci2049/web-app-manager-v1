@@ -66,7 +66,7 @@ export class CheckServiceApi extends BaseApiService {
       pe_organization_id: envs.ORGANIZATION_ID,
       pe_member_id: envs.MEMBER_ID,
       pe_user_id: envs.USER_ID,
-      pe_person_id: 29014, // Valor padrão conforme referência
+      pe_person_id: envs.PERSON_ID, // Valor dinâmico das variáveis de ambiente
       ...additionalData,
     };
   }

@@ -21,7 +21,7 @@ export function useProductFilter({
     searchTerm: "",
     selectedCategory: "all",
     onlyInStock: false,
-    sortBy: "newest" as SortOption,
+    sortBy: "name-asc" as SortOption,
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -124,7 +124,7 @@ export function useProductFilter({
       searchTerm: "",
       selectedCategory: "all",
       onlyInStock: false,
-      sortBy: "newest",
+      sortBy: "name-asc",
     });
     setCurrentPage(1);
   };

@@ -184,7 +184,12 @@
       "productImage": "Imagem",
       "inStock": "Em estoque",
       "outOfStock": "Fora de estoque",
-      "lowStock": "Estoque baixo"
+      "lowStock": "Estoque baixo",
+      "imageError": "Erro ao carregar imagem",
+      "imageNotFound": "Imagem não encontrada",
+      "imageInvalidDomain": "Domínio de imagem não permitido",
+      "imageInvalidFormat": "Formato de imagem inválido",
+      "noImageAvailable": "Sem imagem disponível"
     },
     "customers": {
       "title": "Clientes",

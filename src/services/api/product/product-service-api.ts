@@ -65,6 +65,8 @@ const logger = createLogger("ProductService");
 export class ProductServiceApi extends BaseApiService {
   /**
    * Build base payload with environment variables
+   * Valores obtidos dinamicamente do .env - podem variar por ambiente/usuário
+   * Os valores na documentação da API são apenas exemplos de demonstração
    */
   private static buildBasePayload(
     additionalData: Record<string, unknown> = {},
@@ -76,7 +78,7 @@ export class ProductServiceApi extends BaseApiService {
       pe_organization_id: envs.ORGANIZATION_ID,
       pe_member_id: envs.MEMBER_ID,
       pe_user_id: envs.USER_ID,
-      pe_person_id: 29014, // Fixed value as per reference
+      pe_person_id: envs.PERSON_ID, // Valor dinâmico das variáveis de ambiente
       ...additionalData,
     };
   }
@@ -181,6 +183,11 @@ export class ProductServiceApi extends BaseApiService {
       cleanParams.pe_id_taxonomy = params.pe_id_taxonomy;
     }
 
+    // Only include taxonomy slug filter if it's not empty
+    if (params.pe_slug_taxonomy && params.pe_slug_taxonomy.trim() !== "") {
+      cleanParams.pe_slug_taxonomy = params.pe_slug_taxonomy;
+    }
+
     // Only include product filter if it's a positive number
     if (params.pe_id_produto && params.pe_id_produto > 0) {
       cleanParams.pe_id_produto = params.pe_id_produto;
@@ -193,9 +200,10 @@ export class ProductServiceApi extends BaseApiService {
 
     // Include other parameters with their defaults
     const payload = ProductServiceApi.buildBasePayload({
+      pe_slug_taxonomy: "", // Required field - empty string for no slug filter
       pe_flag_inativo: params.pe_flag_inativo ?? 0, // Default - only active products
       pe_qt_registros: params.pe_qt_registros ?? 20, // Default - 20 records per page
-      pe_pagina_id: params.pe_pagina_id ?? 1, // Default - first page
+      pe_pagina_id: params.pe_pagina_id ?? 0, // Default - first page
       pe_coluna_id: params.pe_coluna_id ?? 1, // Default - sort by first column
       pe_ordem_id: params.pe_ordem_id ?? 1, // Default - ascending order
       ...cleanParams, // Include only the clean parameters

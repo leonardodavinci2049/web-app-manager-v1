@@ -33,10 +33,11 @@ export function ProductCatalogContent({
     searchTerm: "",
     selectedCategory: "all",
     onlyInStock: false,
-    sortBy: "newest",
+    sortBy: "name-asc",
   });
-  const [currentPage, setCurrentPage] = useState(1);
+  const [loadedQuantity, setLoadedQuantity] = useState(20); // Track total quantity loaded
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [reachedEnd, setReachedEnd] = useState(false); // Track if we reached the end of the list
 
   // React 18 useTransition for better UX
   const [isPending, startTransition] = useTransition();
@@ -51,7 +52,8 @@ export function ProductCatalogContent({
     startTransition(async () => {
       try {
         setFilters(newFilters);
-        setCurrentPage(1); // Reset to first page
+        setLoadedQuantity(20); // Reset loaded quantity
+        setReachedEnd(false); // Reset end state
 
         logger.info("Updating filters:", newFilters);
 
@@ -67,6 +69,13 @@ export function ProductCatalogContent({
         if (result.success) {
           setProducts(result.products);
           setTotal(result.total);
+
+          // Check if we reached the end on initial load or filter change
+          if (result.products.length < 20) {
+            setReachedEnd(true);
+          } else {
+            setReachedEnd(false);
+          }
         } else {
           toast.error(result.error || "Erro ao filtrar produtos");
           logger.error("Filter error:", result.error);
@@ -84,34 +93,41 @@ export function ProductCatalogContent({
       searchTerm: "",
       selectedCategory: "all",
       onlyInStock: false,
-      sortBy: "newest",
+      sortBy: "name-asc",
     };
 
+    setLoadedQuantity(20); // Reset loaded quantity
+    setReachedEnd(false); // Reset end state
     updateFilters(defaultFilters);
   };
 
-  // Load more products (pagination)
+  // Load more products (increment quantity)
   const loadMore = async () => {
-    if (isLoadingMore || products.length >= total) return;
+    if (isLoadingMore || reachedEnd) return;
 
     try {
       setIsLoadingMore(true);
-      const nextPage = currentPage + 1;
+      const newQuantity = loadedQuantity + 20;
 
-      logger.info(`Loading more products - page ${nextPage}`);
+      logger.info(`Loading more products - total quantity: ${newQuantity}`);
 
       const result = await fetchProductsWithFilters(
         filters.searchTerm,
         filters.selectedCategory,
         filters.onlyInStock,
         filters.sortBy,
-        nextPage,
-        20,
+        1, // Always use page 1 (will be converted to 0 in API)
+        newQuantity, // Increment total quantity
       );
 
       if (result.success) {
-        setProducts((prev) => [...prev, ...result.products]);
-        setCurrentPage(nextPage);
+        setProducts(result.products); // Replace all products with new expanded list
+        setLoadedQuantity(newQuantity);
+
+        // Check if we reached the end (returned less products than requested)
+        if (result.products.length < newQuantity) {
+          setReachedEnd(true);
+        }
       } else {
         toast.error(result.error || "Erro ao carregar mais produtos");
         logger.error("Load more error:", result.error);
@@ -133,7 +149,7 @@ export function ProductCatalogContent({
 
   // Calculate display values
   const displayedProducts = products.length;
-  const hasMore = displayedProducts < total;
+  const hasMore = !reachedEnd; // Show button unless we reached the end
   const isLoading = isPending || isLoadingMore;
 
   return (
@@ -148,18 +164,52 @@ export function ProductCatalogContent({
         onResetFilters={resetFilters}
         totalProducts={total}
         displayedProducts={displayedProducts}
+        isLoading={isPending}
       />
 
-      {/* Grid de Produtos */}
-      <ProductGrid
-        products={products}
-        viewMode={viewMode}
-        isLoading={isLoading}
-        isInitialLoading={false} // We have initial data from server
-        hasMore={hasMore}
-        onLoadMore={loadMore}
-        onViewDetails={handleViewDetails}
-      />
+      {/* Loading Overlay durante a busca */}
+      {isPending && (
+        <div className="relative">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex items-center gap-3">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <span className="text-lg font-medium">
+                  Pesquisando produtos...
+                </span>
+              </div>
+              <p className="text-muted-foreground text-sm">
+                Aguarde enquanto carregamos os resultados
+              </p>
+            </div>
+          </div>
+          {/* Grid de Produtos com overlay */}
+          <div className="opacity-50">
+            <ProductGrid
+              products={products}
+              viewMode={viewMode}
+              isLoading={isLoading}
+              isInitialLoading={false}
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+              onViewDetails={handleViewDetails}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Grid de Produtos normal */}
+      {!isPending && (
+        <ProductGrid
+          products={products}
+          viewMode={viewMode}
+          isLoading={isLoading}
+          isInitialLoading={false} // We have initial data from server
+          hasMore={hasMore}
+          onLoadMore={loadMore}
+          onViewDetails={handleViewDetails}
+        />
+      )}
     </>
   );
 }
