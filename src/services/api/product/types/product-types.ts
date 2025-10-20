@@ -213,6 +213,7 @@ export interface FindProductsRequest extends BaseProductRequest {
 export interface CreateProductRequest extends BaseProductRequest {
   pe_type_business: number;
   pe_nome_produto: string;
+  pe_slug: string;
   pe_descricao_tab?: string;
   pe_etiqueta?: string;
   pe_ref?: string;

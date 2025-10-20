@@ -240,3 +240,112 @@ export async function fetchProductsWithFilters(
     };
   }
 }
+
+// ========================================
+// CREATE PRODUCT ACTION
+// ========================================
+
+/**
+ * Interface for creating a new product
+ */
+export interface CreateProductData {
+  name: string;
+  slug: string;
+  reference?: string;
+  model?: string;
+  description?: string;
+  tags?: string;
+  brandId?: number;
+  retailPrice?: number;
+  stock?: number;
+  businessType?: number;
+  additionalInfo?: string;
+}
+
+/**
+ * Server Action to create a new product
+ */
+export async function createProduct(data: CreateProductData): Promise<{
+  success: boolean;
+  productId?: number;
+  error?: string;
+}> {
+  try {
+    logger.info("Creating new product with data:", {
+      name: data.name,
+      slug: data.slug,
+      reference: data.reference,
+      model: data.model,
+    });
+
+    // Prepare API request data
+    const apiData = {
+      pe_type_business: data.businessType || 1, // Default business type
+      pe_nome_produto: data.name,
+      pe_slug: data.slug,
+      pe_descricao_tab: data.description || "",
+      pe_etiqueta: data.tags || "",
+      pe_ref: data.reference || "",
+      pe_modelo: data.model || "",
+      pe_id_marca: data.brandId || 0,
+      pe_vl_venda_varejo: data.retailPrice || 0,
+      pe_qt_estoque: data.stock || 0,
+      pe_info: data.additionalInfo || "",
+    };
+
+    // Call API service
+    const response = await ProductServiceApi.createProduct(apiData);
+
+    // Validate response
+    if (!ProductServiceApi.isValidOperationResponse(response)) {
+      logger.error("Invalid API response:", response);
+      return {
+        success: false,
+        error: "Resposta inválida da API",
+      };
+    }
+
+    // Check if operation was successful
+    if (!ProductServiceApi.isOperationSuccessful(response)) {
+      const spResponse =
+        ProductServiceApi.extractStoredProcedureResponse(response);
+      const errorMessage = spResponse?.sp_message || "Erro ao criar produto";
+      logger.error("API returned error:", { spResponse, errorMessage });
+
+      return {
+        success: false,
+        error: errorMessage,
+      };
+    }
+
+    // Extract product ID from response
+    const productId = ProductServiceApi.extractRecordId(response);
+
+    if (!productId) {
+      logger.error("No product ID returned from API:", response);
+      return {
+        success: false,
+        error: "ID do produto não foi retornado",
+      };
+    }
+
+    logger.info("Product created successfully:", { productId });
+
+    return {
+      success: true,
+      productId,
+    };
+  } catch (error) {
+    logger.error("Error creating product:", error);
+
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Erro desconhecido ao criar produto";
+
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
