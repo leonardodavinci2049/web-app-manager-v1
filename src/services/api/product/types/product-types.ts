@@ -130,6 +130,7 @@ export interface ProductDetail {
   FLAG_IMPORTADO: number;
   INATIVO: number;
   SLUG: string;
+  PATH_IMAGEM: string;
   META_TITLE: string;
   META_DESCRIPTION: string;
   DATADOCADASTRO: string;

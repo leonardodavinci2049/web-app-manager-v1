@@ -194,6 +194,43 @@
       "search": {
         "placeholder": "Buscar por nome ou SKU..."
       },
+      "details": {
+        "title": "Detalhes do Produto",
+        "loading": "Carregando informações do produto...",
+        "notFound": "Produto não encontrado",
+        "errorLoading": "Erro ao carregar produto",
+        "tryAgain": "Tentar novamente",
+        "backToCatalog": "Voltar para o catálogo",
+        "breadcrumbCatalog": "Catálogo",
+        "breadcrumbDetails": "Detalhes",
+        "priceLabel": "Preço",
+        "stockLabel": "Estoque",
+        "categoryLabel": "Categoria",
+        "brandLabel": "Marca",
+        "referenceLabel": "Referência",
+        "modelLabel": "Modelo",
+        "descriptionLabel": "Descrição",
+        "productId": "ID do Produto",
+        "sku": "SKU",
+        "status": "Status",
+        "retailPrice": "Preço Varejo",
+        "wholesalePrice": "Preço Atacado",
+        "corporatePrice": "Preço Corporativo",
+        "availableStock": "Estoque Disponível",
+        "createdAt": "Data de Criação",
+        "updatedAt": "Última Atualização",
+        "basicInfo": "Informações Básicas",
+        "pricing": "Preços",
+        "inventory": "Estoque",
+        "metadata": "Metadados",
+        "active": "Ativo",
+        "inactive": "Inativo",
+        "actions": {
+          "edit": "Editar",
+          "delete": "Excluir",
+          "duplicate": "Duplicar"
+        }
+      },
       "filters": {
         "title": "Filtros",
         "category": "Categoria",
