@@ -44,6 +44,7 @@ export const FindProductsSchema = z.object({
 export const CreateProductSchema = z.object({
   pe_type_business: z.number().int().min(1).max(2),
   pe_nome_produto: z.string().min(1).max(255),
+  pe_slug: z.string().min(1).max(255),
   pe_descricao_tab: z.string().max(500).optional(),
   pe_etiqueta: z.string().max(100).optional(),
   pe_ref: z.string().max(100).optional(),

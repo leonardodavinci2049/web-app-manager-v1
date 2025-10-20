@@ -84,6 +84,7 @@ const productsResponse = await ProductServiceApi.findProducts({
 const createResponse = await ProductServiceApi.createProduct({
   pe_type_business: 1,
   pe_nome_produto: "NOTEBOOK LENOVO IDEAPAD 3",
+  pe_slug: "notebook-lenovo-ideapad-3",
   pe_ref: "LEN-IDEA3-001",
   pe_modelo: "IDEAPAD 3 15ITL6",
 });
@@ -100,6 +101,7 @@ if (ProductServiceApi.isOperationSuccessful(createResponse)) {
 const createResponse = await ProductServiceApi.createProduct({
   pe_type_business: 1,
   pe_nome_produto: "NOTEBOOK LENOVO IDEAPAD 3",
+  pe_slug: "notebook-lenovo-ideapad-3-15itl6",
   pe_descricao_tab: "Notebook Lenovo com processador Intel Core i3",
   pe_etiqueta: "7891234567892",
   pe_ref: "LEN-IDEA3-001",
@@ -293,6 +295,7 @@ export async function createProductAction(formData: FormData) {
     const response = await ProductServiceApi.createProduct({
       pe_type_business: 1,
       pe_nome_produto: formData.get('name') as string,
+      pe_slug: formData.get('slug') as string,
       pe_ref: formData.get('ref') as string,
       pe_modelo: formData.get('model') as string,
     });
