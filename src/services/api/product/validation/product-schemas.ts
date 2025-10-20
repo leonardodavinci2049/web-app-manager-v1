@@ -29,7 +29,7 @@ export const FindProductsSchema = z.object({
   pe_flag_estoque: z.number().int().min(0).max(1).optional(),
   pe_flag_inativo: z.number().int().min(0).max(1).optional(),
   pe_qt_registros: z.number().int().min(1).max(100).optional(),
-  pe_pagina_id: z.number().int().min(1).optional(),
+  pe_pagina_id: z.number().int().min(0).optional(), // MariaDB pagination starts at 0
   pe_coluna_id: z.number().int().optional(),
   pe_ordem_id: z.number().int().min(1).max(2).optional(),
 });

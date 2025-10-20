@@ -8,6 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Product } from "../../../../types/types";
 import { formatCurrency } from "../../../../utils/common-utils";
+import {
+  createImageErrorHandler,
+  getValidImageUrl,
+} from "../../../../utils/image-utils";
 
 interface ProductCardProps {
   product: Product;
@@ -28,11 +32,9 @@ export function ProductCard({
     ? product.promotionalPrice
     : product.normalPrice;
 
-  // Use fallback image if original is empty/invalid
-  const imageUrl =
-    product.image && product.image.trim() !== ""
-      ? product.image
-      : "/images/product/no-image.jpeg";
+  // Use validated image URL with fallback
+  const imageUrl = getValidImageUrl(product.image);
+  const imageErrorHandler = createImageErrorHandler();
 
   const categoryLabels: Record<string, string> = {
     electronics: "Eletrônicos",
@@ -63,7 +65,10 @@ export function ProductCard({
                   className="rounded-md object-cover"
                   sizes="(max-width: 96px) 100vw, 96px"
                   loading="lazy"
-                  onError={() => setImageError(true)}
+                  onError={(e) => {
+                    setImageError(true);
+                    imageErrorHandler.onError(e);
+                  }}
                   onLoad={() => setImageError(false)}
                 />
               )}
@@ -149,7 +154,10 @@ export function ProductCard({
               className="object-cover transition-transform duration-200 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
               loading="lazy"
-              onError={() => setImageError(true)}
+              onError={(e) => {
+                setImageError(true);
+                imageErrorHandler.onError(e);
+              }}
               onLoad={() => setImageError(false)}
             />
           )}
