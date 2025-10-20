@@ -173,18 +173,38 @@ export class ProductServiceApi extends BaseApiService {
   private static buildProductSearchPayload(
     params: Partial<FindProductsRequest>,
   ): Record<string, unknown> {
+    // Build clean parameters object, only including non-zero/non-empty values
+    const cleanParams: Partial<FindProductsRequest> = {};
+
+    // Only include taxonomy filter if it's a positive number
+    if (params.pe_id_taxonomy && params.pe_id_taxonomy > 0) {
+      cleanParams.pe_id_taxonomy = params.pe_id_taxonomy;
+    }
+
+    // Only include product filter if it's a positive number
+    if (params.pe_id_produto && params.pe_id_produto > 0) {
+      cleanParams.pe_id_produto = params.pe_id_produto;
+    }
+
+    // Only include product name filter if it's not empty
+    if (params.pe_produto && params.pe_produto.trim() !== "") {
+      cleanParams.pe_produto = params.pe_produto;
+    }
+
+    // Include other parameters with their defaults
     const payload = ProductServiceApi.buildBasePayload({
-      pe_id_taxonomy: 0, // Default - no taxonomy filter
-      pe_id_produto: 0, // Default - no specific product filter
-      pe_produto: "", // Default - no name filter
-      pe_flag_estoque: undefined, // Optional - stock filter
-      pe_flag_inativo: 0, // Default - only active products
-      pe_qt_registros: 20, // Default - 20 records per page
-      pe_pagina_id: 1, // Default - first page
-      pe_coluna_id: 1, // Default - sort by first column
-      pe_ordem_id: 1, // Default - ascending order
-      ...params,
+      pe_flag_inativo: params.pe_flag_inativo ?? 0, // Default - only active products
+      pe_qt_registros: params.pe_qt_registros ?? 20, // Default - 20 records per page
+      pe_pagina_id: params.pe_pagina_id ?? 1, // Default - first page
+      pe_coluna_id: params.pe_coluna_id ?? 1, // Default - sort by first column
+      pe_ordem_id: params.pe_ordem_id ?? 1, // Default - ascending order
+      ...cleanParams, // Include only the clean parameters
     });
+
+    // Add optional parameters if they exist
+    if (params.pe_flag_estoque !== undefined) {
+      payload.pe_flag_estoque = params.pe_flag_estoque;
+    }
 
     return payload;
   }
