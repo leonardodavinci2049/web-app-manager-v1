@@ -207,6 +207,97 @@
         "inStockOnly": "APENAS EM ESTOQUE",
         "sortBy": "Ordenar por",
         "showingResults": "Mostrando {{displayed}} de {{total}} produtos"
+      },
+      "new": {
+        "title": "Adicionar Novo Produto",
+        "subtitle": "Crie um novo produto para adicionar ao seu catálogo",
+        "sections": {
+          "basicInfo": "Informações Básicas",
+          "basicInfoDesc": "Dados principais do produto",
+          "description": "Descrição e Categorização",
+          "descriptionDesc": "Descrições e informações de categorização",
+          "pricing": "Preços e Estoque",
+          "pricingDesc": "Valores de venda e controle de estoque",
+          "additional": "Informações Adicionais",
+          "additionalDesc": "Informações complementares sobre o produto",
+          "settings": "Configurações Adicionais",
+          "settingsDesc": "Configurações avançadas do produto"
+        },
+        "fields": {
+          "name": "Nome do Produto",
+          "slug": "Slug (URL)",
+          "reference": "Referência/Código",
+          "model": "Modelo",
+          "description": "Descrição",
+          "tags": "Etiquetas/Tags",
+          "brand": "Marca",
+          "retailPrice": "Preço de Venda (Varejo)",
+          "stock": "Estoque Inicial",
+          "businessType": "Tipo de Negócio",
+          "additionalInfo": "Informações Adicionais"
+        },
+        "placeholders": {
+          "name": "Digite o nome do produto",
+          "slug": "slug-do-produto",
+          "reference": "REF001",
+          "model": "Modelo XYZ",
+          "description": "Descreva o produto...",
+          "tags": "eletrônicos, smartphones",
+          "selectBrand": "Selecione uma marca",
+          "retailPrice": "0,00",
+          "stock": "0",
+          "additionalInfo": "Informações extras sobre o produto..."
+        },
+        "help": {
+          "name": "Nome que será exibido para o produto",
+          "slug": "URL amigável gerada automaticamente",
+          "reference": "Código de referência interno",
+          "model": "Modelo ou versão do produto",
+          "description": "Descrição detalhada do produto",
+          "tags": "Palavras-chave separadas por vírgula",
+          "brand": "Marca fabricante do produto",
+          "retailPrice": "Preço de venda ao consumidor final",
+          "stock": "Quantidade inicial em estoque",
+          "businessType": "Configuração do tipo de negócio",
+          "additionalInfo": "Informações complementares"
+        },
+        "buttons": {
+          "cancel": "Cancelar",
+          "create": "Criar Produto",
+          "creating": "Criando produto..."
+        },
+        "actions": {
+          "cancel": "Cancelar",
+          "create": "Criar Produto",
+          "creating": "Criando produto..."
+        }
+      },
+      "messages": {
+        "createdSuccess": "Produto criado com sucesso!",
+        "createFailed": "Falha ao criar produto",
+        "unexpectedError": "Erro inesperado ao criar produto"
+      },
+      "errors": {
+        "loadBrandsFailed": "Erro ao carregar marcas",
+        "nameRequired": "Nome do produto é obrigatório",
+        "slugRequired": "Slug é obrigatório",
+        "invalidSlug": "Slug deve conter apenas letras minúsculas, números e hífens",
+        "priceInvalid": "Preço deve ser um número válido",
+        "stockInvalid": "Estoque deve ser um número inteiro"
+      },
+      "validation": {
+        "nameMinLength": "Nome deve ter pelo menos 2 caracteres",
+        "nameMaxLength": "Nome não pode ter mais de 200 caracteres",
+        "slugMinLength": "Slug deve ter pelo menos 2 caracteres",
+        "slugMaxLength": "Slug não pode ter mais de 100 caracteres",
+        "slugFormat": "Slug deve conter apenas letras minúsculas, números e hífens",
+        "referenceMaxLength": "Referência não pode ter mais de 50 caracteres",
+        "modelMaxLength": "Modelo não pode ter mais de 100 caracteres",
+        "descriptionMaxLength": "Descrição não pode ter mais de 1000 caracteres",
+        "tagsMaxLength": "Etiquetas não podem ter mais de 200 caracteres",
+        "priceMin": "Preço deve ser maior ou igual a 0",
+        "stockMin": "Estoque deve ser maior ou igual a 0",
+        "additionalInfoMaxLength": "Informações adicionais não podem ter mais de 500 caracteres"
       }
     },
     "customers": {

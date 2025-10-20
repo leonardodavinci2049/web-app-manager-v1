@@ -284,6 +284,7 @@ export class ProductServiceApi extends BaseApiService {
     params: Partial<CreateProductRequest> & {
       pe_type_business: number;
       pe_nome_produto: string;
+      pe_slug: string;
     },
   ): Promise<CreateProductResponse> {
     try {
@@ -291,6 +292,7 @@ export class ProductServiceApi extends BaseApiService {
       const validatedParams = CreateProductSchema.parse({
         pe_type_business: params.pe_type_business,
         pe_nome_produto: params.pe_nome_produto,
+        pe_slug: params.pe_slug,
         pe_descricao_tab: params.pe_descricao_tab,
         pe_etiqueta: params.pe_etiqueta,
         pe_ref: params.pe_ref,
