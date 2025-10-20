@@ -2,6 +2,7 @@
 
 import { Eye, Package } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,12 +20,19 @@ export function ProductCard({
   viewMode,
   onViewDetails,
 }: ProductCardProps) {
+  const [imageError, setImageError] = useState(false);
   const isOutOfStock = product.stock === 0;
   const hasPromotion =
     product.promotionalPrice && product.promotionalPrice < product.normalPrice;
   const finalPrice = hasPromotion
     ? product.promotionalPrice
     : product.normalPrice;
+
+  // Use fallback image if original is empty/invalid
+  const imageUrl =
+    product.image && product.image.trim() !== ""
+      ? product.image
+      : "/images/product/no-image.jpeg";
 
   const categoryLabels: Record<string, string> = {
     electronics: "Eletrônicos",
@@ -43,14 +51,22 @@ export function ProductCard({
           <div className="flex gap-4">
             {/* Imagem */}
             <div className="relative h-24 w-24 flex-shrink-0">
-              <Image
-                src={product.image}
-                alt={`Imagem do produto ${product.name}`}
-                fill
-                className="rounded-md object-cover"
-                sizes="(max-width: 96px) 100vw, 96px"
-                loading="lazy"
-              />
+              {imageError ? (
+                <div className="flex h-full w-full items-center justify-center rounded-md bg-muted">
+                  <Package className="h-8 w-8 text-muted-foreground" />
+                </div>
+              ) : (
+                <Image
+                  src={imageUrl}
+                  alt={`Imagem do produto ${product.name}`}
+                  fill
+                  className="rounded-md object-cover"
+                  sizes="(max-width: 96px) 100vw, 96px"
+                  loading="lazy"
+                  onError={() => setImageError(true)}
+                  onLoad={() => setImageError(false)}
+                />
+              )}
               {isOutOfStock && (
                 <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/50">
                   <Badge variant="destructive" className="text-xs">
@@ -99,7 +115,7 @@ export function ProductCard({
                 <Button
                   size="sm"
                   disabled={isOutOfStock}
-                  onClick={() => onViewDetails?.(product.id)}
+                  onClick={() => product.id && onViewDetails?.(product.id)}
                   className="gap-2"
                 >
                   <Eye className="h-4 w-4" />
@@ -121,14 +137,22 @@ export function ProductCard({
       <CardContent className="flex h-full flex-col p-4">
         {/* Imagem */}
         <div className="relative aspect-square overflow-hidden rounded-md">
-          <Image
-            src={product.image}
-            alt={`Imagem do produto ${product.name}`}
-            fill
-            className="object-cover transition-transform duration-200 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-            loading="lazy"
-          />
+          {imageError ? (
+            <div className="flex h-full w-full items-center justify-center bg-muted">
+              <Package className="h-12 w-12 text-muted-foreground" />
+            </div>
+          ) : (
+            <Image
+              src={imageUrl}
+              alt={`Imagem do produto ${product.name}`}
+              fill
+              className="object-cover transition-transform duration-200 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+              loading="lazy"
+              onError={() => setImageError(true)}
+              onLoad={() => setImageError(false)}
+            />
+          )}
 
           {/* Badges sobrepostos */}
           <div className="absolute top-2 left-2 flex flex-col gap-1">
@@ -189,7 +213,7 @@ export function ProductCard({
             size="sm"
             className="mt-auto w-full gap-2"
             disabled={isOutOfStock}
-            onClick={() => onViewDetails?.(product.id)}
+            onClick={() => product.id && onViewDetails?.(product.id)}
           >
             <Eye className="h-4 w-4" />
             {isOutOfStock ? "Indisponível" : "Ver detalhes"}

@@ -1,8 +1,12 @@
-export function formatCurrency(value: number): string {
+export function formatCurrency(value: number | null | undefined): string {
+  // Handle null, undefined, or invalid numbers
+  const numericValue =
+    typeof value === "number" && !Number.isNaN(value) ? value : 0;
+
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
-  }).format(value);
+  }).format(numericValue);
 }
 
 export function debounce<T extends (...args: never[]) => unknown>(
