@@ -7,7 +7,146 @@ export const mockCategories: Category[] = [
   { id: "home-garden", name: "Casa & Jardim", slug: "home-garden" },
   { id: "sports", name: "Esportes & Lazer", slug: "sports" },
   { id: "books-media", name: "Livros & Mídia", slug: "books-media" },
+  { id: "tools", name: "Ferramentas", slug: "tools" },
+  { id: "automotive", name: "Automotivo", slug: "automotive" },
 ];
+
+// Estrutura hierárquica de categorias com subcategorias
+export const mockCategoryHierarchy = {
+  all: {
+    id: "all",
+    name: "Todas as Categorias",
+    slug: "all",
+    subcategories: [],
+  },
+  electronics: {
+    id: "electronics",
+    name: "Eletrônicos",
+    slug: "electronics",
+    subcategories: [
+      { id: "smartphones", name: "Smartphones", slug: "smartphones" },
+      { id: "computers", name: "Computadores", slug: "computers" },
+      { id: "audio", name: "Áudio & Som", slug: "audio" },
+      { id: "tv-video", name: "TV & Vídeo", slug: "tv-video" },
+      { id: "gaming", name: "Games", slug: "gaming" },
+    ],
+  },
+  clothing: {
+    id: "clothing",
+    name: "Roupas & Acessórios",
+    slug: "clothing",
+    subcategories: [
+      { id: "mens-clothing", name: "Roupas Masculinas", slug: "mens-clothing" },
+      {
+        id: "womens-clothing",
+        name: "Roupas Femininas",
+        slug: "womens-clothing",
+      },
+      { id: "shoes", name: "Calçados", slug: "shoes" },
+      { id: "accessories", name: "Acessórios", slug: "accessories" },
+      { id: "watches", name: "Relógios", slug: "watches" },
+    ],
+  },
+  "home-garden": {
+    id: "home-garden",
+    name: "Casa & Jardim",
+    slug: "home-garden",
+    subcategories: [
+      { id: "furniture", name: "Móveis", slug: "furniture" },
+      { id: "appliances", name: "Eletrodomésticos", slug: "appliances" },
+      { id: "decor", name: "Decoração", slug: "decor" },
+      { id: "kitchen", name: "Cozinha", slug: "kitchen" },
+      { id: "garden", name: "Jardim", slug: "garden" },
+    ],
+  },
+  sports: {
+    id: "sports",
+    name: "Esportes & Lazer",
+    slug: "sports",
+    subcategories: [
+      { id: "fitness", name: "Fitness", slug: "fitness" },
+      { id: "outdoor", name: "Esportes Outdoor", slug: "outdoor" },
+      { id: "team-sports", name: "Esportes Coletivos", slug: "team-sports" },
+      { id: "water-sports", name: "Esportes Aquáticos", slug: "water-sports" },
+      { id: "cycling", name: "Ciclismo", slug: "cycling" },
+    ],
+  },
+  "books-media": {
+    id: "books-media",
+    name: "Livros & Mídia",
+    slug: "books-media",
+    subcategories: [
+      { id: "books", name: "Livros", slug: "books" },
+      { id: "ebooks", name: "E-books", slug: "ebooks" },
+      { id: "audiobooks", name: "Audiobooks", slug: "audiobooks" },
+      { id: "magazines", name: "Revistas", slug: "magazines" },
+      { id: "movies", name: "Filmes & Séries", slug: "movies" },
+    ],
+  },
+  tools: {
+    id: "tools",
+    name: "Ferramentas",
+    slug: "tools",
+    subcategories: [
+      {
+        id: "power-tools",
+        name: "Ferramentas Elétricas",
+        slug: "power-tools",
+        subgroups: [
+          { id: "drills", name: "Furadeiras", slug: "drills" },
+          {
+            id: "angle-grinders",
+            name: "Esmerilhadeiras",
+            slug: "angle-grinders",
+          },
+          {
+            id: "circular-saws",
+            name: "Serras Circulares",
+            slug: "circular-saws",
+          },
+          { id: "sanders", name: "Lixadeiras", slug: "sanders" },
+        ],
+      },
+      {
+        id: "hand-tools",
+        name: "Ferramentas Manuais",
+        slug: "hand-tools",
+        subgroups: [
+          { id: "screwdrivers", name: "Chaves de Fenda", slug: "screwdrivers" },
+          { id: "wrenches", name: "Chaves Inglesas", slug: "wrenches" },
+          { id: "hammers", name: "Martelos", slug: "hammers" },
+          { id: "pliers", name: "Alicates", slug: "pliers" },
+        ],
+      },
+      {
+        id: "measuring",
+        name: "Instrumentos de Medição",
+        slug: "measuring",
+        subgroups: [
+          { id: "rulers", name: "Réguas e Trenas", slug: "rulers" },
+          { id: "levels", name: "Níveis", slug: "levels" },
+          { id: "calipers", name: "Paquímetros", slug: "calipers" },
+        ],
+      },
+    ],
+  },
+  automotive: {
+    id: "automotive",
+    name: "Automotivo",
+    slug: "automotive",
+    subcategories: [
+      { id: "car-parts", name: "Peças Automotivas", slug: "car-parts" },
+      {
+        id: "car-accessories",
+        name: "Acessórios para Carro",
+        slug: "car-accessories",
+      },
+      { id: "oils-fluids", name: "Óleos & Fluidos", slug: "oils-fluids" },
+      { id: "tires", name: "Pneus", slug: "tires" },
+      { id: "car-care", name: "Cuidados com o Carro", slug: "car-care" },
+    ],
+  },
+};
 
 export const mockProducts: Product[] = [
   // Eletrônicos
