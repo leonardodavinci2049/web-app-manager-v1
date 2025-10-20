@@ -140,17 +140,38 @@ export interface ProductDetail {
  * Product list item data structure (ENDPOINT 2)
  */
 export interface ProductListItem {
-  ID_TBL_PRODUTO: number;
+  ID_PRODUTO: number;
+  ID_POST: number;
   PRODUTO: string;
+  DESCRICAO_TAB: string;
+  SKU: number;
+  ID_TIPO: number;
+  TIPO: string;
+  ETIQUETA: string;
   REF: string;
   MODELO: string;
-  VL_VENDA_VAREJO: number;
-  QT_ESTOQUE: number;
-  INATIVO: number;
-  SLUG: string;
+  ESTOQUE_LOJA: number;
+  IMPORTADO: number;
+  PROMOCAO: number;
+  LANCAMENTO: number;
+  OURO: string;
+  PRATA: string;
+  BRONZE: string;
+  VL_ATACADO: string;
+  VL_CORPORATIVO: string;
+  VL_VAREJO: string;
+  TX_PRODUTO_LOJA: string;
+  DECONTO: string;
+  TEMPODEGARANTIA_MES: number;
+  TEMPODEGARANTIA_DIA: number;
+  DESCRICAO_VENDA: string;
   ID_MARCA: number;
-  MARCA: string;
-  PATH_IMAGEM: string | null;
+  MARCA_NOME: string;
+  ID_IMAGEM_MARCA: number;
+  ID_IMAGEM: number;
+  PATH_IMAGEM: string;
+  SLUG: string;
+  DATADOCADASTRO: string;
 }
 
 // ========================================
@@ -171,6 +192,7 @@ export interface FindProductByIdRequest extends BaseProductRequest {
  */
 export interface FindProductsRequest extends BaseProductRequest {
   pe_id_taxonomy?: number;
+  pe_slug_taxonomy?: string;
   pe_id_produto?: number;
   pe_produto?: string;
   pe_flag_estoque?: number;

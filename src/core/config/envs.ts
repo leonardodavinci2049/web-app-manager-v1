@@ -29,10 +29,15 @@ const envsSchema = z.object({
   // Organization, Member and User IDs
   // ⚠️ DEVELOPMENT ONLY: Em produção, estes valores devem vir da sessão do usuário
   // Não devem ser fixos no .env, pois cada usuário tem seus próprios IDs
+  // Os valores na documentação da API são apenas exemplos de demonstração
   // TODO: Migrar para obtenção via getUserSession() em produção
   ORGANIZATION_ID: z.string().min(1, "ORGANIZATION_ID is required"),
   MEMBER_ID: z.string().min(1, "MEMBER_ID is required"),
   USER_ID: z.string().min(1, "USER_ID is required"),
+  PERSON_ID: z
+    .string()
+    .transform((val) => parseInt(val, 10))
+    .pipe(z.number().positive("PERSON_ID must be a positive number")),
   // INFO DEVELOPER - Variáveis públicas (disponíveis no cliente)
   // Usadas para exibir informações do desenvolvedor no footer/sobre
   NEXT_PUBLIC_DEVELOPER_NAME: z
@@ -133,6 +138,7 @@ if (typeof window === "undefined") {
     ORGANIZATION_ID: "",
     MEMBER_ID: "",
     USER_ID: "",
+    PERSON_ID: 0,
     // Estas variáveis públicas PODEM ser acessadas no cliente
     NEXT_PUBLIC_DEVELOPER_NAME: process.env.NEXT_PUBLIC_DEVELOPER_NAME || "",
     NEXT_PUBLIC_DEVELOPER_URL: process.env.NEXT_PUBLIC_DEVELOPER_URL || "",
@@ -180,10 +186,11 @@ export const envs = {
   APP_ID: envVars.APP_ID,
   TYPE_BUSINESS: envVars.TYPE_BUSINESS,
 
-  // Organization and Member IDs
+  // Organization, Member and User IDs (valores flexíveis baseados no .env)
   ORGANIZATION_ID: envVars.ORGANIZATION_ID,
   MEMBER_ID: envVars.MEMBER_ID,
   USER_ID: envVars.USER_ID,
+  PERSON_ID: envVars.PERSON_ID,
 
   // INFO DEVELOPER
   NEXT_PUBLIC_DEVELOPER_NAME: envVars.NEXT_PUBLIC_DEVELOPER_NAME,

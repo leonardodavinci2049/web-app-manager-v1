@@ -23,12 +23,13 @@ export const FindProductByIdSchema = z.object({
  */
 export const FindProductsSchema = z.object({
   pe_id_taxonomy: z.number().int().min(0).optional(), // Allow 0 for "no specific taxonomy"
+  pe_slug_taxonomy: z.string().max(255).optional(), // Slug da taxonomia/categoria
   pe_id_produto: z.number().int().min(0).optional(), // Allow 0 for "no specific product"
   pe_produto: z.string().max(255).optional(),
   pe_flag_estoque: z.number().int().min(0).max(1).optional(),
   pe_flag_inativo: z.number().int().min(0).max(1).optional(),
   pe_qt_registros: z.number().int().min(1).max(100).optional(),
-  pe_pagina_id: z.number().int().min(1).optional(),
+  pe_pagina_id: z.number().int().min(0).optional(), // MariaDB pagination starts at 0
   pe_coluna_id: z.number().int().optional(),
   pe_ordem_id: z.number().int().min(1).max(2).optional(),
 });

@@ -7,6 +7,7 @@ import type {
   ProductListItem,
 } from "@/services/api/product/types/product-types";
 import type { Product } from "@/types/types";
+import { getValidImageUrl } from "@/utils/image-utils";
 
 const logger = createLogger("ProductActions");
 
@@ -18,17 +19,17 @@ function convertApiProductToAppProduct(
   index?: number,
 ): Product {
   // Safely handle potential null/undefined values
-  const productId = apiProduct?.ID_TBL_PRODUTO;
+  const productId = apiProduct?.ID_PRODUTO;
   const id =
     productId?.toString() || `temp-${Date.now()}-${index || Math.random()}`;
   const name = apiProduct?.PRODUTO || "Produto sem nome";
   const ref = apiProduct?.REF || "";
   const sku = ref || `SKU-${id}`;
-  const image =
-    apiProduct?.PATH_IMAGEM || "/images/product/default-product.png";
-  const normalPrice = apiProduct?.VL_VENDA_VAREJO || 0;
-  const stock = apiProduct?.QT_ESTOQUE || 0;
-  const category = apiProduct?.MARCA || "Sem Categoria";
+  const image = getValidImageUrl(apiProduct?.PATH_IMAGEM);
+  // Convert string price to number
+  const normalPrice = parseFloat(apiProduct?.VL_VAREJO || "0") || 0;
+  const stock = apiProduct?.ESTOQUE_LOJA || 0;
+  const category = apiProduct?.MARCA_NOME || "Sem Categoria";
 
   return {
     id,
@@ -56,6 +57,29 @@ export interface ProductSearchParams {
 }
 
 /**
+ * Map sortBy option to API parameters
+ */
+function mapSortToApiParams(sortBy?: string): {
+  pe_coluna_id: number;
+  pe_ordem_id: number;
+} {
+  switch (sortBy) {
+    case "name-asc":
+      return { pe_coluna_id: 1, pe_ordem_id: 1 }; // Nome A-Z
+    case "name-desc":
+      return { pe_coluna_id: 1, pe_ordem_id: 2 }; // Nome Z-A
+    case "newest":
+      return { pe_coluna_id: 2, pe_ordem_id: 2 }; // Mais Recente
+    case "price-asc":
+      return { pe_coluna_id: 3, pe_ordem_id: 1 }; // Menor Preço
+    case "price-desc":
+      return { pe_coluna_id: 3, pe_ordem_id: 2 }; // Maior Preço
+    default:
+      return { pe_coluna_id: 1, pe_ordem_id: 1 }; // Default: Nome A-Z
+  }
+}
+
+/**
  * Server Action to fetch products from API
  */
 export async function fetchProducts(params: ProductSearchParams = {}): Promise<{
@@ -67,13 +91,17 @@ export async function fetchProducts(params: ProductSearchParams = {}): Promise<{
   try {
     logger.info("Fetching products with params:", params);
 
+    // Map sort option to API parameters
+    const sortParams = mapSortToApiParams(params.sortBy);
+
     // Build API request parameters - only include meaningful values
+    // Note: MariaDB pagination starts at 0, so we convert 1-based to 0-based
     const apiParams: Partial<FindProductsRequest> = {
       pe_flag_inativo: 0, // Only active products
       pe_qt_registros: params.perPage || 20,
-      pe_pagina_id: params.page || 1,
-      pe_coluna_id: 1, // Sort column
-      pe_ordem_id: params.sortBy?.includes("desc") ? 2 : 1, // 1=ASC, 2=DESC
+      pe_pagina_id: (params.page || 1) - 1, // Convert 1-based to 0-based pagination
+      pe_coluna_id: sortParams.pe_coluna_id,
+      pe_ordem_id: sortParams.pe_ordem_id,
     };
 
     // Only include search term if not empty
@@ -163,12 +191,13 @@ export async function fetchProducts(params: ProductSearchParams = {}): Promise<{
 
 /**
  * Server Action to fetch products with advanced filters
+ * Note: Uses 1-based pagination for frontend consistency, converts to 0-based for API
  */
 export async function fetchProductsWithFilters(
   searchTerm: string = "",
   categoryId: string = "all",
   onlyInStock: boolean = false,
-  sortBy: string = "newest",
+  sortBy: string = "name-asc",
   page: number = 1,
   perPage: number = 20,
 ): Promise<{
