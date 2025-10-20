@@ -138,6 +138,7 @@
       "view": "Visualizar",
       "search": "Pesquisar",
       "filter": "Filtrar",
+      "clearFilters": "Limpar Filtros",
       "export": "Exportar",
       "import": "Importar",
       "refresh": "Atualizar",
@@ -189,7 +190,24 @@
       "imageNotFound": "Imagem não encontrada",
       "imageInvalidDomain": "Domínio de imagem não permitido",
       "imageInvalidFormat": "Formato de imagem inválido",
-      "noImageAvailable": "Sem imagem disponível"
+      "noImageAvailable": "Sem imagem disponível",
+      "search": {
+        "placeholder": "Buscar por nome ou SKU..."
+      },
+      "filters": {
+        "title": "Filtros",
+        "category": "Categoria",
+        "subcategory": "Subcategoria",
+        "selectCategory": "Selecione uma categoria",
+        "selectCategoryFirst": "Selecione uma categoria primeiro",
+        "selectSubcategory": "Selecione uma subcategoria",
+        "allCategories": "Todas as Categorias",
+        "allSubcategories": "Todas as Subcategorias",
+        "activeFilters": "Filtros ativos",
+        "inStockOnly": "APENAS EM ESTOQUE",
+        "sortBy": "Ordenar por",
+        "showingResults": "Mostrando {{displayed}} de {{total}} produtos"
+      }
     },
     "customers": {
       "title": "Clientes",

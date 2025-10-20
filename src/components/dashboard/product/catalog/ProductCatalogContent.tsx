@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { fetchProductsWithFilters } from "@/app/actions/action-products";
 import { createLogger } from "@/lib/logger";
 import type { Category, FilterOptions, Product, ViewMode } from "@/types/types";
-import { ProductFilters } from "./ProductFilters";
+import { ProductFiltersImproved } from "./ProductFiltersImproved";
 import { ProductGrid } from "./ProductGrid";
 
 const logger = createLogger("ProductCatalogContent");
@@ -32,6 +32,8 @@ export function ProductCatalogContent({
   const [filters, setFilters] = useState<FilterOptions>({
     searchTerm: "",
     selectedCategory: "all",
+    selectedSubcategory: undefined,
+    selectedSubgroup: undefined,
     onlyInStock: false,
     sortBy: "name-asc",
   });
@@ -92,6 +94,8 @@ export function ProductCatalogContent({
     const defaultFilters: FilterOptions = {
       searchTerm: "",
       selectedCategory: "all",
+      selectedSubcategory: undefined,
+      selectedSubgroup: undefined,
       onlyInStock: false,
       sortBy: "name-asc",
     };
@@ -99,9 +103,7 @@ export function ProductCatalogContent({
     setLoadedQuantity(20); // Reset loaded quantity
     setReachedEnd(false); // Reset end state
     updateFilters(defaultFilters);
-  };
-
-  // Load more products (increment quantity)
+  }; // Load more products (increment quantity)
   const loadMore = async () => {
     if (isLoadingMore || reachedEnd) return;
 
@@ -155,7 +157,7 @@ export function ProductCatalogContent({
   return (
     <>
       {/* Filtros */}
-      <ProductFilters
+      <ProductFiltersImproved
         filters={filters}
         categories={categories}
         viewMode={viewMode}
