@@ -22,8 +22,8 @@ export const FindProductByIdSchema = z.object({
  * Schema for listing products (ENDPOINT 2)
  */
 export const FindProductsSchema = z.object({
-  pe_id_taxonomy: z.number().int().positive().optional(),
-  pe_id_produto: z.number().int().positive().optional(),
+  pe_id_taxonomy: z.number().int().min(0).optional(), // Allow 0 for "no specific taxonomy"
+  pe_id_produto: z.number().int().min(0).optional(), // Allow 0 for "no specific product"
   pe_produto: z.string().max(255).optional(),
   pe_flag_estoque: z.number().int().min(0).max(1).optional(),
   pe_flag_inativo: z.number().int().min(0).max(1).optional(),
