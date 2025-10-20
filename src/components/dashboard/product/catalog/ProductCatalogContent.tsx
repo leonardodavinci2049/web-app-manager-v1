@@ -144,9 +144,9 @@ export function ProductCatalogContent({
 
   // Handle product details view
   const handleViewDetails = (productId: string) => {
-    // TODO: Implement navigation to product details page
-    logger.info("Viewing product details:", productId);
-    toast.info(`Visualizando detalhes do produto ID: ${productId}`);
+    logger.info("Navigating to product details:", productId);
+    // Navigate to product details page
+    window.location.href = `/dashboard/product/product-details?id=${productId}`;
   };
 
   // Calculate display values
