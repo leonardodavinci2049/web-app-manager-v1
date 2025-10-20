@@ -107,11 +107,6 @@ export function ProductFilters({
     <div className="space-y-6">
       {/* Card de Pesquisa */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            Pesquisar Produtos
-          </CardTitle>
-        </CardHeader>
         <CardContent className="pt-0">
           <div className="flex flex-col items-center gap-4">
             {/* Linha principal - Input e botão de pesquisa centralizados */}
@@ -233,11 +228,6 @@ export function ProductFilters({
 
       {/* Controles de Filtro e Visualização */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            Filtros e Visualização
-          </CardTitle>
-        </CardHeader>
         <CardContent className="pt-0">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
