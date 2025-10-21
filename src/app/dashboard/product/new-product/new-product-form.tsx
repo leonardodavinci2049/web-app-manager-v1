@@ -2,109 +2,156 @@
 
 /**
  * Componente de formulário para criação de novo produto
+ * Migrado para usar Form component do Next.js 15 com Server Actions
  */
 
+import Form from "next/form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { createProduct } from "@/app/actions/action-products";
-import { Button } from "@/components/ui/button";
+import { createProductFromForm } from "@/app/actions/action-products";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+  FormButton,
+  FormInput,
+  FormTextarea,
+} from "@/components/forms/form-inputs";
+import { SubmitButton } from "@/components/forms/submit-button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
-
-import { generateSlugFromName } from "./validation";
 
 /**
  * Componente do formulário de criação de produto
+ * Usa useActionState para gerenciar resposta e useFormStatus nos inputs para loading
  */
 export function NewProductForm() {
   const { t } = useTranslation();
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
-  // Estado do formulário
-  const [formData, setFormData] = useState({
-    name: "",
-    slug: "",
-    reference: "",
-    model: "",
-    description: "",
-    tags: "",
-    retailPrice: 0,
-    stock: 0,
-    additionalInfo: "",
-  });
+  // Função de validação customizada
+  const validateForm = (formData: FormData): Record<string, string> => {
+    const errors: Record<string, string> = {};
 
-  // Gerar slug automaticamente baseado no nome
-  const handleNameChange = (name: string) => {
-    const slug = generateSlugFromName(name);
-    setFormData((prev) => ({
-      ...prev,
-      name,
-      slug,
-    }));
+    // Validar Nome do Produto
+    const name = formData.get("name") as string;
+    if (!name || name.trim().length === 0) {
+      errors.name = "O nome do produto é obrigatório e não pode estar vazio.";
+    } else if (name.trim().length < 3) {
+      errors.name =
+        "O nome do produto deve ter pelo menos 3 caracteres para ser identificado adequadamente.";
+    }
+
+    // Validar Preço Atacado
+    const wholesalePrice = parseFloat(formData.get("wholesalePrice") as string);
+    if (Number.isNaN(wholesalePrice) || wholesalePrice < 0) {
+      errors.wholesalePrice =
+        "O preço de atacado é obrigatório e deve ser um valor numérico válido (maior ou igual a zero).";
+    } else if (wholesalePrice === 0) {
+      errors.wholesalePrice =
+        "O preço de atacado não pode ser zero. Por favor, defina um valor adequado para vendas no atacado.";
+    }
+
+    // Validar Preço Varejo
+    const retailPrice = parseFloat(formData.get("retailPrice") as string);
+    if (Number.isNaN(retailPrice) || retailPrice < 0) {
+      errors.retailPrice =
+        "O preço de varejo é obrigatório e deve ser um valor numérico válido (maior ou igual a zero).";
+    } else if (retailPrice === 0) {
+      errors.retailPrice =
+        "O preço de varejo não pode ser zero. Por favor, defina um valor adequado para vendas no varejo.";
+    }
+
+    // Validar Preço Corporativo
+    const corporatePrice = parseFloat(formData.get("corporatePrice") as string);
+    if (Number.isNaN(corporatePrice) || corporatePrice < 0) {
+      errors.corporatePrice =
+        "O preço corporativo é obrigatório e deve ser um valor numérico válido (maior ou igual a zero).";
+    } else if (corporatePrice === 0) {
+      errors.corporatePrice =
+        "O preço corporativo não pode ser zero. Por favor, defina um valor adequado para vendas corporativas.";
+    }
+
+    // Validar Estoque (opcional)
+    const stock = parseInt(formData.get("stock") as string, 10);
+    if (!Number.isNaN(stock) && stock < 0) {
+      errors.stock =
+        "O estoque deve ser um número inteiro válido (maior ou igual a zero).";
+    }
+
+    // Validar ID da Marca (opcional)
+    const brandId = parseInt(formData.get("brandId") as string, 10);
+    if (!Number.isNaN(brandId) && brandId < 0) {
+      errors.brandId =
+        "O ID da marca deve ser um número inteiro válido (maior ou igual a zero).";
+    }
+
+    // Validar ID do Tipo (opcional)
+    const typeId = parseInt(formData.get("typeId") as string, 10);
+    if (!Number.isNaN(typeId) && typeId < 0) {
+      errors.typeId =
+        "O ID do tipo deve ser um número inteiro válido (maior ou igual a zero).";
+    }
+
+    // Validações de consistência entre preços
+    if (
+      !Number.isNaN(wholesalePrice) &&
+      !Number.isNaN(retailPrice) &&
+      wholesalePrice > retailPrice
+    ) {
+      errors.wholesalePrice =
+        "O preço de atacado não deve ser maior que o preço de varejo. Verifique os valores informados.";
+    }
+
+    return errors;
   };
 
-  // Submeter formulário
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setIsSubmitting(true);
+  // Função para lidar com o envio do formulário com validação
+  const handleFormSubmit = async (formData: FormData) => {
+    // Limpar erros anteriores
+    setValidationErrors({});
 
-    try {
-      // Validar campos obrigatórios
-      if (!formData.name.trim()) {
-        toast.error(t("dashboard.products.errors.nameRequired"));
-        return;
+    // Validar formulário
+    const errors = validateForm(formData);
+
+    if (Object.keys(errors).length > 0) {
+      // Mostrar erros de validação
+      setValidationErrors(errors);
+
+      // Mostrar toast com resumo dos erros
+      const errorCount = Object.keys(errors).length;
+      toast.error(
+        `Encontrados ${errorCount} erro${errorCount > 1 ? "s" : ""} de validação. Por favor, corrija os campos destacados.`,
+        {
+          duration: 5000,
+        },
+      ); // Focar no primeiro campo com erro
+      const firstErrorField = Object.keys(errors)[0];
+      const element = document.getElementById(firstErrorField);
+      if (element) {
+        element.focus();
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
       }
 
-      if (!formData.slug.trim()) {
-        toast.error(t("dashboard.products.errors.slugRequired"));
-        return;
-      }
-
-      const result = await createProduct({
-        name: formData.name,
-        slug: formData.slug,
-        reference: formData.reference,
-        model: formData.model,
-        description: formData.description,
-        tags: formData.tags,
-        retailPrice: formData.retailPrice,
-        stock: formData.stock,
-        businessType: 1,
-        additionalInfo: formData.additionalInfo,
-      });
-
-      if (result.success) {
-        toast.success(t("dashboard.products.messages.createdSuccess"));
-
-        // Aguardar um momento para mostrar o toast antes do redirecionamento
-        setTimeout(() => {
-          router.push("/dashboard/product");
-        }, 1000);
-      } else {
-        toast.error(
-          result.error || t("dashboard.products.messages.createFailed"),
-        );
-      }
-    } catch (error) {
-      console.error("Erro ao criar produto:", error);
-      toast.error(t("dashboard.products.messages.unexpectedError"));
-    } finally {
-      setIsSubmitting(false);
+      return;
     }
-  }
+
+    // Se não há erros, prosseguir com o envio
+    const result = await createProductFromForm(formData);
+
+    if (result.success && result.productId) {
+      toast.success(t("dashboard.products.messages.createdSuccess"));
+      setTimeout(() => {
+        router.push("/dashboard/product");
+      }, 1000);
+    } else if (result.error) {
+      toast.error(result.error);
+    }
+  };
 
   // Cancelar e voltar para lista
   const handleCancel = () => {
@@ -112,16 +159,13 @@ export function NewProductForm() {
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <Form action={handleFormSubmit} className="space-y-6">
       {/* Informações Básicas */}
       <Card>
         <CardHeader>
           <CardTitle>
             {t("dashboard.products.new.sections.basicInfo")}
           </CardTitle>
-          <CardDescription>
-            {t("dashboard.products.new.sections.basicInfoDesc")}
-          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Nome do Produto */}
@@ -129,35 +173,21 @@ export function NewProductForm() {
             <Label htmlFor="name">
               {t("dashboard.products.new.fields.name")}
             </Label>
-            <Input
+            <FormInput
               id="name"
-              value={formData.name}
-              onChange={(e) => handleNameChange(e.target.value)}
+              name="name"
               placeholder={t("dashboard.products.new.placeholders.name")}
-              required
-            />
-            <p className="text-sm text-muted-foreground">
-              {t("dashboard.products.new.help.name")}
-            </p>
-          </div>
-
-          {/* Slug */}
-          <div className="space-y-2">
-            <Label htmlFor="slug">
-              {t("dashboard.products.new.fields.slug")}
-            </Label>
-            <Input
-              id="slug"
-              value={formData.slug}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, slug: e.target.value }))
+              className={
+                validationErrors.name
+                  ? "border-red-500 focus:border-red-500"
+                  : ""
               }
-              placeholder={t("dashboard.products.new.placeholders.slug")}
-              required
             />
-            <p className="text-sm text-muted-foreground">
-              {t("dashboard.products.new.help.slug")}
-            </p>
+            {validationErrors.name && (
+              <p className="text-sm text-red-600 mt-1">
+                {validationErrors.name}
+              </p>
+            )}
           </div>
 
           {/* Referência */}
@@ -165,146 +195,178 @@ export function NewProductForm() {
             <Label htmlFor="reference">
               {t("dashboard.products.new.fields.reference")}
             </Label>
-            <Input
+            <FormInput
               id="reference"
-              value={formData.reference}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, reference: e.target.value }))
-              }
+              name="reference"
               placeholder={t("dashboard.products.new.placeholders.reference")}
             />
-            <p className="text-sm text-muted-foreground">
-              {t("dashboard.products.new.help.reference")}
-            </p>
-          </div>
-
-          {/* Modelo */}
-          <div className="space-y-2">
-            <Label htmlFor="model">
-              {t("dashboard.products.new.fields.model")}
-            </Label>
-            <Input
-              id="model"
-              value={formData.model}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, model: e.target.value }))
-              }
-              placeholder={t("dashboard.products.new.placeholders.model")}
-            />
-            <p className="text-sm text-muted-foreground">
-              {t("dashboard.products.new.help.model")}
-            </p>
           </div>
         </CardContent>
       </Card>
 
-      {/* Preço e Estoque */}
+      {/* Preços */}
       <Card>
         <CardHeader>
           <CardTitle>{t("dashboard.products.new.sections.pricing")}</CardTitle>
-          <CardDescription>
-            {t("dashboard.products.new.sections.pricingDesc")}
-          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Preço de Venda */}
+          {/* Preço Atacado */}
           <div className="space-y-2">
-            <Label htmlFor="retailPrice">
-              {t("dashboard.products.new.fields.retailPrice")}
-            </Label>
-            <Input
-              id="retailPrice"
+            <Label htmlFor="wholesalePrice">Preço Atacado</Label>
+            <FormInput
+              id="wholesalePrice"
+              name="wholesalePrice"
               type="number"
               min="0"
               step="0.01"
-              value={formData.retailPrice}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  retailPrice: parseFloat(e.target.value) || 0,
-                }))
+              defaultValue="0"
+              placeholder="0.00"
+              className={
+                validationErrors.wholesalePrice
+                  ? "border-red-500 focus:border-red-500"
+                  : ""
               }
-              placeholder={t("dashboard.products.new.placeholders.retailPrice")}
             />
-            <p className="text-sm text-muted-foreground">
-              {t("dashboard.products.new.help.retailPrice")}
-            </p>
+            {validationErrors.wholesalePrice && (
+              <p className="text-sm text-red-600 mt-1">
+                {validationErrors.wholesalePrice}
+              </p>
+            )}
           </div>
 
+          {/* Preço Varejo */}
+          <div className="space-y-2">
+            <Label htmlFor="retailPrice">Preço Varejo</Label>
+            <FormInput
+              id="retailPrice"
+              name="retailPrice"
+              type="number"
+              min="0"
+              step="0.01"
+              defaultValue="0"
+              placeholder="0.00"
+              className={
+                validationErrors.retailPrice
+                  ? "border-red-500 focus:border-red-500"
+                  : ""
+              }
+            />
+            {validationErrors.retailPrice && (
+              <p className="text-sm text-red-600 mt-1">
+                {validationErrors.retailPrice}
+              </p>
+            )}
+          </div>
+
+          {/* Preço Corporativo */}
+          <div className="space-y-2">
+            <Label htmlFor="corporatePrice">Preço Corporativo</Label>
+            <FormInput
+              id="corporatePrice"
+              name="corporatePrice"
+              type="number"
+              min="0"
+              step="0.01"
+              defaultValue="0"
+              placeholder="0.00"
+              className={
+                validationErrors.corporatePrice
+                  ? "border-red-500 focus:border-red-500"
+                  : ""
+              }
+            />
+            {validationErrors.corporatePrice && (
+              <p className="text-sm text-red-600 mt-1">
+                {validationErrors.corporatePrice}
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Estoque */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("dashboard.products.new.fields.stock")}</CardTitle>
+        </CardHeader>
+        <CardContent>
           {/* Estoque */}
           <div className="space-y-2">
             <Label htmlFor="stock">
               {t("dashboard.products.new.fields.stock")}
             </Label>
-            <Input
+            <FormInput
               id="stock"
+              name="stock"
               type="number"
               min="0"
-              value={formData.stock}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  stock: parseInt(e.target.value, 10) || 0,
-                }))
-              }
+              defaultValue="0"
               placeholder={t("dashboard.products.new.placeholders.stock")}
+              className={
+                validationErrors.stock
+                  ? "border-red-500 focus:border-red-500"
+                  : ""
+              }
             />
-            <p className="text-sm text-muted-foreground">
-              {t("dashboard.products.new.help.stock")}
-            </p>
+            {validationErrors.stock && (
+              <p className="text-sm text-red-600 mt-1">
+                {validationErrors.stock}
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Descrição e Detalhes */}
+      {/* Marca e Tipo */}
       <Card>
         <CardHeader>
-          <CardTitle>
-            {t("dashboard.products.new.sections.description")}
-          </CardTitle>
-          <CardDescription>
-            {t("dashboard.products.new.sections.descriptionDesc")}
-          </CardDescription>
+          <CardTitle>Marca e Tipo</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Descrição */}
+          {/* ID da Marca */}
           <div className="space-y-2">
-            <Label htmlFor="description">
-              {t("dashboard.products.new.fields.description")}
-            </Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
+            <Label htmlFor="brandId">ID da Marca</Label>
+            <FormInput
+              id="brandId"
+              name="brandId"
+              type="number"
+              min="0"
+              defaultValue="0"
+              placeholder="0"
+              className={
+                validationErrors.brandId
+                  ? "border-red-500 focus:border-red-500"
+                  : ""
               }
-              placeholder={t("dashboard.products.new.placeholders.description")}
-              rows={4}
             />
-            <p className="text-sm text-muted-foreground">
-              {t("dashboard.products.new.help.description")}
-            </p>
+            {validationErrors.brandId && (
+              <p className="text-sm text-red-600 mt-1">
+                {validationErrors.brandId}
+              </p>
+            )}
           </div>
 
-          {/* Tags */}
+          {/* ID do Tipo */}
           <div className="space-y-2">
-            <Label htmlFor="tags">
-              {t("dashboard.products.new.fields.tags")}
-            </Label>
-            <Input
-              id="tags"
-              value={formData.tags}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, tags: e.target.value }))
+            <Label htmlFor="typeId">ID do Tipo</Label>
+            <FormInput
+              id="typeId"
+              name="typeId"
+              type="number"
+              min="0"
+              defaultValue="0"
+              placeholder="0"
+              className={
+                validationErrors.typeId
+                  ? "border-red-500 focus:border-red-500"
+                  : ""
               }
-              placeholder={t("dashboard.products.new.placeholders.tags")}
             />
-            <p className="text-sm text-muted-foreground">
-              {t("dashboard.products.new.help.tags")}
-            </p>
+            {validationErrors.typeId && (
+              <p className="text-sm text-red-600 mt-1">
+                {validationErrors.typeId}
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -315,9 +377,6 @@ export function NewProductForm() {
           <CardTitle>
             {t("dashboard.products.new.sections.additional")}
           </CardTitle>
-          <CardDescription>
-            {t("dashboard.products.new.sections.additionalDesc")}
-          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Informações Adicionais */}
@@ -325,50 +384,40 @@ export function NewProductForm() {
             <Label htmlFor="additionalInfo">
               {t("dashboard.products.new.fields.additionalInfo")}
             </Label>
-            <Textarea
+            <FormTextarea
               id="additionalInfo"
-              value={formData.additionalInfo}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  additionalInfo: e.target.value,
-                }))
-              }
+              name="additionalInfo"
               placeholder={t(
                 "dashboard.products.new.placeholders.additionalInfo",
               )}
               rows={3}
             />
-            <p className="text-sm text-muted-foreground">
-              {t("dashboard.products.new.help.additionalInfo")}
-            </p>
           </div>
         </CardContent>
       </Card>
 
       <Separator />
 
+      {/* Campo oculto para businessType - valor vem das variáveis de ambiente */}
+      <input type="hidden" name="businessType" value="1" />
+
       {/* Botões de Ação */}
       <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
-        <Button
+        <FormButton
           type="button"
           variant="outline"
           onClick={handleCancel}
-          disabled={isSubmitting}
           className="w-full sm:w-auto"
         >
           {t("dashboard.products.new.actions.cancel")}
-        </Button>
-        <Button
-          type="submit"
-          disabled={isSubmitting}
+        </FormButton>
+        <SubmitButton
           className="w-full sm:w-auto"
+          pendingText={t("dashboard.products.new.actions.creating")}
         >
-          {isSubmitting
-            ? t("dashboard.products.new.actions.creating")
-            : t("dashboard.products.new.actions.create")}
-        </Button>
+          {t("dashboard.products.new.actions.create")}
+        </SubmitButton>
       </div>
-    </form>
+    </Form>
   );
 }

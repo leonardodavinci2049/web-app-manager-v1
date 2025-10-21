@@ -4,7 +4,6 @@ import { SiteHeaderWithBreadcrumb } from "@/components/dashboard/header/site-hea
 import { ProductCatalogContent } from "@/components/dashboard/product/catalog/ProductCatalogContent";
 import { ProductGridSkeleton } from "@/components/dashboard/product/catalog/ProductSkeleton";
 import { createLogger } from "@/lib/logger";
-import { mockCategories } from "@/mock/dashboard/mocked-statistics-data";
 import type { Product } from "@/types/types";
 
 const logger = createLogger("CatalogPage");
@@ -79,7 +78,7 @@ export default async function CatalogoPage() {
                   <ProductCatalogContent
                     initialProducts={initialProducts.products}
                     initialTotal={initialProducts.total}
-                    categories={mockCategories}
+                    categories={[]}
                     hasError={hasError}
                     errorMessage={errorMessage}
                   />

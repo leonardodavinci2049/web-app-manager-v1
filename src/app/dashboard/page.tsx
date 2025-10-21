@@ -1,9 +1,6 @@
 import { ChartAreaInteractive } from "@/components/dashboard/chart-area-interactive";
-import { DataTable } from "@/components/dashboard/data-table";
 import { SiteHeaderWithBreadcrumb } from "@/components/dashboard/header/site-header-with-breadcrumb";
 import { SectionCards } from "@/components/dashboard/section-cards";
-
-import data from "@/mock/dashboard/mocked-product-data.json";
 
 export default function Page() {
   return (
@@ -22,7 +19,16 @@ export default function Page() {
             <div className="px-4 lg:px-6">
               <ChartAreaInteractive />
             </div>
-            <DataTable data={data} />
+            {/* DataTable temporariamente desabilitado - será substituído por dados reais da API */}
+            <div className="px-4 lg:px-6">
+              <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+                <h3 className="text-lg font-semibold mb-2">Dados da Tabela</h3>
+                <p className="text-muted-foreground">
+                  Os dados da tabela serão carregados da API em futuras
+                  iterações.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
