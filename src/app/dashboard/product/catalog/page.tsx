@@ -74,7 +74,7 @@ export default async function CatalogoPage() {
 
                 {/* Content with Suspense for better UX */}
                 <Suspense
-                  fallback={<ProductGridSkeleton viewMode="grid" count={8} />}
+                  fallback={<ProductGridSkeleton viewMode="list" count={8} />}
                 >
                   <ProductCatalogContent
                     initialProducts={initialProducts.products}
