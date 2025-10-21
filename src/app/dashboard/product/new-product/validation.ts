@@ -15,6 +15,7 @@ export const CreateProductFormSchema = z.object({
     .max(200, "Nome não pode ter mais de 200 caracteres")
     .trim(),
 
+  // Slug agora é opcional - será gerado automaticamente no servidor
   slug: z
     .string()
     .min(2, "Slug deve ter pelo menos 2 caracteres")
@@ -23,7 +24,8 @@ export const CreateProductFormSchema = z.object({
       /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
       "Slug deve conter apenas letras minúsculas, números e hífens",
     )
-    .trim(),
+    .trim()
+    .optional(),
 
   // Campos opcionais
   reference: z
@@ -80,21 +82,6 @@ export const CreateProductFormSchema = z.object({
 export type CreateProductFormData = z.infer<typeof CreateProductFormSchema>;
 
 /**
- * Função para gerar slug automaticamente baseado no nome
- * @param name Nome do produto
- * @returns Slug formatado
- */
-export function generateSlugFromName(name: string): string {
-  return name
-    .toLowerCase()
-    .trim()
-    .normalize("NFD") // Normalize unicode characters
-    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics (acentos)
-    .replace(/\s+/g, "-") // Substituir espaços por hífens
-    .replace(/[^a-z0-9-]/g, "") // Remover caracteres especiais
-    .replace(/-+/g, "-") // Remover hífens duplicados
-    .replace(/^-|-$/g, ""); // Remover hífens do início e fim
-}
 
 /**
  * Função para validar e formatar preço

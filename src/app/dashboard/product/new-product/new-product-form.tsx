@@ -23,8 +23,6 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 
-import { generateSlugFromName } from "./validation";
-
 /**
  * Componente do formulário de criação de produto
  */
@@ -36,7 +34,6 @@ export function NewProductForm() {
   // Estado do formulário
   const [formData, setFormData] = useState({
     name: "",
-    slug: "",
     reference: "",
     model: "",
     description: "",
@@ -46,13 +43,11 @@ export function NewProductForm() {
     additionalInfo: "",
   });
 
-  // Gerar slug automaticamente baseado no nome
+  // Atualizar nome do produto
   const handleNameChange = (name: string) => {
-    const slug = generateSlugFromName(name);
     setFormData((prev) => ({
       ...prev,
       name,
-      slug,
     }));
   };
 
@@ -68,14 +63,8 @@ export function NewProductForm() {
         return;
       }
 
-      if (!formData.slug.trim()) {
-        toast.error(t("dashboard.products.errors.slugRequired"));
-        return;
-      }
-
       const result = await createProduct({
         name: formData.name,
-        slug: formData.slug,
         reference: formData.reference,
         model: formData.model,
         description: formData.description,
@@ -138,25 +127,6 @@ export function NewProductForm() {
             />
             <p className="text-sm text-muted-foreground">
               {t("dashboard.products.new.help.name")}
-            </p>
-          </div>
-
-          {/* Slug */}
-          <div className="space-y-2">
-            <Label htmlFor="slug">
-              {t("dashboard.products.new.fields.slug")}
-            </Label>
-            <Input
-              id="slug"
-              value={formData.slug}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, slug: e.target.value }))
-              }
-              placeholder={t("dashboard.products.new.placeholders.slug")}
-              required
-            />
-            <p className="text-sm text-muted-foreground">
-              {t("dashboard.products.new.help.slug")}
             </p>
           </div>
 

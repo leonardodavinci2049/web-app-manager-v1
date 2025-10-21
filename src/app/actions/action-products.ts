@@ -8,40 +8,145 @@ import type {
 } from "@/services/api/product/types/product-types";
 import type { Product } from "@/types/types";
 import { getValidImageUrl } from "@/utils/image-utils";
+import { generateSlugFromName } from "@/utils/slug-utils";
 
 const logger = createLogger("ProductActions");
 
 /**
- * Convert API product data to application format
+ * Helper function to safely parse float from string values
  */
-function convertApiProductToAppProduct(
+function safeParseFloat(value: string | number | null | undefined): number {
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    const parsed = parseFloat(value);
+    return Number.isNaN(parsed) ? 0 : parsed;
+  }
+  return 0;
+}
+
+/**
+ * Calculate promotional price based on PROMOCAO flag
+ * In this implementation, we assume a 10% discount when promotion is active
+ * This logic can be adjusted based on business rules
+ */
+function calculatePromotionalPrice(
+  normalPrice: number,
+  isPromotion: boolean,
+): number | undefined {
+  if (!isPromotion || normalPrice <= 0) return undefined;
+  // Apply 10% discount for promotional price
+  return normalPrice * 0.9;
+}
+
+/**
+ * Transform API ProductListItem to application Product interface
+ * Based on the API Reference documentation and prompt requirements
+ */
+function transformApiProductToProduct(
   apiProduct: ProductListItem,
   index?: number,
 ): Product {
-  // Safely handle potential null/undefined values
-  const productId = apiProduct?.ID_PRODUTO;
-  const id =
-    productId?.toString() || `temp-${Date.now()}-${index || Math.random()}`;
-  const name = apiProduct?.PRODUTO || "Produto sem nome";
-  const ref = apiProduct?.REF || "";
-  const sku = ref || `SKU-${id}`;
-  const image = getValidImageUrl(apiProduct?.PATH_IMAGEM);
-  // Convert string price to number
-  const normalPrice = parseFloat(apiProduct?.VL_VAREJO || "0") || 0;
-  const stock = apiProduct?.ESTOQUE_LOJA || 0;
-  const category = apiProduct?.MARCA_NOME || "Sem Categoria";
+  try {
+    // Validate required fields
+    if (!apiProduct || typeof apiProduct !== "object") {
+      throw new Error("Invalid API product data");
+    }
 
-  return {
-    id,
-    name,
-    sku,
-    image,
-    normalPrice,
-    promotionalPrice: undefined, // API doesn't have promotional price in list
-    stock,
-    category,
-    createdAt: new Date(), // API doesn't have creation date in list
-  };
+    // ID - Use API ID or generate fallback
+    const productId = apiProduct.ID_PRODUTO;
+    const id =
+      productId?.toString() || `temp-${Date.now()}-${index || Math.random()}`;
+
+    // Name - Use API product name
+    const name = apiProduct.PRODUTO || "Produto sem nome";
+
+    // SKU - Use real SKU from API, convert to string
+    const sku = apiProduct.SKU?.toString() || "0";
+
+    // Image - Use validated image URL with fallback
+    const image = getValidImageUrl(apiProduct.PATH_IMAGEM);
+
+    // Prices - Convert string prices to numbers
+    const normalPrice = safeParseFloat(apiProduct.VL_VAREJO);
+    const wholesalePrice = safeParseFloat(apiProduct.VL_ATACADO);
+    const corporatePrice = safeParseFloat(apiProduct.VL_CORPORATIVO);
+
+    // Stock - Use API stock value
+    const stock = apiProduct.ESTOQUE_LOJA || 0;
+
+    // Category - Use TIPO (product type) instead of brand
+    const category = apiProduct.TIPO || "Sem Categoria";
+
+    // Brand - Use MARCA_NOME (required field)
+    const brand = apiProduct.MARCA_NOME || "Sem Marca";
+
+    // Warranty - Use TEMPODEGARANTIA_DIA
+    const warrantyDays = apiProduct.TEMPODEGARANTIA_DIA || 0;
+
+    // Flags - Convert numeric flags to boolean
+    const isPromotion = (apiProduct.PROMOCAO || 0) === 1;
+    const isImported = (apiProduct.IMPORTADO || 0) === 1;
+    const isNew = (apiProduct.LANCAMENTO || 0) === 1;
+
+    // Promotional price - Calculate based on promotion flag
+    const promotionalPrice = calculatePromotionalPrice(
+      normalPrice,
+      isPromotion,
+    );
+
+    // Created date - Parse from API or use current date as fallback
+    let createdAt: Date;
+    try {
+      createdAt = apiProduct.DATADOCADASTRO
+        ? new Date(apiProduct.DATADOCADASTRO)
+        : new Date();
+    } catch {
+      createdAt = new Date();
+    }
+
+    return {
+      id,
+      name,
+      sku,
+      image,
+      normalPrice,
+      promotionalPrice,
+      wholesalePrice,
+      corporatePrice,
+      stock,
+      category,
+      brand,
+      warrantyDays,
+      isPromotion,
+      isImported,
+      isNew,
+      createdAt,
+    };
+  } catch (error) {
+    logger.error("Error transforming API product to app product:", {
+      apiProduct,
+      error,
+    });
+
+    // Return a minimal valid product on error
+    return {
+      id: `error-${Date.now()}-${index || Math.random()}`,
+      name: "Produto com erro",
+      sku: "0",
+      image: "/images/product/default-product.png",
+      normalPrice: 0,
+      wholesalePrice: 0,
+      corporatePrice: 0,
+      stock: 0,
+      category: "Erro",
+      brand: "Erro",
+      warrantyDays: 0,
+      isPromotion: false,
+      isImported: false,
+      isNew: false,
+      createdAt: new Date(),
+    };
+  }
 }
 
 /**
@@ -89,8 +194,6 @@ export async function fetchProducts(params: ProductSearchParams = {}): Promise<{
   error?: string;
 }> {
   try {
-    logger.info("Fetching products with params:", params);
-
     // Map sort option to API parameters
     const sortParams = mapSortToApiParams(params.sortBy);
 
@@ -154,7 +257,7 @@ export async function fetchProducts(params: ProductSearchParams = {}): Promise<{
       .filter((product) => product && typeof product === "object") // Filter out null/invalid products
       .map((product, index) => {
         try {
-          return convertApiProductToAppProduct(product, index);
+          return transformApiProductToProduct(product, index);
         } catch (error) {
           logger.error("Error converting product:", { product, error });
           return null;
@@ -162,9 +265,9 @@ export async function fetchProducts(params: ProductSearchParams = {}): Promise<{
       })
       .filter((product): product is Product => product !== null); // Filter out failed conversions
 
-    logger.info(
+    /*     logger.info(
       `Successfully fetched ${products.length} products from ${apiProducts.length} API products`,
-    );
+    ); */
 
     return {
       success: true,
@@ -250,7 +353,7 @@ export async function fetchProductsWithFilters(
  */
 export interface CreateProductData {
   name: string;
-  slug: string;
+  slug?: string; // Now optional - will be auto-generated from name
   reference?: string;
   model?: string;
   description?: string;
@@ -271,9 +374,29 @@ export async function createProduct(data: CreateProductData): Promise<{
   error?: string;
 }> {
   try {
+    // Auto-generate slug from product name if not provided
+    const slug = data.slug || generateSlugFromName(data.name);
+
+    // Validate that we have a name to work with
+    if (!data.name || !data.name.trim()) {
+      return {
+        success: false,
+        error: "Nome do produto é obrigatório",
+      };
+    }
+
+    // Validate generated slug
+    if (!slug || slug.length < 2) {
+      return {
+        success: false,
+        error:
+          "Não foi possível gerar um slug válido a partir do nome do produto",
+      };
+    }
+
     logger.info("Creating new product with data:", {
       name: data.name,
-      slug: data.slug,
+      slug,
       reference: data.reference,
       model: data.model,
     });
@@ -282,7 +405,7 @@ export async function createProduct(data: CreateProductData): Promise<{
     const apiData = {
       pe_type_business: data.businessType || 1, // Default business type
       pe_nome_produto: data.name,
-      pe_slug: data.slug,
+      pe_slug: slug, // Use auto-generated slug
       pe_descricao_tab: data.description || "",
       pe_etiqueta: data.tags || "",
       pe_ref: data.reference || "",

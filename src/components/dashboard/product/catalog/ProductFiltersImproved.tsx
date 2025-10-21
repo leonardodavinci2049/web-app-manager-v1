@@ -20,7 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { mockCategoryHierarchy } from "@/mock/dashboard/mocked-statistics-data";
 import type {
   Category,
   FilterOptions,
@@ -78,27 +77,17 @@ export function ProductFiltersImproved({
 
   // Atualizar subcategorias quando a categoria muda
   useEffect(() => {
-    if (filters.selectedCategory && filters.selectedCategory !== "all") {
-      const categoryData =
-        mockCategoryHierarchy[
-          filters.selectedCategory as keyof typeof mockCategoryHierarchy
-        ];
-      if (categoryData) {
-        setAvailableSubcategories(categoryData.subcategories);
-      } else {
-        setAvailableSubcategories([]);
-      }
-    } else {
-      setAvailableSubcategories([]);
-      setAvailableSubgroups([]);
-      // Limpar subcategoria e subgrupo quando "Todas" for selecionada
-      if (filters.selectedSubcategory || filters.selectedSubgroup) {
-        onFiltersChange({
-          ...filters,
-          selectedSubcategory: undefined,
-          selectedSubgroup: undefined,
-        });
-      }
+    // Por enquanto, sem dados de hierarquia de categorias
+    setAvailableSubcategories([]);
+    setAvailableSubgroups([]);
+
+    // Limpar subcategoria e subgrupo quando categoria muda
+    if (filters.selectedSubcategory || filters.selectedSubgroup) {
+      onFiltersChange({
+        ...filters,
+        selectedSubcategory: undefined,
+        selectedSubgroup: undefined,
+      });
     }
   }, [
     filters.selectedCategory,
@@ -224,17 +213,12 @@ export function ProductFiltersImproved({
     }
 
     if (filters.selectedCategory && filters.selectedCategory !== "all") {
-      const categoryData =
-        mockCategoryHierarchy[
-          filters.selectedCategory as keyof typeof mockCategoryHierarchy
-        ];
-      if (categoryData) {
-        activeFilters.push({
-          type: "category" as const,
-          label: categoryData.name,
-          value: filters.selectedCategory,
-        });
-      }
+      // Usar o valor da categoria como label por enquanto
+      activeFilters.push({
+        type: "category" as const,
+        label: filters.selectedCategory,
+        value: filters.selectedCategory,
+      });
     }
 
     if (filters.selectedSubcategory) {
@@ -362,13 +346,7 @@ export function ProductFiltersImproved({
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">Todas as Famílias</SelectItem>
-                        {Object.values(mockCategoryHierarchy)
-                          .filter((cat) => cat.id !== "all")
-                          .map((category) => (
-                            <SelectItem key={category.id} value={category.id}>
-                              {category.name}
-                            </SelectItem>
-                          ))}
+                        {/* Categorias serão carregadas da API em futuras iterações */}
                       </SelectContent>
                     </Select>
                   </div>

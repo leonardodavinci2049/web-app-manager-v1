@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, Package } from "lucide-react";
+import { Eye, Package, Plane, Shield, Star } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -28,9 +28,6 @@ export function ProductCard({
   const isOutOfStock = product.stock === 0;
   const hasPromotion =
     product.promotionalPrice && product.promotionalPrice < product.normalPrice;
-  const finalPrice = hasPromotion
-    ? product.promotionalPrice
-    : product.normalPrice;
 
   // Use validated image URL with fallback
   const imageUrl = getValidImageUrl(product.image);
@@ -91,6 +88,11 @@ export function ProductCard({
                   <p className="text-muted-foreground text-sm">
                     SKU: {product.sku}
                   </p>
+                  {product.brand && (
+                    <p className="text-muted-foreground text-xs">
+                      Marca: {product.brand}
+                    </p>
+                  )}
                 </div>
                 <Badge variant="outline" className="flex-shrink-0">
                   {categoryLabels[product.category] || product.category}
@@ -99,32 +101,71 @@ export function ProductCard({
 
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
+                  {/* Status badges */}
+                  <div className="flex gap-1">
+                    {product.isNew && (
+                      <Badge
+                        variant="secondary"
+                        className="text-xs bg-blue-100 text-blue-800 hover:bg-blue-200"
+                      >
+                        <Star className="h-3 w-3 mr-1" />
+                        Lançamento
+                      </Badge>
+                    )}
+                    {product.isImported && (
+                      <Badge variant="outline" className="text-xs">
+                        <Plane className="h-3 w-3 mr-1" />
+                        Importado
+                      </Badge>
+                    )}
+                  </div>
+                  {/* Preços principais */}
                   <div className="flex items-center gap-2">
                     {hasPromotion && (
                       <span className="text-muted-foreground text-sm line-through">
                         {formatCurrency(product.normalPrice)}
                       </span>
                     )}
-                    <span
-                      className={`font-bold ${hasPromotion ? "text-green-600" : "text-foreground"}`}
-                    >
-                      {formatCurrency(finalPrice || 0)}
+                  </div>
+                  {/* Preços diferenciados - mesma linha no modo lista */}
+                  <div className="flex flex-wrap items-center gap-3 text-sm font-medium">
+                    <span className="text-green-600 dark:text-green-400">
+                      Atac. {formatCurrency(product.wholesalePrice)}
+                    </span>
+                    <span className="text-orange-600 dark:text-orange-400">
+                      Vare. {formatCurrency(product.normalPrice)}
+                    </span>
+                    <span className="text-blue-600 dark:text-blue-400">
+                      Corp. {formatCurrency(product.corporatePrice)}
                     </span>
                   </div>
-                  <div className="text-muted-foreground flex items-center gap-1 text-sm">
-                    <Package className="h-3 w-3" />
-                    <span>{product.stock} em estoque</span>
+                  <div className="flex items-center justify-between">
+                    <div
+                      className={`flex items-center gap-1 text-sm font-medium ${
+                        product.stock === 0
+                          ? "text-red-600 dark:text-red-400"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      <Package className="h-3 w-3" />
+                      <span>Estoque: {product.stock}</span>
+                    </div>
+                    {product.warrantyDays > 0 && (
+                      <div className="text-muted-foreground flex items-center gap-1 text-xs">
+                        <Shield className="h-3 w-3" />
+                        <span>{product.warrantyDays} dias</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <Button
                   size="sm"
-                  disabled={isOutOfStock}
                   onClick={() => product.id && onViewDetails?.(product.id)}
                   className="gap-2"
                 >
                   <Eye className="h-4 w-4" />
-                  {isOutOfStock ? "Indisponível" : "Ver detalhes"}
+                  Ver detalhes
                 </Button>
               </div>
             </div>
@@ -137,7 +178,7 @@ export function ProductCard({
   // Grid View
   return (
     <Card
-      className={`group transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${isOutOfStock ? "opacity-60" : ""}`}
+      className={`group transition-all duration-200 hover:-translate-y-1 hover:shadow-lg max-w-[500px] ${isOutOfStock ? "opacity-60" : ""}`}
     >
       <CardContent className="flex h-full flex-col p-4">
         {/* Imagem */}
@@ -169,6 +210,18 @@ export function ProductCard({
                 Promoção
               </Badge>
             )}
+            {product.isNew && (
+              <Badge className="bg-blue-500 text-xs hover:bg-blue-600">
+                <Star className="h-3 w-3 mr-1" />
+                Novo
+              </Badge>
+            )}
+            {product.isImported && (
+              <Badge variant="secondary" className="text-xs">
+                <Plane className="h-3 w-3 mr-1" />
+                Importado
+              </Badge>
+            )}
           </div>
 
           {isOutOfStock && (
@@ -190,27 +243,57 @@ export function ProductCard({
             <h3 className="line-clamp-2 text-sm leading-tight font-semibold">
               {product.name}
             </h3>
-            <p className="text-muted-foreground text-xs">SKU: {product.sku}</p>
+            <div className="space-y-1">
+              <p className="text-muted-foreground text-xs">
+                SKU: {product.sku}
+              </p>
+              {product.brand && (
+                <p className="text-muted-foreground text-xs">
+                  Marca: {product.brand}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Preços */}
           <div className="space-y-1">
             {hasPromotion && (
               <span className="text-muted-foreground block text-xs line-through">
-                {formatCurrency(product.normalPrice)}
+                Preço original: {formatCurrency(product.normalPrice)}
               </span>
             )}
-            <span
-              className={`block text-lg font-bold ${hasPromotion ? "text-green-600" : "text-foreground"}`}
-            >
-              {formatCurrency(finalPrice || 0)}
-            </span>
+            {/* Preços diferenciados - linhas diferentes no modo grid */}
+            <div className="space-y-1">
+              <div className="text-sm font-medium text-green-600 dark:text-green-400">
+                Atac. {formatCurrency(product.wholesalePrice)}
+              </div>
+              <div className="text-sm font-medium text-orange-600 dark:text-orange-400">
+                Vare. {formatCurrency(product.normalPrice)}
+              </div>
+              <div className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                Corp. {formatCurrency(product.corporatePrice)}
+              </div>
+            </div>
           </div>
 
-          {/* Estoque */}
-          <div className="text-muted-foreground flex items-center gap-1 text-xs">
-            <Package className="h-3 w-3" />
-            <span>{product.stock} em estoque</span>
+          {/* Estoque e Garantia */}
+          <div className="space-y-1">
+            <div
+              className={`flex items-center gap-1 text-sm font-medium ${
+                product.stock === 0
+                  ? "text-red-600 dark:text-red-400"
+                  : "text-muted-foreground"
+              }`}
+            >
+              <Package className="h-3 w-3" />
+              <span>Estoque: {product.stock}</span>
+            </div>
+            {product.warrantyDays > 0 && (
+              <div className="text-muted-foreground flex items-center gap-1 text-xs">
+                <Shield className="h-3 w-3" />
+                <span>{product.warrantyDays} dias de garantia</span>
+              </div>
+            )}
           </div>
 
           {/* Espaçador flexível para empurrar o botão para baixo */}
@@ -220,11 +303,10 @@ export function ProductCard({
           <Button
             size="sm"
             className="mt-auto w-full gap-2"
-            disabled={isOutOfStock}
             onClick={() => product.id && onViewDetails?.(product.id)}
           >
             <Eye className="h-4 w-4" />
-            {isOutOfStock ? "Indisponível" : "Ver detalhes"}
+            Ver detalhes
           </Button>
         </div>
       </CardContent>
