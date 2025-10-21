@@ -132,7 +132,8 @@ export class ProductServiceApi extends BaseApiService {
 
   /**
    * ENDPOINT 2 - List products with filters and pagination
-   * @param params - Search and pagination parameters
+   * Based on API Reference: product-find.md
+   * @param params - Search and pagination parameters (all optional)
    * @returns Promise with product list
    */
   static async findProducts(
@@ -170,6 +171,7 @@ export class ProductServiceApi extends BaseApiService {
 
   /**
    * Build search payload with default values
+   * Based on API Reference: product-find.md
    * @private
    */
   private static buildProductSearchPayload(
@@ -178,38 +180,40 @@ export class ProductServiceApi extends BaseApiService {
     // Build clean parameters object, only including non-zero/non-empty values
     const cleanParams: Partial<FindProductsRequest> = {};
 
-    // Only include taxonomy filter if it's a positive number
+    // Filtros - Only include if meaningful values are provided
+
+    // Filtrar por taxonomia/categoria - only if positive number
     if (params.pe_id_taxonomy && params.pe_id_taxonomy > 0) {
       cleanParams.pe_id_taxonomy = params.pe_id_taxonomy;
     }
 
-    // Only include taxonomy slug filter if it's not empty
+    // Slug da categoria - only if not empty
     if (params.pe_slug_taxonomy && params.pe_slug_taxonomy.trim() !== "") {
       cleanParams.pe_slug_taxonomy = params.pe_slug_taxonomy;
     }
 
-    // Only include product filter if it's a positive number
+    // Filtrar por ID específico de produto - only if positive number
     if (params.pe_id_produto && params.pe_id_produto > 0) {
       cleanParams.pe_id_produto = params.pe_id_produto;
     }
 
-    // Only include product name filter if it's not empty
+    // Busca por nome (LIKE) - only if not empty
     if (params.pe_produto && params.pe_produto.trim() !== "") {
       cleanParams.pe_produto = params.pe_produto;
     }
 
-    // Include other parameters with their defaults
+    // Include parameters with their API defaults
     const payload = ProductServiceApi.buildBasePayload({
-      pe_slug_taxonomy: "", // Required field - empty string for no slug filter
-      pe_flag_inativo: params.pe_flag_inativo ?? 0, // Default - only active products
-      pe_qt_registros: params.pe_qt_registros ?? 20, // Default - 20 records per page
-      pe_pagina_id: params.pe_pagina_id ?? 0, // Default - first page
-      pe_coluna_id: params.pe_coluna_id ?? 1, // Default - sort by first column
-      pe_ordem_id: params.pe_ordem_id ?? 1, // Default - ascending order
-      ...cleanParams, // Include only the clean parameters
+      pe_slug_taxonomy: "", // Required field - vazio para não filtrar por slug
+      pe_flag_inativo: params.pe_flag_inativo ?? 0, // Default: 0 = apenas produtos ativos
+      pe_qt_registros: params.pe_qt_registros ?? 20, // Default: 20 registros por página
+      pe_pagina_id: params.pe_pagina_id ?? 0, // Default: 0 = primeira página
+      pe_coluna_id: params.pe_coluna_id ?? 1, // Default: 1 = primeira coluna para ordenação
+      pe_ordem_id: params.pe_ordem_id ?? 1, // Default: 1 = ASC
+      ...cleanParams, // Include only the meaningful filter parameters
     });
 
-    // Add optional parameters if they exist
+    // Add stock filter only if explicitly requested
     if (params.pe_flag_estoque !== undefined) {
       payload.pe_flag_estoque = params.pe_flag_estoque;
     }

@@ -49,13 +49,7 @@ export function ProductGrid({
   return (
     <div className="space-y-6">
       {/* Grid de Produtos */}
-      <div
-        className={
-          viewMode === "grid"
-            ? "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-            : "space-y-4"
-        }
-      >
+      <div className={viewMode === "grid" ? "product-grid-fluid" : "space-y-4"}>
         {products.map((product) => (
           <ProductCard
             key={product.id}

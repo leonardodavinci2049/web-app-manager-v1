@@ -49,7 +49,7 @@ const productResponse = await ProductServiceApi.findProductById({
 const productsResponse = await ProductServiceApi.findProducts({
   pe_flag_inativo: 0,
   pe_qt_registros: 20,
-  pe_pagina_id: 1,
+  pe_pagina_id: 0, // Primeira página (paginação 0-based)
 });
 
 // Extrair lista de produtos

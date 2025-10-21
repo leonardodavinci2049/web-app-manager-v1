@@ -321,7 +321,7 @@ export function ProductFiltersImproved({
                 ) : (
                   <Search className="h-4 w-4" />
                 )}
-                Pesquisar
+                <span className="hidden sm:inline">Pesquisar</span>
               </Button>
             </div>
           </div>

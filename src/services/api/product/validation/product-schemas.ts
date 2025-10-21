@@ -20,18 +20,22 @@ export const FindProductByIdSchema = z.object({
 
 /**
  * Schema for listing products (ENDPOINT 2)
+ * Based on API Reference: product-find.md
  */
 export const FindProductsSchema = z.object({
-  pe_id_taxonomy: z.number().int().min(0).optional(), // Allow 0 for "no specific taxonomy"
-  pe_slug_taxonomy: z.string().max(255).optional(), // Slug da taxonomia/categoria
-  pe_id_produto: z.number().int().min(0).optional(), // Allow 0 for "no specific product"
-  pe_produto: z.string().max(255).optional(),
-  pe_flag_estoque: z.number().int().min(0).max(1).optional(),
-  pe_flag_inativo: z.number().int().min(0).max(1).optional(),
-  pe_qt_registros: z.number().int().min(1).max(100).optional(),
-  pe_pagina_id: z.number().int().min(0).optional(), // MariaDB pagination starts at 0
-  pe_coluna_id: z.number().int().optional(),
-  pe_ordem_id: z.number().int().min(1).max(2).optional(),
+  // Filtros (opcionais)
+  pe_id_taxonomy: z.number().int().min(0).optional(), // Filtrar por taxonomia/categoria (default: 0)
+  pe_slug_taxonomy: z.string().max(255).optional(), // slug da categoria (default: vazio)
+  pe_id_produto: z.number().int().min(0).optional(), // Filtrar por ID específico (default: 0)
+  pe_produto: z.string().max(255).optional(), // Busca por nome (LIKE)(default: vazio)
+  pe_flag_estoque: z.number().int().min(0).max(1).optional(), // 1 = apenas com estoque
+  pe_flag_inativo: z.number().int().min(0).max(1).optional(), // 0 = ativos, 1 = inativos
+
+  // Paginação (opcionais)
+  pe_qt_registros: z.number().int().min(1).max(100).optional(), // Quantidade por página (default: 20)
+  pe_pagina_id: z.number().int().min(0).optional(), // Página atual (default: 0)
+  pe_coluna_id: z.number().int().optional(), // Coluna para ordenação (default: 1)
+  pe_ordem_id: z.number().int().min(1).max(2).optional(), // 1 = ASC, 2 = DESC (default: 1)
 });
 
 // ========================================
