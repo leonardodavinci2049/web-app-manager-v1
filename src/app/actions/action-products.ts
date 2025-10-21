@@ -181,7 +181,7 @@ function mapSortToApiParams(sortBy?: string): {
     case "price-desc":
       return { pe_coluna_id: 3, pe_ordem_id: 2 }; // Maior Preço
     default:
-      return { pe_coluna_id: 1, pe_ordem_id: 1 }; // Default: Nome A-Z
+      return { pe_coluna_id: 2, pe_ordem_id: 2 }; // Default: Mais Recente (newest)
   }
 }
 
