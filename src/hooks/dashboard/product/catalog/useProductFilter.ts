@@ -49,7 +49,7 @@ export function useProductFilter({
       result = result.filter(
         (product) =>
           product.name.toLowerCase().includes(searchLower) ||
-          product.sku.toLowerCase().includes(searchLower),
+          product.sku.toString().includes(searchLower),
       );
     }
 

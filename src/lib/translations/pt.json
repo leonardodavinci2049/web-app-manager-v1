@@ -253,7 +253,7 @@
           "basicInfoDesc": "Dados principais do produto",
           "description": "Descrição e Categorização",
           "descriptionDesc": "Descrições e informações de categorização",
-          "pricing": "Preços e Estoque",
+          "pricing": "Preços",
           "pricingDesc": "Valores de venda e controle de estoque",
           "additional": "Informações Adicionais",
           "additionalDesc": "Informações complementares sobre o produto",

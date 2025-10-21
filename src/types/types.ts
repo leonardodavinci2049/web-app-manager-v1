@@ -1,13 +1,19 @@
 export interface Product {
   id: string;
   name: string;
-  sku: string;
+  sku: string; // SKU should be string (alphanumeric codes)
   image: string;
   normalPrice: number;
   promotionalPrice?: number;
+  wholesalePrice: number; // NEW: VL_ATACADO
+  corporatePrice: number; // NEW: VL_CORPORATIVO
   stock: number;
   category: string;
-  brand?: string;
+  brand: string; // Changed from optional to required (MARCA_NOME always available)
+  warrantyDays: number; // NEW: TEMPODEGARANTIA_DIA
+  isPromotion: boolean; // NEW: PROMOCAO flag
+  isImported: boolean; // NEW: IMPORTADO flag
+  isNew: boolean; // NEW: LANCAMENTO flag
   createdAt: Date;
 }
 

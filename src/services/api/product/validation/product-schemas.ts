@@ -44,36 +44,49 @@ export const FindProductsSchema = z.object({
 
 /**
  * Schema for creating a new product (ENDPOINT 6)
+ * Baseado na documentação da API e nos parâmetros obrigatórios/opcionais
  */
 export const CreateProductSchema = z.object({
+  // Parâmetros obrigatórios
   pe_type_business: z.number().int().min(1).max(2),
   pe_nome_produto: z.string().min(1).max(255),
   pe_slug: z.string().min(1).max(255),
-  pe_descricao_tab: z.string().max(500).optional(),
-  pe_etiqueta: z.string().max(100).optional(),
-  pe_ref: z.string().max(100).optional(),
-  pe_modelo: z.string().max(100).optional(),
-  pe_id_fornecedor: z.number().int().positive().optional(),
-  pe_id_tipo: z.number().int().positive().optional(),
-  pe_id_marca: z.number().int().positive().optional(),
-  pe_id_familia: z.number().int().positive().optional(),
-  pe_id_grupo: z.number().int().positive().optional(),
-  pe_id_subgrupo: z.number().int().positive().optional(),
-  pe_peso_gr: z.number().min(0).optional(),
-  pe_comprimento_mm: z.number().min(0).optional(),
-  pe_largura_mm: z.number().min(0).optional(),
-  pe_altura_mm: z.number().min(0).optional(),
-  pe_diametro_mm: z.number().min(0).optional(),
-  pe_tempodegarantia_mes: z.number().int().min(0).optional(),
-  pe_vl_venda_atacado: z.number().min(0).optional(),
-  pe_vl_venda_varejo: z.number().min(0).optional(),
-  pe_vl_corporativo: z.number().min(0).optional(),
-  pe_qt_estoque: z.number().int().min(0).optional(),
-  pe_flag_website_off: z.number().int().min(0).max(1).optional(),
-  pe_flag_importado: z.number().int().min(0).max(1).optional(),
-  pe_info: z.string().optional(),
-});
 
+  // Dados básicos opcionais
+  pe_descricao_tab: z.string().max(500).optional().default(""),
+  pe_etiqueta: z.string().max(100).optional().default(""),
+  pe_ref: z.string().max(100).optional().default(""),
+  pe_modelo: z.string().max(100).optional().default(""),
+
+  // Relacionamentos opcionais
+  pe_id_fornecedor: z.number().int().min(0).optional().default(0),
+  pe_id_tipo: z.number().int().min(0).optional().default(0),
+  pe_id_marca: z.number().int().min(0).optional().default(0),
+  pe_id_familia: z.number().int().min(0).optional().default(0),
+  pe_id_grupo: z.number().int().min(0).optional().default(0),
+  pe_id_subgrupo: z.number().int().min(0).optional().default(0),
+
+  // Características físicas opcionais
+  pe_peso_gr: z.number().min(0).optional().default(0),
+  pe_comprimento_mm: z.number().min(0).optional().default(0),
+  pe_largura_mm: z.number().min(0).optional().default(0),
+  pe_altura_mm: z.number().min(0).optional().default(0),
+  pe_diametro_mm: z.number().min(0).optional().default(0),
+  pe_tempodegarantia_mes: z.number().int().min(0).optional().default(0),
+
+  // Preços obrigatórios
+  pe_vl_venda_atacado: z.number().min(0).optional().default(0),
+  pe_vl_venda_varejo: z.number().min(0).optional().default(0),
+  pe_vl_corporativo: z.number().min(0).optional().default(0),
+
+  // Estoque e flags opcionais
+  pe_qt_estoque: z.number().int().min(0).optional().default(0),
+  pe_flag_website_off: z.number().int().min(0).max(1).optional().default(0),
+  pe_flag_importado: z.number().int().min(0).max(2).optional().default(2),
+
+  // Informações adicionais opcionais
+  pe_info: z.string().optional().default(""),
+});
 // ========================================
 // UPDATE ENDPOINTS SCHEMAS
 // ========================================
