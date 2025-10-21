@@ -52,15 +52,16 @@ export class ProductValidationError extends ProductError {
 
 /**
  * Base request interface with common parameters
+ * All parameters are optional as they are automatically filled from environment variables
  */
 interface BaseProductRequest {
-  pe_app_id: number;
-  pe_system_client_id: number;
-  pe_store_id: number;
-  pe_organization_id: string;
-  pe_member_id: string;
-  pe_user_id: string;
-  pe_person_id: number;
+  pe_app_id?: number; // (variável de ambiente)
+  pe_system_client_id?: number; // (variável de ambiente)
+  pe_store_id?: number; // (variável de ambiente)
+  pe_organization_id?: string; // (variável de ambiente)
+  pe_member_id?: string; // (variável de ambiente)
+  pe_user_id?: string; // (variável de ambiente)
+  pe_person_id?: number; // (variável de ambiente)
 }
 
 /**
@@ -190,18 +191,22 @@ export interface FindProductByIdRequest extends BaseProductRequest {
 
 /**
  * Request for listing products (ENDPOINT 2)
+ * Based on API Reference: product-find.md
  */
 export interface FindProductsRequest extends BaseProductRequest {
-  pe_id_taxonomy?: number;
-  pe_slug_taxonomy?: string;
-  pe_id_produto?: number;
-  pe_produto?: string;
-  pe_flag_estoque?: number;
-  pe_flag_inativo?: number;
-  pe_qt_registros?: number;
-  pe_pagina_id?: number;
-  pe_coluna_id?: number;
-  pe_ordem_id?: number;
+  // Filtros (opcionais)
+  pe_id_taxonomy?: number; // Filtrar por taxonomia/categoria (default: 0)
+  pe_slug_taxonomy?: string; // slug da categoria (default: vazio)
+  pe_id_produto?: number; // Filtrar por ID específico (default: 0)
+  pe_produto?: string; // Busca por nome (LIKE)(default: vazio)
+  pe_flag_estoque?: number; // 1 = apenas com estoque
+  pe_flag_inativo?: number; // 0 = ativos, 1 = inativos
+
+  // Paginação (opcionais)
+  pe_qt_registros?: number; // Quantidade por página (default: 20)
+  pe_pagina_id?: number; // Página atual (default: 0)
+  pe_coluna_id?: number; // Coluna para ordenação (default: 1)
+  pe_ordem_id?: number; // 1 = ASC, 2 = DESC (default: 1)
 }
 
 // ========================================

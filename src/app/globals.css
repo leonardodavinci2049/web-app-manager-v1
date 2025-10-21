@@ -120,3 +120,36 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  /* Grid fluido para produtos com mínimo de 2 colunas em todas as telas */
+  .product-grid-fluid {
+    display: grid;
+    gap: 1rem;
+    /* Mobile: 2 colunas com cards menores */
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+
+  /* A partir de 480px, aumenta o tamanho mínimo dos cards */
+  @media (min-width: 480px) {
+    .product-grid-fluid {
+      gap: 1.25rem;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+  }
+
+  /* A partir de 640px (sm), usa grid fluido com cards maiores */
+  @media (min-width: 640px) {
+    .product-grid-fluid {
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+  }
+
+  /* Em telas muito grandes, ajusta o tamanho mínimo para manter proporção */
+  @media (min-width: 1200px) {
+    .product-grid-fluid {
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+  }
+}
