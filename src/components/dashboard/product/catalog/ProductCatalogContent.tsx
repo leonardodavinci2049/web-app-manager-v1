@@ -35,7 +35,7 @@ export function ProductCatalogContent({
     selectedSubcategory: undefined,
     selectedSubgroup: undefined,
     onlyInStock: false,
-    sortBy: "name-asc",
+    sortBy: "newest", // Default to newest products first
   });
   const [loadedQuantity, setLoadedQuantity] = useState(20); // Track total quantity loaded
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -97,7 +97,7 @@ export function ProductCatalogContent({
       selectedSubcategory: undefined,
       selectedSubgroup: undefined,
       onlyInStock: false,
-      sortBy: "name-asc",
+      sortBy: "newest", // Default to newest products first
     };
 
     setLoadedQuantity(20); // Reset loaded quantity

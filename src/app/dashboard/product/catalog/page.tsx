@@ -20,10 +20,11 @@ export default async function CatalogoPage() {
   let errorMessage = "";
 
   try {
-    // Fetch initial products data
+    // Fetch initial products data with newest first sorting
     const result = await fetchProducts({
       page: 1,
       perPage: 20,
+      sortBy: "newest", // Show newest products first
     });
 
     initialProducts = result;
