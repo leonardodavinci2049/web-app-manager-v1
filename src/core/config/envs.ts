@@ -96,7 +96,7 @@ const envsSchema = z.object({
   EXTERNAL_API_BASE_URL: z
     .string()
     .url("EXTERNAL_API_BASE_URL must be a valid URL")
-    .default("http://localhost:3333/api"),
+    .default("http://localhost:5572/api"),
 
   // Next.js Application Base URL (for BetterAuth and internal references)
   NEXT_APP_BASE_URL: z
@@ -171,7 +171,7 @@ if (typeof window === "undefined") {
     API_KEY: "",
 
     // External API - não deve ser acessada no cliente (apenas server-side)
-    EXTERNAL_API_BASE_URL: "http://localhost:3333/api",
+    EXTERNAL_API_BASE_URL: "http://localhost:5572/api",
 
     // Next.js App URL - pode ser acessada no cliente se necessário
     NEXT_APP_BASE_URL: "http://localhost:5557",

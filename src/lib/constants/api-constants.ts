@@ -15,7 +15,7 @@ export const EXTERNAL_API_BASE_URL = (() => {
       );
     }
     console.warn("⚠️  Using default EXTERNAL_API_BASE_URL for development");
-    return "http://localhost:3333/api";
+    return "http://localhost:5572/api";
   }
 
   return url;
