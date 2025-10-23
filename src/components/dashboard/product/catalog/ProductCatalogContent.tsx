@@ -145,8 +145,8 @@ export function ProductCatalogContent({
   // Handle product details view
   const handleViewDetails = (productId: string) => {
     logger.info("Navigating to product details:", productId);
-    // Navigate to product details page
-    window.location.href = `/dashboard/product/product-details?id=${productId}`;
+    // Navigate to product details page using dynamic route
+    window.location.href = `/dashboard/product/${productId}`;
   };
 
   // Calculate display values
