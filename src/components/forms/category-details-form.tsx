@@ -121,9 +121,6 @@ export function CategoryDetailsForm({ category }: CategoryDetailsFormProps) {
           disabled={isPending}
           required
         />
-        <p className="text-xs text-muted-foreground">
-          {t("dashboard.category.help.name")}
-        </p>
       </div>
 
       {/* Slug - Para URL amigável */}
@@ -137,9 +134,6 @@ export function CategoryDetailsForm({ category }: CategoryDetailsFormProps) {
           defaultValue={initialValues.slug}
           disabled={isPending}
         />
-        <p className="text-xs text-muted-foreground">
-          {t("dashboard.category.help.slug")}
-        </p>
       </div>
 
       {/* Categoria Pai */}
@@ -156,9 +150,6 @@ export function CategoryDetailsForm({ category }: CategoryDetailsFormProps) {
           disabled={isPending}
           min="0"
         />
-        <p className="text-xs text-muted-foreground">
-          {t("dashboard.category.help.parent")}
-        </p>
       </div>
 
       {/* Ordem */}
@@ -172,9 +163,6 @@ export function CategoryDetailsForm({ category }: CategoryDetailsFormProps) {
           disabled={isPending}
           min="1"
         />
-        <p className="text-xs text-muted-foreground">
-          {t("dashboard.category.help.order")}
-        </p>
       </div>
 
       {/* Caminho da Imagem */}
@@ -190,9 +178,6 @@ export function CategoryDetailsForm({ category }: CategoryDetailsFormProps) {
           defaultValue={initialValues.imagePath}
           disabled={isPending}
         />
-        <p className="text-xs text-muted-foreground">
-          {t("dashboard.category.help.imagePath")}
-        </p>
       </div>
 
       {/* Meta Title - SEO */}
@@ -209,9 +194,6 @@ export function CategoryDetailsForm({ category }: CategoryDetailsFormProps) {
           disabled={isPending}
           maxLength={60}
         />
-        <p className="text-xs text-muted-foreground">
-          {t("dashboard.category.help.metaTitle")}
-        </p>
       </div>
 
       {/* Meta Description - SEO */}
@@ -228,9 +210,6 @@ export function CategoryDetailsForm({ category }: CategoryDetailsFormProps) {
           maxLength={160}
           rows={3}
         />
-        <p className="text-xs text-muted-foreground">
-          {t("dashboard.category.help.metaDescription")}
-        </p>
       </div>
 
       {/* Notas/Anotações */}
@@ -244,9 +223,6 @@ export function CategoryDetailsForm({ category }: CategoryDetailsFormProps) {
           disabled={isPending}
           rows={4}
         />
-        <p className="text-xs text-muted-foreground">
-          {t("dashboard.category.help.notes")}
-        </p>
       </div>
 
       {/* Status */}
@@ -279,9 +255,6 @@ export function CategoryDetailsForm({ category }: CategoryDetailsFormProps) {
           name="status"
           defaultValue={initialValues.status}
         />
-        <p className="text-xs text-muted-foreground">
-          {t("dashboard.category.help.status")}
-        </p>
       </div>
 
       {/* Botões de Ação */}
