@@ -8,6 +8,7 @@ import {
   Rocket,
   Zap,
 } from "lucide-react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -183,9 +184,11 @@ const DevelopmentPage = () => {
 
         {/* Ações do usuário */}
         <div className="flex flex-col justify-center gap-4 sm:flex-row">
-          <Button variant="outline" className="group">
-            <ArrowLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
-            Voltar ao Dashboard
+          <Button asChild variant="outline" className="group">
+            <Link href="/dashboard">
+              <ArrowLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
+              Voltar ao Dashboard
+            </Link>
           </Button>
           <Button variant="default" className="group">
             <Github className="h-4 w-4 transition-transform duration-200 group-hover:rotate-12" />

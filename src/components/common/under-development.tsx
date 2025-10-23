@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
 interface UnderDevelopmentProps {
   title?: string;
   message?: string;
@@ -69,6 +72,15 @@ const UnderDevelopment: React.FC<UnderDevelopmentProps> = ({
               ></div>
             </div>
           )}
+
+          <div className="mt-8">
+            <Button
+              asChild
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
+            >
+              <Link href="/dashboard">Voltar ao Dashboard</Link>
+            </Button>
+          </div>
         </div>
       </div>
     </div>
