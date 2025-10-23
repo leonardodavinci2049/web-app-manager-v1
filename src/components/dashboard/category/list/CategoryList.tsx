@@ -1,7 +1,10 @@
 "use client";
 
+import { ChevronRight } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/hooks/use-translation";
@@ -26,6 +29,12 @@ export function CategoryList({
   isLoading = false,
 }: CategoryListProps) {
   const { t } = useTranslation();
+  const router = useRouter();
+
+  // Função para navegar para detalhes da categoria
+  const handleViewDetails = (categoryId: number) => {
+    router.push(`/dashboard/category/category-details?id=${categoryId}`);
+  };
 
   // Loading state with skeletons
   if (isLoading) {
@@ -47,6 +56,8 @@ export function CategoryList({
                 <Skeleton className="h-6 w-16" />
                 <Skeleton className="h-6 w-16" />
               </div>
+              {/* Skeleton para o botão de detalhe */}
+              <Skeleton className="h-8 w-20" />
             </div>
           </Card>
         ))}
@@ -134,6 +145,19 @@ export function CategoryList({
                     {t("dashboard.category.list.cardProducts")}
                   </Badge>
                 )}
+            </div>
+
+            {/* Botão de Detalhe */}
+            <div className="flex flex-shrink-0">
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-2"
+                onClick={() => handleViewDetails(category.ID_TAXONOMY)}
+              >
+                <ChevronRight className="h-4 w-4" />
+                {t("dashboard.category.list.buttonDetail")}
+              </Button>
             </div>
           </div>
         </Card>

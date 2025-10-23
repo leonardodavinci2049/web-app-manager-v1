@@ -165,17 +165,8 @@ export function CategoryFiltersClient({
             </SelectContent>
           </Select>
 
-          {/* Botões de Modo de Visualização */}
+          {/* Botões de Modo de Visualização - List primeiro por ser padrão */}
           <div className="flex gap-1">
-            <Button
-              variant={viewMode === "grid" ? "default" : "outline"}
-              size="sm"
-              onClick={() => onViewChange("grid")}
-              className="h-9 w-9 p-0"
-              title={t("dashboard.category.list.viewModeGrid")}
-            >
-              <Grid3X3 className="h-4 w-4" />
-            </Button>
             <Button
               variant={viewMode === "list" ? "default" : "outline"}
               size="sm"
@@ -184,6 +175,15 @@ export function CategoryFiltersClient({
               title={t("dashboard.category.list.viewModeList")}
             >
               <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "default" : "outline"}
+              size="sm"
+              onClick={() => onViewChange("grid")}
+              className="h-9 w-9 p-0"
+              title={t("dashboard.category.list.viewModeGrid")}
+            >
+              <Grid3X3 className="h-4 w-4" />
             </Button>
           </div>
         </div>

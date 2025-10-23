@@ -51,7 +51,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: t("dashboard.navigation.products"),
         url: "#",
         icon: SquareTerminal,
-        isActive: true,
         items: [
           {
             title: "Catalogo",

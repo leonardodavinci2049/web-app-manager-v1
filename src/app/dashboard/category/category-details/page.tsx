@@ -102,7 +102,7 @@ async function CategoryDetailsContent({ categoryId }: { categoryId: number }) {
       <Separator className="my-4" />
 
       {/* Card com Formulário */}
-      <div className="w-full lg:w-[40%]">
+      <div className="w-full lg:w-2/3">
         <Card className="p-6">
           <div className="mb-6">
             <h2 className="text-xl font-semibold">Editar Categoria</h2>
