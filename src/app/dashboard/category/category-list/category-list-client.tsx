@@ -47,8 +47,8 @@ export function CategoryListClient({
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(initialCategories.length === 20);
 
-  // Estado local para modo de visualização
-  const [viewMode, setViewMode] = useState<ViewMode>(currentView);
+  // Estado local para modo de visualização - usar "list" como padrão para evitar flash
+  const [viewMode, setViewMode] = useState<ViewMode>(currentView || "list");
 
   // Loading states
   const [isLoadingMore, setIsLoadingMore] = useState(false);
