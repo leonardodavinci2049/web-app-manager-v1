@@ -142,15 +142,24 @@ function CategoryListLoadingFallback() {
             <div className="h-4 w-64 animate-pulse rounded-md bg-muted" />
           </div>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {Array.from({ length: 8 }).map((_item, index) => (
+          {/* Skeleton em modo lista para evitar flash visual */}
+          <div className="space-y-2">
+            {Array.from({ length: 5 }).map((_item, index) => (
               <div
                 key={`skeleton-loading-${Date.now()}-${index}`}
-                className="space-y-3"
+                className="rounded-lg border p-4"
               >
-                <div className="aspect-square w-full animate-pulse rounded-lg bg-muted" />
-                <div className="h-4 w-3/4 animate-pulse rounded-md bg-muted" />
-                <div className="h-4 w-1/2 animate-pulse rounded-md bg-muted" />
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 animate-pulse rounded-md bg-muted" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-1/3 animate-pulse rounded-md bg-muted" />
+                    <div className="h-3 w-1/2 animate-pulse rounded-md bg-muted" />
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="h-6 w-16 animate-pulse rounded-md bg-muted" />
+                    <div className="h-6 w-16 animate-pulse rounded-md bg-muted" />
+                  </div>
+                </div>
               </div>
             ))}
           </div>
