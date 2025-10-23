@@ -568,6 +568,34 @@
       "deleted": "Item excluído com sucesso!",
       "created": "Item criado com sucesso!",
       "updated": "Item atualizado com sucesso!"
+    },
+    "assets": {
+      "entityType": {
+        "product": "Produto",
+        "profile": "Perfil",
+        "order": "Pedido",
+        "invoice": "Fatura",
+        "banner": "Banner",
+        "logo": "Logo",
+        "gallery": "Galeria",
+        "category": "Categoria",
+        "brand": "Marca",
+        "article": "Artigo",
+        "event": "Evento",
+        "document": "Documento",
+        "other": "Outro"
+      },
+      "fileType": {
+        "image": "Imagem",
+        "document": "Documento",
+        "spreadsheet": "Planilha"
+      },
+      "fileStatus": {
+        "active": "Ativo",
+        "processing": "Processando",
+        "archived": "Arquivado",
+        "deleted": "Excluído"
+      }
     }
   }
 }
