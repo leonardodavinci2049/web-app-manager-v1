@@ -166,7 +166,6 @@ export function ProductInlineEditDemo({ product }: ProductInlineEditDemoProps) {
             onSave={updateRetailPrice}
             type="currency"
             min={0}
-            step={0.01}
           />
 
           <InlineNumberEdit
@@ -175,7 +174,6 @@ export function ProductInlineEditDemo({ product }: ProductInlineEditDemoProps) {
             onSave={updateWholesalePrice}
             type="currency"
             min={0}
-            step={0.01}
           />
 
           <InlineNumberEdit
@@ -184,7 +182,6 @@ export function ProductInlineEditDemo({ product }: ProductInlineEditDemoProps) {
             onSave={updateCorporatePrice}
             type="currency"
             min={0}
-            step={0.01}
           />
         </CardContent>
       </Card>
@@ -204,7 +201,6 @@ export function ProductInlineEditDemo({ product }: ProductInlineEditDemoProps) {
             onSave={updateStock}
             type="number"
             min={0}
-            step={1}
             suffix="unidades"
           />
 
@@ -214,7 +210,6 @@ export function ProductInlineEditDemo({ product }: ProductInlineEditDemoProps) {
             onSave={updateWeight}
             type="decimal"
             min={0}
-            step={0.1}
             suffix="g"
           />
         </CardContent>

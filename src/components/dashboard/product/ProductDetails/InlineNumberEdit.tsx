@@ -15,7 +15,6 @@ interface InlineNumberEditProps {
   type?: "currency" | "number" | "decimal";
   min?: number;
   max?: number;
-  step?: number;
   suffix?: string;
   className?: string;
 }
@@ -27,7 +26,6 @@ export function InlineNumberEdit({
   type = "number",
   min,
   max,
-  step = 1,
   suffix = "",
   className = "",
 }: InlineNumberEditProps) {
