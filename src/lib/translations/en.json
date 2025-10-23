@@ -219,6 +219,72 @@
           "edit": "Edit",
           "delete": "Delete",
           "duplicate": "Duplicate"
+        },
+        "gallery": {
+          "title": "Image Gallery",
+          "mainImage": "Main Image",
+          "addImage": "Add Image",
+          "uploadImages": "Upload Images",
+          "dragDropHint": "Drag and drop images here or click to select",
+          "uploadSuccess": "{{count}} image(s) added successfully!",
+          "uploadError": "Error uploading images",
+          "deleteImage": "Delete Image",
+          "deleteConfirm": "Are you sure you want to remove this image?",
+          "deleteSuccess": "Image removed successfully!",
+          "deleteError": "Error removing image",
+          "zoomHint": "Use ← → to navigate | ESC to close",
+          "imageCounter": "{{current}} of {{total}}",
+          "imageNotAvailable": "Image not available",
+          "uploading": "Uploading...",
+          "dropHere": "Drop here"
+        },
+        "inlineEdit": {
+          "title": "Inline Editing",
+          "subtitle": "Edit product information directly on the page",
+          "demonstration": "Inline Editing Demonstration",
+          "demonstrationDesc": "This is a demonstration implementation of inline editing components. In a real application, save functions would make actual API calls.",
+          "basicInfoSection": "Basic Information",
+          "basicInfoDesc": "Click the edit icon next to each field to edit inline",
+          "pricingSection": "Pricing",
+          "pricingDesc": "Edit product prices directly",
+          "stockSection": "Stock and Characteristics",
+          "stockDesc": "Stock information and physical characteristics",
+          "fields": {
+            "productName": "Product Name",
+            "reference": "Reference",
+            "description": "Description",
+            "retailPrice": "Retail Price",
+            "wholesalePrice": "Wholesale Price",
+            "corporatePrice": "Corporate Price",
+            "stock": "Stock Quantity",
+            "weight": "Weight"
+          },
+          "placeholders": {
+            "productName": "Enter product name",
+            "reference": "Enter product reference",
+            "description": "Enter product description",
+            "price": "Enter price",
+            "stock": "Enter quantity",
+            "weight": "Enter weight"
+          },
+          "actions": {
+            "save": "Save",
+            "saving": "Saving...",
+            "cancel": "Cancel",
+            "edit": "Edit"
+          },
+          "messages": {
+            "saveSuccess": "{{field}} updated successfully!",
+            "saveError": "Error saving changes"
+          },
+          "validation": {
+            "required": "This field is required",
+            "invalidNumber": "Value must be a valid number",
+            "minValue": "Value must be greater than or equal to {{min}}",
+            "maxValue": "Value must be less than or equal to {{max}}",
+            "positiveNumber": "Value must be a positive number"
+          },
+          "notInformed": "Not informed"
         }
       }
     },

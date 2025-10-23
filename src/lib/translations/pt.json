@@ -229,6 +229,72 @@
           "edit": "Editar",
           "delete": "Excluir",
           "duplicate": "Duplicar"
+        },
+        "gallery": {
+          "title": "Galeria de Imagens",
+          "mainImage": "Imagem Principal",
+          "addImage": "Adicionar Imagem",
+          "uploadImages": "Enviar Imagens",
+          "dragDropHint": "Arraste e solte imagens aqui ou clique para selecionar",
+          "uploadSuccess": "{{count}} imagem(s) adicionada(s) com sucesso!",
+          "uploadError": "Erro ao fazer upload das imagens",
+          "deleteImage": "Excluir Imagem",
+          "deleteConfirm": "Tem certeza que deseja remover esta imagem?",
+          "deleteSuccess": "Imagem removida com sucesso!",
+          "deleteError": "Erro ao remover imagem",
+          "zoomHint": "Use ← → para navegar | ESC para fechar",
+          "imageCounter": "{{current}} de {{total}}",
+          "imageNotAvailable": "Imagem não disponível",
+          "uploading": "Enviando...",
+          "dropHere": "Soltar aqui"
+        },
+        "inlineEdit": {
+          "title": "Edição Inline",
+          "subtitle": "Edite informações do produto diretamente na página",
+          "demonstration": "Demonstração de Edição Inline",
+          "demonstrationDesc": "Esta é uma implementação de demonstração dos componentes de edição inline. Em uma aplicação real, as funções de salvamento fariam chamadas reais para a API.",
+          "basicInfoSection": "Informações Básicas",
+          "basicInfoDesc": "Clique no ícone de edição ao lado de cada campo para editar inline",
+          "pricingSection": "Preços",
+          "pricingDesc": "Edite os preços do produto diretamente",
+          "stockSection": "Estoque e Características",
+          "stockDesc": "Informações de estoque e características físicas",
+          "fields": {
+            "productName": "Nome do Produto",
+            "reference": "Referência",
+            "description": "Descrição",
+            "retailPrice": "Preço Varejo",
+            "wholesalePrice": "Preço Atacado",
+            "corporatePrice": "Preço Corporativo",
+            "stock": "Quantidade em Estoque",
+            "weight": "Peso"
+          },
+          "placeholders": {
+            "productName": "Digite o nome do produto",
+            "reference": "Digite a referência do produto",
+            "description": "Digite a descrição do produto",
+            "price": "Digite o preço",
+            "stock": "Digite a quantidade",
+            "weight": "Digite o peso"
+          },
+          "actions": {
+            "save": "Salvar",
+            "saving": "Salvando...",
+            "cancel": "Cancelar",
+            "edit": "Editar"
+          },
+          "messages": {
+            "saveSuccess": "{{field}} atualizado com sucesso!",
+            "saveError": "Erro ao salvar alterações"
+          },
+          "validation": {
+            "required": "Este campo é obrigatório",
+            "invalidNumber": "Valor deve ser um número válido",
+            "minValue": "Valor deve ser maior ou igual a {{min}}",
+            "maxValue": "Valor deve ser menor ou igual a {{max}}",
+            "positiveNumber": "Valor deve ser um número positivo"
+          },
+          "notInformed": "Não informado"
         }
       },
       "filters": {
