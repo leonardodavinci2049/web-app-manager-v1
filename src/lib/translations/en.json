@@ -365,6 +365,34 @@
       "deleted": "Item deleted successfully!",
       "created": "Item created successfully!",
       "updated": "Item updated successfully!"
+    },
+    "assets": {
+      "entityType": {
+        "product": "Product",
+        "profile": "Profile",
+        "order": "Order",
+        "invoice": "Invoice",
+        "banner": "Banner",
+        "logo": "Logo",
+        "gallery": "Gallery",
+        "category": "Category",
+        "brand": "Brand",
+        "article": "Article",
+        "event": "Event",
+        "document": "Document",
+        "other": "Other"
+      },
+      "fileType": {
+        "image": "Image",
+        "document": "Document",
+        "spreadsheet": "Spreadsheet"
+      },
+      "fileStatus": {
+        "active": "Active",
+        "processing": "Processing",
+        "archived": "Archived",
+        "deleted": "Deleted"
+      }
     }
   }
 }

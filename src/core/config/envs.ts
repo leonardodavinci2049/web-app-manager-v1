@@ -98,7 +98,11 @@ const envsSchema = z.object({
     .url("EXTERNAL_API_BASE_URL must be a valid URL")
     .default("http://localhost:5572/api"),
 
-  // Next.js Application Base URL (for BetterAuth and internal references)
+  // External Assets API (srv-assets-v1)
+  EXTERNAL_API_ASSETS_URL: z
+    .string()
+    .url("EXTERNAL_API_ASSETS_URL must be a valid URL")
+    .default("http://localhost:5573/api"), // Next.js Application Base URL (for BetterAuth and internal references)
   NEXT_APP_BASE_URL: z
     .string()
     .url("NEXT_APP_BASE_URL must be a valid URL")
@@ -173,6 +177,9 @@ if (typeof window === "undefined") {
     // External API - não deve ser acessada no cliente (apenas server-side)
     EXTERNAL_API_BASE_URL: "http://localhost:5572/api",
 
+    // External Assets API - não deve ser acessada no cliente (apenas server-side)
+    EXTERNAL_API_ASSETS_URL: "http://localhost:5573/api",
+
     // Next.js App URL - pode ser acessada no cliente se necessário
     NEXT_APP_BASE_URL: "http://localhost:5557",
   };
@@ -222,6 +229,10 @@ export const envs = {
 
   // External API (NestJS Backend) - apenas server-side
   EXTERNAL_API_BASE_URL: envVars.EXTERNAL_API_BASE_URL,
+
+  // External Assets API (srv-assets-v1) - apenas server-side
+  EXTERNAL_API_ASSETS_URL: envVars.EXTERNAL_API_ASSETS_URL,
+  EXTERNAL_API_ASSETS_KEY: envVars.API_KEY, // Reutiliza a API_KEY existente
 
   // Next.js Application Base URL
   NEXT_APP_BASE_URL: envVars.NEXT_APP_BASE_URL,
