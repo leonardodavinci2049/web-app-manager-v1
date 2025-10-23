@@ -46,18 +46,28 @@ export function CategoryList({
             key={index}
             className="p-4"
           >
-            <div className="flex items-center gap-4">
-              <Skeleton className="h-12 w-12 rounded-md" />
-              <div className="flex-1 space-y-2">
-                <Skeleton className="h-4 w-1/3" />
-                <Skeleton className="h-3 w-1/2" />
+            {/* Layout responsivo do skeleton */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+              {/* Seção superior do skeleton */}
+              <div className="flex items-center gap-3 sm:flex-1">
+                <Skeleton className="h-12 w-12 rounded-md" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-3/4 sm:w-1/3" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+                {/* Botão skeleton mobile */}
+                <Skeleton className="h-8 w-8 sm:hidden" />
               </div>
-              <div className="flex gap-2">
-                <Skeleton className="h-6 w-16" />
-                <Skeleton className="h-6 w-16" />
+
+              {/* Seção inferior do skeleton */}
+              <div className="flex items-center justify-between gap-2 sm:justify-end">
+                <div className="flex gap-2">
+                  <Skeleton className="h-6 w-16" />
+                  <Skeleton className="h-6 w-16" />
+                </div>
+                {/* Botão skeleton desktop */}
+                <Skeleton className="hidden h-8 w-20 sm:block" />
               </div>
-              {/* Skeleton para o botão de detalhe */}
-              <Skeleton className="h-8 w-20" />
             </div>
           </Card>
         ))}
@@ -89,75 +99,97 @@ export function CategoryList({
           key={category.ID_TAXONOMY}
           className="hover:bg-accent transition-colors duration-200"
         >
-          <div className="flex items-center gap-4 p-4">
-            {/* Image */}
-            <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-md border bg-muted">
-              {category.PATH_IMAGEM ? (
-                <Image
-                  src={category.PATH_IMAGEM}
-                  alt={category.TAXONOMIA}
-                  fill
-                  className="object-cover"
-                  sizes="48px"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
-                  {t("dashboard.category.list.noImage")}
+          {/* Layout responsivo: horizontal em desktop, vertical em mobile */}
+          <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4">
+            {/* Seção superior: Imagem + Info principal + Botão (mobile) */}
+            <div className="flex items-center gap-3 sm:flex-1">
+              {/* Image */}
+              <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-md border bg-muted">
+                {category.PATH_IMAGEM ? (
+                  <Image
+                    src={category.PATH_IMAGEM}
+                    alt={category.TAXONOMIA}
+                    fill
+                    className="object-cover"
+                    sizes="48px"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+                    {t("dashboard.category.list.noImage")}
+                  </div>
+                )}
+              </div>
+
+              {/* Main Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+                  <h3 className="font-semibold truncate">
+                    {category.TAXONOMIA}
+                  </h3>
+                  <Badge variant="outline" className="text-xs w-fit">
+                    {t("dashboard.category.list.cardId")}:{" "}
+                    {category.ID_TAXONOMY}
+                  </Badge>
                 </div>
-              )}
+                <div className="mt-1 flex flex-col gap-1 text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 sm:text-sm">
+                  {category.SLUG && (
+                    <span className="truncate">
+                      {t("dashboard.category.list.cardSlug")}: {category.SLUG}
+                    </span>
+                  )}
+                  {category.PARENT_ID !== 0 && (
+                    <span className="truncate">
+                      {t("dashboard.category.list.cardParent")}:{" "}
+                      {category.PARENT_ID}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Botão de Detalhe - visível apenas em mobile */}
+              <div className="flex flex-shrink-0 sm:hidden">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8 px-2"
+                  onClick={() => handleViewDetails(category.ID_TAXONOMY)}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
-            {/* Main Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold truncate">{category.TAXONOMIA}</h3>
-                <Badge variant="outline" className="text-xs flex-shrink-0">
-                  {t("dashboard.category.list.cardId")}: {category.ID_TAXONOMY}
-                </Badge>
-              </div>
-              <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                {category.SLUG && (
-                  <span className="truncate">
-                    {t("dashboard.category.list.cardSlug")}: {category.SLUG}
-                  </span>
-                )}
-                {category.PARENT_ID !== 0 && (
-                  <span className="truncate">
-                    {t("dashboard.category.list.cardParent")}:{" "}
-                    {category.PARENT_ID}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Badges */}
-            <div className="flex flex-shrink-0 items-center gap-2">
-              {category.LEVEL !== null && category.LEVEL !== undefined && (
-                <Badge variant="secondary">
-                  {t("dashboard.category.list.cardLevel")} {category.LEVEL}
-                </Badge>
-              )}
-              {category.QT_RECORDS !== null &&
-                category.QT_RECORDS !== undefined &&
-                category.QT_RECORDS > 0 && (
-                  <Badge variant="default">
-                    {category.QT_RECORDS}{" "}
-                    {t("dashboard.category.list.cardProducts")}
+            {/* Seção inferior: Badges + Botão (desktop) */}
+            <div className="flex items-center justify-between gap-2 sm:flex-shrink-0 sm:justify-end">
+              {/* Badges */}
+              <div className="flex flex-wrap items-center gap-2">
+                {category.LEVEL !== null && category.LEVEL !== undefined && (
+                  <Badge variant="secondary" className="text-xs">
+                    {t("dashboard.category.list.cardLevel")} {category.LEVEL}
                   </Badge>
                 )}
-            </div>
+                {category.QT_RECORDS !== null &&
+                  category.QT_RECORDS !== undefined &&
+                  category.QT_RECORDS > 0 && (
+                    <Badge variant="default" className="text-xs">
+                      {category.QT_RECORDS}{" "}
+                      {t("dashboard.category.list.cardProducts")}
+                    </Badge>
+                  )}
+              </div>
 
-            {/* Botão de Detalhe */}
-            <div className="flex flex-shrink-0">
-              <Button
-                size="sm"
-                variant="outline"
-                className="gap-2"
-                onClick={() => handleViewDetails(category.ID_TAXONOMY)}
-              >
-                <ChevronRight className="h-4 w-4" />
-                {t("dashboard.category.list.buttonDetail")}
-              </Button>
+              {/* Botão de Detalhe - visível apenas em desktop */}
+              <div className="hidden sm:flex sm:flex-shrink-0">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => handleViewDetails(category.ID_TAXONOMY)}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                  {t("dashboard.category.list.buttonDetail")}
+                </Button>
+              </div>
             </div>
           </div>
         </Card>
