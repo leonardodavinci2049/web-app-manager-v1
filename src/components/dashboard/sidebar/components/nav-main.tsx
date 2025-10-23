@@ -19,6 +19,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 export function NavMain({
@@ -36,16 +37,24 @@ export function NavMain({
   }[];
 }) {
   const pathname = usePathname();
+  const { isMobile, setOpenMobile } = useSidebar();
 
-  // Estado para controlar quais menus estão abertos
-  const [openItems, setOpenItems] = useState<Set<string>>(new Set());
+  // Estado para controlar qual menu está aberto (apenas um por vez)
+  const [openItem, setOpenItem] = useState<string | null>(null);
+
+  // Função para fechar sidebar mobile quando link é clicado
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   // Função para verificar se um item específico está ativo
   const isSubItemActive = (url: string): boolean => {
     return pathname === url;
   };
 
-  // Efeito para abrir automaticamente menus que têm subitens ativos
+  // Efeito para abrir automaticamente o menu que tem subitem ativo
   useEffect(() => {
     // Função para verificar se um item do menu tem algum subitem ativo
     const hasActiveSubItem = (menuItem: {
@@ -55,27 +64,28 @@ export function NavMain({
       return menuItem.items.some((subItem) => pathname === subItem.url);
     };
 
-    const newOpenItems = new Set<string>();
+    // Encontra o primeiro item que deveria estar aberto
+    const activeItem = items.find(
+      (item) => item.isActive || hasActiveSubItem(item),
+    );
 
-    items.forEach((item) => {
-      if (item.isActive || hasActiveSubItem(item)) {
-        newOpenItems.add(item.title);
-      }
-    });
-
-    setOpenItems(newOpenItems);
+    if (activeItem) {
+      setOpenItem(activeItem.title);
+    } else {
+      // Se não há item ativo, mantém o estado atual ou fecha tudo
+      // setOpenItem(null); // Descomente se quiser fechar tudo quando não há item ativo
+    }
   }, [pathname, items]);
 
-  // Função para alternar o estado de abertura de um menu
+  // Função para alternar o estado de abertura de um menu (accordion behavior)
   const toggleItem = (itemTitle: string) => {
-    setOpenItems((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(itemTitle)) {
-        newSet.delete(itemTitle);
-      } else {
-        newSet.add(itemTitle);
+    setOpenItem((prev) => {
+      // Se o item clicado já está aberto, fecha ele
+      if (prev === itemTitle) {
+        return null;
       }
-      return newSet;
+      // Caso contrário, abre o item clicado (fechando qualquer outro)
+      return itemTitle;
     });
   };
 
@@ -84,7 +94,7 @@ export function NavMain({
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
-          const isOpen = openItems.has(item.title);
+          const isOpen = openItem === item.title;
 
           return (
             <Collapsible
@@ -110,7 +120,7 @@ export function NavMain({
                           asChild
                           isActive={isSubItemActive(subItem.url)}
                         >
-                          <Link href={subItem.url}>
+                          <Link href={subItem.url} onClick={handleLinkClick}>
                             <span>{subItem.title}</span>
                           </Link>
                         </SidebarMenuSubButton>
