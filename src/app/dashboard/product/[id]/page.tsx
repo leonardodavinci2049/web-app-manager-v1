@@ -65,7 +65,7 @@ async function ProductDetailsPageContent({ productId }: { productId: number }) {
         <div className="flex flex-col gap-6 py-6">
           <div className="px-4 lg:px-6">
             {/* New Modern Product Details Layout */}
-            <ProductDetailsLayout product={product} />
+            <ProductDetailsLayout product={product} productId={productId} />
           </div>
         </div>
       </div>
