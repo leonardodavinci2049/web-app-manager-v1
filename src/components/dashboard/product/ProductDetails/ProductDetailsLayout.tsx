@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // Server Component - não usar hooks de cliente
 import type { ProductDetail } from "@/services/api/product/types/product-types";
 import { formatCurrency } from "@/utils/common-utils";
-import { ProductImageGallery } from "./ProductImageGallery";
+import { ProductImageGalleryServer } from "./ProductImageGalleryServer";
 import { ProductInfoDisplay } from "./ProductInfoDisplay";
 import { ProductInlineEditDemo } from "./ProductInlineEditDemo";
 
@@ -96,14 +96,6 @@ export function ProductDetailsLayout({ product }: ProductDetailsLayoutProps) {
 
   const productImage = getProductImageUrl();
 
-  // Mock additional images for gallery (in real app, this would come from API)
-  const productImages = [
-    productImage,
-    "/images/product/no-image.jpeg", // Placeholder for additional images
-    "/images/product/no-image.jpeg",
-    "/images/product/no-image.jpeg",
-  ];
-
   // Format prices
   const retailPrice = product.VL_VENDA_VAREJO
     ? formatCurrency(product.VL_VENDA_VAREJO)
@@ -169,11 +161,11 @@ export function ProductDetailsLayout({ product }: ProductDetailsLayoutProps) {
 
       {/* Main Product Layout */}
       <div className="grid gap-8 lg:grid-cols-2">
-        {/* Left Column - Images Gallery (Client Component) */}
-        <ProductImageGallery
-          images={productImages}
-          productName={product.PRODUTO}
+        {/* Left Column - Images Gallery (Server Component with Client Component) */}
+        <ProductImageGalleryServer
           productId={product.ID_TBL_PRODUTO || 0}
+          productName={product.PRODUTO}
+          fallbackImage={productImage}
         />
 
         {/* Right Column - Product Info (Server Component) */}
