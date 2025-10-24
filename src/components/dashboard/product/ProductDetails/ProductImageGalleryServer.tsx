@@ -1,7 +1,8 @@
 import { createLogger } from "@/lib/logger";
 import { assetsApiService } from "@/services/api-assets/assets-api-service";
 import { isApiError } from "@/types/api-assets";
-import { ProductImageGallery } from "./ProductImageGallery";
+
+import { ProductImageGalleryRefresh } from "./ProductImageGalleryRefresh";
 
 const logger = createLogger("ProductImageGalleryServer");
 
@@ -18,7 +19,7 @@ interface ProductImageGalleryServerProps {
  * 1. Fetches images from the external assets API using the entity-gallery endpoint
  * 2. Transforms the response to extract image URLs
  * 3. Applies fallback image if gallery is empty or error occurs
- * 4. Renders the client-side ProductImageGallery component with the loaded images
+ * 4. Wraps the client-side ProductImageGallery with refresh functionality
  */
 export async function ProductImageGalleryServer({
   productId,
@@ -37,12 +38,13 @@ export async function ProductImageGalleryServer({
       logger.warn(
         `Failed to fetch gallery for product ${productId}: ${galleryResponse.message}`,
       );
-      // Use fallback image on error
+      // Use fallback image on error with refresh wrapper
       return (
-        <ProductImageGallery
-          images={[fallbackImage]}
-          productName={productName}
+        <ProductImageGalleryRefresh
           productId={productId}
+          productName={productName}
+          fallbackImage={fallbackImage}
+          initialImages={[fallbackImage]}
         />
       );
     }
@@ -59,10 +61,11 @@ export async function ProductImageGalleryServer({
         `No images found in gallery for product ${productId}, using fallback`,
       );
       return (
-        <ProductImageGallery
-          images={[fallbackImage]}
-          productName={productName}
+        <ProductImageGalleryRefresh
           productId={productId}
+          productName={productName}
+          fallbackImage={fallbackImage}
+          initialImages={[fallbackImage]}
         />
       );
     }
@@ -72,10 +75,11 @@ export async function ProductImageGalleryServer({
     );
 
     return (
-      <ProductImageGallery
-        images={galleryImages}
-        productName={productName}
+      <ProductImageGalleryRefresh
         productId={productId}
+        productName={productName}
+        fallbackImage={fallbackImage}
+        initialImages={galleryImages}
       />
     );
   } catch (error) {
@@ -83,12 +87,13 @@ export async function ProductImageGalleryServer({
       `Unexpected error fetching gallery for product ${productId}:`,
       error,
     );
-    // Use fallback image on unexpected error
+    // Use fallback image on unexpected error with refresh wrapper
     return (
-      <ProductImageGallery
-        images={[fallbackImage]}
-        productName={productName}
+      <ProductImageGalleryRefresh
         productId={productId}
+        productName={productName}
+        fallbackImage={fallbackImage}
+        initialImages={[fallbackImage]}
       />
     );
   }
