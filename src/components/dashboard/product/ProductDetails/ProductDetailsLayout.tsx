@@ -259,10 +259,10 @@ export function ProductDetailsLayout({
                   </span>
                 </div>
 
-                {product.REF && (
+                {product.SKU && (
                   <div className="flex justify-between py-2 border-b">
-                    <span className="font-medium">Referência:</span>
-                    <span className="font-mono text-sm">{product.REF}</span>
+                    <span className="font-medium">SKU:</span>
+                    <span className="font-mono text-sm">{product.SKU}</span>
                   </div>
                 )}
 

@@ -43,7 +43,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const { productId } = validation.data;
 
-    logger.debug(`Refreshing gallery for product: ${productId}`);
+    // Debug info removed for cleaner console output
 
     // Fetch updated gallery from external API
     const galleryResponse = await assetsApiService.getEntityGallery({
@@ -94,9 +94,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           img.url !== undefined,
       );
 
-    logger.debug(
-      `Successfully fetched ${images.length} images for product ${productId}`,
-    );
+    // Debug info removed for cleaner console output
 
     return NextResponse.json({
       success: true,

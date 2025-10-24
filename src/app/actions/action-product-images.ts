@@ -60,7 +60,7 @@ async function updateProductImagePathIfEmpty(
     }
 
     // PATH_IMAGEM is empty, update it with the new image URL
-    logger.info(
+    logger.debug(
       `Updating PATH_IMAGEM for product ${productId} with URL: ${imageUrl}`,
     );
 
@@ -71,7 +71,7 @@ async function updateProductImagePathIfEmpty(
 
     // Check if update was successful
     if (ProductServiceApi.isOperationSuccessful(updateResponse)) {
-      logger.info(`Successfully updated PATH_IMAGEM for product ${productId}`);
+      logger.debug(`Successfully updated PATH_IMAGEM for product ${productId}`);
     } else {
       const spResponse =
         ProductServiceApi.extractStoredProcedureResponse(updateResponse);
@@ -144,13 +144,7 @@ export async function uploadProductImageAction(
       };
     }
 
-    logger.debug("Upload product image", {
-      fileName: file.name,
-      productId,
-      tagsString,
-      description,
-      altText,
-    });
+    // Debug info removed for cleaner console output
 
     // Create FormData exactly like test page does
     const uploadFormData = new FormData();
@@ -161,15 +155,7 @@ export async function uploadProductImageAction(
     if (description) uploadFormData.append("description", description);
     if (altText) uploadFormData.append("altText", altText);
 
-    console.log(
-      "uploadProductImageAction - FormData being sent to uploadFileAction:",
-      {
-        entries: Array.from(uploadFormData.entries()).map(([key, value]) => [
-          key,
-          value instanceof File ? `File: ${value.name}` : value,
-        ]),
-      },
-    );
+    // FormData logging removed for cleaner console output
 
     // Call the test assets action that we know works
     const result = await uploadFileAction(uploadFormData);
@@ -221,7 +207,7 @@ export async function deleteProductImageAction(
       };
     }
 
-    logger.debug("Delete product image", { imageId });
+    // Debug info removed for cleaner console output
 
     // Call the assets API to delete the file
     const result = await assetsApiService.deleteFile({ id: imageId });
@@ -237,7 +223,7 @@ export async function deleteProductImageAction(
       };
     }
 
-    logger.info(`Successfully deleted image ${imageId}`);
+    // Success logged via return value
     return {
       success: true,
     };
@@ -270,7 +256,7 @@ export async function setPrimaryImageAction(
       };
     }
 
-    logger.debug("Set primary image", { productId, imageId });
+    // Debug info removed for cleaner console output
 
     // Call the assets API to set primary image
     const result = await assetsApiService.setPrimaryImage({
@@ -291,9 +277,7 @@ export async function setPrimaryImageAction(
       };
     }
 
-    logger.info(
-      `Successfully set image ${imageId} as primary for product ${productId}`,
-    );
+    // Success logged via return value
     return {
       success: true,
     };

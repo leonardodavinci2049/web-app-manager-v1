@@ -48,10 +48,8 @@ export function ProductInfoDisplay({
           <h1 className="text-3xl font-bold tracking-tight">
             {product.PRODUTO}
           </h1>
-          {product.REF && (
-            <p className="text-muted-foreground mt-1">
-              Referência: {product.REF}
-            </p>
+          {product.SKU && (
+            <p className="text-muted-foreground mt-1">SKU: {product.SKU}</p>
           )}
           {product.MODELO && (
             <p className="text-muted-foreground">Modelo: {product.MODELO}</p>

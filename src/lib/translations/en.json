@@ -286,6 +286,17 @@
           },
           "notInformed": "Not informed"
         }
+      },
+      "catalog": {
+        "upload": {
+          "addImage": "Add Image",
+          "clickOrDrag": "Click or drag",
+          "success": "Image uploaded successfully!",
+          "error": "Error uploading image",
+          "invalidFileType": "Please select only image files",
+          "fileTooLarge": "File too large. Limit: 10MB",
+          "ariaLabel": "Upload product image"
+        }
       }
     },
     "customers": {
