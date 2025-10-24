@@ -28,6 +28,7 @@ import type {
   UpdateProductDescriptionRequest,
   UpdateProductFlagsRequest,
   UpdateProductGeneralRequest,
+  UpdateProductImagePathRequest,
   UpdateProductNameRequest,
   UpdateProductPriceRequest,
   UpdateProductResponse,
@@ -47,6 +48,7 @@ import {
   UpdateProductDescriptionSchema,
   UpdateProductFlagsSchema,
   UpdateProductGeneralSchema,
+  UpdateProductImagePathSchema,
   UpdateProductNameSchema,
   UpdateProductPriceSchema,
   UpdateProductShortDescriptionSchema,
@@ -776,6 +778,41 @@ export class ProductServiceApi extends BaseApiService {
       return data;
     } catch (error) {
       logger.error("Erro ao atualizar dados diversos do produto", error);
+      throw error;
+    }
+  }
+
+  /**
+   * ENDPOINT 19 - Update product image path
+   * @param params - Update parameters
+   * @returns Promise with update response
+   */
+  static async updateProductImagePath(
+    params: Partial<UpdateProductImagePathRequest> & {
+      pe_id_produto: number;
+      pe_path_imagem: string;
+    },
+  ): Promise<UpdateProductResponse> {
+    try {
+      const validatedParams = UpdateProductImagePathSchema.parse(params);
+      const instance = new ProductServiceApi();
+      const requestBody = ProductServiceApi.buildBasePayload(validatedParams);
+
+      const data: UpdateProductResponse =
+        await instance.post<UpdateProductResponse>(
+          PRODUCT_ENDPOINTS.UPDATE_IMAGE_PATH,
+          requestBody,
+        );
+
+      if (isApiError(data.statusCode)) {
+        throw new Error(
+          data.message || "Erro ao atualizar caminho da imagem do produto",
+        );
+      }
+
+      return data;
+    } catch (error) {
+      logger.error("Erro ao atualizar caminho da imagem do produto", error);
       throw error;
     }
   }

@@ -214,6 +214,14 @@ export const UpdateProductVariousSchema = z.object({
   pe_nome_produto: z.string().min(1).max(255),
 });
 
+/**
+ * Schema for updating product image path (ENDPOINT 19)
+ */
+export const UpdateProductImagePathSchema = z.object({
+  pe_id_produto: z.number().int().positive(),
+  pe_path_imagem: z.string().min(1).max(255),
+});
+
 // ========================================
 // INFERRED TYPES
 // ========================================
@@ -244,4 +252,7 @@ export type UpdateProductDescriptionInput = z.infer<
 >;
 export type UpdateProductVariousInput = z.infer<
   typeof UpdateProductVariousSchema
+>;
+export type UpdateProductImagePathInput = z.infer<
+  typeof UpdateProductImagePathSchema
 >;
