@@ -1,12 +1,90 @@
 "use server";
 
 import { createLogger } from "@/lib/logger";
+import { ProductServiceApi } from "@/services/api/product/product-service-api";
 import { assetsApiService } from "@/services/api-assets/assets-api-service";
 import type { FileAsset } from "@/types/api-assets";
 import { isApiError } from "@/types/api-assets";
 import { uploadFileAction } from "./action-test-assets";
 
 const logger = createLogger("action-product-images");
+
+/**
+ * Helper function to update product PATH_IMAGEM only if it's currently empty
+ * This ensures we don't override existing main images
+ *
+ * @param productId - Product ID to update
+ * @param imageUrl - New image URL to set as PATH_IMAGEM
+ */
+async function updateProductImagePathIfEmpty(
+  productId: number,
+  imageUrl: string,
+): Promise<void> {
+  try {
+    // First, fetch current product data to check if PATH_IMAGEM is empty
+    const productResponse = await ProductServiceApi.findProductById({
+      pe_type_business: 1,
+      pe_id_produto: productId,
+      pe_slug_produto: "",
+    });
+
+    // Check if we got a valid response
+    if (!ProductServiceApi.isValidProductDetailResponse(productResponse)) {
+      logger.warn(
+        `Could not fetch product ${productId} for PATH_IMAGEM check:`,
+        productResponse.message,
+      );
+      return;
+    }
+
+    // Extract product detail
+    const product = ProductServiceApi.extractProductDetail(productResponse);
+    if (!product) {
+      logger.warn(`Product ${productId} not found in response`);
+      return;
+    }
+
+    // Check if PATH_IMAGEM is empty or null
+    const currentPathImagem = product.PATH_IMAGEM;
+    const isPathImagemEmpty =
+      !currentPathImagem ||
+      currentPathImagem.trim() === "" ||
+      currentPathImagem === "null" ||
+      currentPathImagem === "undefined";
+
+    if (!isPathImagemEmpty) {
+      logger.debug(
+        `Product ${productId} already has PATH_IMAGEM: ${currentPathImagem}. Skipping update.`,
+      );
+      return;
+    }
+
+    // PATH_IMAGEM is empty, update it with the new image URL
+    logger.info(
+      `Updating PATH_IMAGEM for product ${productId} with URL: ${imageUrl}`,
+    );
+
+    const updateResponse = await ProductServiceApi.updateProductImagePath({
+      pe_id_produto: productId,
+      pe_path_imagem: imageUrl,
+    });
+
+    // Check if update was successful
+    if (ProductServiceApi.isOperationSuccessful(updateResponse)) {
+      logger.info(`Successfully updated PATH_IMAGEM for product ${productId}`);
+    } else {
+      const spResponse =
+        ProductServiceApi.extractStoredProcedureResponse(updateResponse);
+      logger.warn(
+        `Failed to update PATH_IMAGEM for product ${productId}:`,
+        spResponse?.sp_message || updateResponse.message,
+      );
+    }
+  } catch (error) {
+    logger.error(`Error updating PATH_IMAGEM for product ${productId}:`, error);
+    throw error;
+  }
+}
 
 /**
  * Server Actions for Product Image Upload
@@ -95,6 +173,24 @@ export async function uploadProductImageAction(
 
     // Call the test assets action that we know works
     const result = await uploadFileAction(uploadFormData);
+
+    // If upload was successful, try to update product PATH_IMAGEM if it's empty
+    if (result.success && result.data?.urls?.medium) {
+      try {
+        await updateProductImagePathIfEmpty(
+          Number(productId),
+          result.data.urls.medium,
+        );
+      } catch (pathUpdateError) {
+        // Log error but don't fail the upload - image was successfully uploaded
+        logger.warn(
+          `Failed to update PATH_IMAGEM for product ${productId}:`,
+          pathUpdateError,
+        );
+        // Upload was successful, just PATH_IMAGEM update failed
+        // This is not critical enough to fail the entire operation
+      }
+    }
 
     // Return the result from the working uploadFileAction
     return result;
