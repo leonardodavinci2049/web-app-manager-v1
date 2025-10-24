@@ -3,11 +3,17 @@
 import { useState } from "react";
 import { ProductImageGallery } from "./ProductImageGallery";
 
+interface GalleryImageWithId {
+  id: string;
+  url: string;
+  isPrimary?: boolean;
+}
+
 interface ProductImageGalleryRefreshProps {
   productId: number;
   productName: string;
   fallbackImage: string;
-  initialImages: string[];
+  initialImages: GalleryImageWithId[];
 }
 
 /**
@@ -27,7 +33,7 @@ export function ProductImageGalleryRefresh({
   fallbackImage,
   initialImages,
 }: ProductImageGalleryRefreshProps) {
-  const [images, setImages] = useState<string[]>(initialImages);
+  const [images, setImages] = useState<GalleryImageWithId[]>(initialImages);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleImageUploadSuccess = async () => {
@@ -53,7 +59,11 @@ export function ProductImageGalleryRefresh({
 
       if (data.success && data.images) {
         // Update images with the new gallery
-        setImages(data.images.length > 0 ? data.images : [fallbackImage]);
+        setImages(
+          data.images.length > 0
+            ? data.images
+            : [{ id: "fallback", url: fallbackImage, isPrimary: true }],
+        );
       } else {
         // Keep existing images if refresh fails
         console.error("Gallery refresh failed:", data.error);

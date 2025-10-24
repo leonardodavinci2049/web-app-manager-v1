@@ -138,6 +138,8 @@ export interface GalleryImage {
   originalName: string;
   uploadedAt: string;
   tags?: string[];
+  isPrimary: boolean;
+  displayOrder: number;
   urls: FileUrls;
 }
 

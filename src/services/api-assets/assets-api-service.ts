@@ -254,6 +254,39 @@ export class AssetsApiService {
   }
 
   /**
+   * ENDPOINT 07 - Set Primary Image
+   * POST /file/v1/set-primary-image
+   * Requires authentication
+   */
+  async setPrimaryImage(request: {
+    entityType: string;
+    entityId: string;
+    assetId: string;
+    displayOrder?: number;
+  }): Promise<ApiResponse<{ success: boolean; message: string }>> {
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/file/v1/set-primary-image`,
+        {
+          method: "POST",
+          headers: this.getHeaders(),
+          body: JSON.stringify(request),
+        },
+      );
+
+      return this.handleResponse<{ success: boolean; message: string }>(
+        response,
+      );
+    } catch (error) {
+      return {
+        statusCode: 500,
+        message: `Set primary failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        error: "Set Primary Error",
+      };
+    }
+  }
+
+  /**
    * Utility method to check if a response is an error
    */
   isError<T>(
