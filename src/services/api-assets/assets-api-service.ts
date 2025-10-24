@@ -110,7 +110,8 @@ export class AssetsApiService {
       formData.append("entityId", request.entityId);
 
       if (request.tags && request.tags.length > 0) {
-        formData.append("tags", request.tags.join(","));
+        // Convert tags array to JSON string for multipart form data
+        formData.append("tags", JSON.stringify(request.tags));
       }
       if (request.description) {
         formData.append("description", request.description);
