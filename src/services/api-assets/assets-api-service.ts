@@ -1,4 +1,5 @@
 import { envs } from "@/core/config/envs";
+import { createLogger } from "@/lib/logger";
 import type {
   ApiResponse,
   ApiStatusResponse,
@@ -13,6 +14,8 @@ import type {
   UploadFileRequest,
 } from "@/types/api-assets";
 import { isApiError } from "@/types/api-assets";
+
+const logger = createLogger("AssetsApiService");
 
 /**
  * AssetsApiService - Service for External Assets API (srv-assets-v1)
@@ -110,8 +113,14 @@ export class AssetsApiService {
       formData.append("entityId", request.entityId);
 
       if (request.tags && request.tags.length > 0) {
-        // Convert tags array to JSON string for multipart form data
-        formData.append("tags", JSON.stringify(request.tags));
+        const tagsString = request.tags.join(",");
+        logger.debug("Appending tags to FormData", {
+          tags: request.tags,
+          tagsString,
+        });
+        formData.append("tags", tagsString);
+      } else {
+        logger.debug("No tags provided", { tags: request.tags });
       }
       if (request.description) {
         formData.append("description", request.description);
@@ -119,6 +128,12 @@ export class AssetsApiService {
       if (request.altText) {
         formData.append("altText", request.altText);
       }
+
+      logger.debug("Uploading file", {
+        fileName: request.file.name,
+        entityType: request.entityType,
+        entityId: request.entityId,
+      });
 
       const response = await fetch(`${this.baseUrl}/file/v1/upload-file`, {
         method: "POST",
@@ -131,6 +146,7 @@ export class AssetsApiService {
 
       return this.handleResponse<FileAsset>(response);
     } catch (error) {
+      logger.error("Upload error", error);
       return {
         statusCode: 500,
         message: `Upload failed: ${error instanceof Error ? error.message : "Unknown error"}`,

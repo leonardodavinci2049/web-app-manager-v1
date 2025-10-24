@@ -93,7 +93,7 @@ export function ProductImageGallery({
           const formData = new FormData();
           formData.append("file", file);
           formData.append("productId", productId.toString());
-          formData.append("tags", "product-image");
+          // Don't send tags to match the working test page pattern
 
           // Call server action to upload
           const result = await uploadProductImageAction(formData);

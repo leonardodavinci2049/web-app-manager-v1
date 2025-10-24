@@ -65,7 +65,7 @@ export async function ProductImageGalleryServer({
           productId={productId}
           productName={productName}
           fallbackImage={fallbackImage}
-          initialImages={[fallbackImage]}
+          initialImages={fallbackImage ? [fallbackImage] : []}
         />
       );
     }

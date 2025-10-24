@@ -37,9 +37,13 @@ function formatDate(dateString: string): string {
 
 interface ProductDetailsLayoutProps {
   product: ProductDetail;
+  productId: number;
 }
 
-export function ProductDetailsLayout({ product }: ProductDetailsLayoutProps) {
+export function ProductDetailsLayout({
+  product,
+  productId,
+}: ProductDetailsLayoutProps) {
   // Helper function to validate and get product image URL
   const getProductImageUrl = (): string => {
     const defaultImage = "/images/product/no-image.jpeg";
@@ -163,7 +167,7 @@ export function ProductDetailsLayout({ product }: ProductDetailsLayoutProps) {
       <div className="grid gap-8 lg:grid-cols-2">
         {/* Left Column - Images Gallery (Server Component with Client Component) */}
         <ProductImageGalleryServer
-          productId={product.ID_TBL_PRODUTO || 0}
+          productId={productId}
           productName={product.PRODUTO}
           fallbackImage={productImage}
         />

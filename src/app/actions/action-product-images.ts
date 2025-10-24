@@ -1,8 +1,10 @@
 "use server";
 
-import { assetsApiService } from "@/services/api-assets";
-import type { EntityType, FileAsset } from "@/types/api-assets";
-import { isApiError } from "@/types/api-assets";
+import { createLogger } from "@/lib/logger";
+import type { FileAsset } from "@/types/api-assets";
+import { uploadFileAction } from "./action-test-assets";
+
+const logger = createLogger("action-product-images");
 
 /**
  * Server Actions for Product Image Upload
@@ -52,38 +54,38 @@ export async function uploadProductImageAction(
       };
     }
 
-    // Parse tags
-    const tags = tagsString
-      ? tagsString
-          .split(",")
-          .map((tag) => tag.trim())
-          .filter((tag) => tag)
-      : undefined;
-
-    // Call the assets API service to upload the file
-    const result = await assetsApiService.uploadFile({
-      file,
-      entityType: "PRODUCT" as EntityType,
-      entityId: productId,
-      tags,
-      description: description || undefined,
-      altText: altText || undefined,
+    logger.debug("Upload product image", {
+      fileName: file.name,
+      productId,
+      tagsString,
+      description,
+      altText,
     });
 
-    // Check if the response is an error
-    if (isApiError(result)) {
-      return {
-        success: false,
-        error: Array.isArray(result.message)
-          ? result.message.join(", ")
-          : result.message,
-      };
-    }
+    // Create FormData exactly like test page does
+    const uploadFormData = new FormData();
+    uploadFormData.append("file", file);
+    uploadFormData.append("entityType", "PRODUCT");
+    uploadFormData.append("entityId", productId);
+    if (tagsString) uploadFormData.append("tags", tagsString);
+    if (description) uploadFormData.append("description", description);
+    if (altText) uploadFormData.append("altText", altText);
 
-    return {
-      success: true,
-      data: result,
-    };
+    console.log(
+      "uploadProductImageAction - FormData being sent to uploadFileAction:",
+      {
+        entries: Array.from(uploadFormData.entries()).map(([key, value]) => [
+          key,
+          value instanceof File ? `File: ${value.name}` : value,
+        ]),
+      },
+    );
+
+    // Call the test assets action that we know works
+    const result = await uploadFileAction(uploadFormData);
+
+    // Return the result from the working uploadFileAction
+    return result;
   } catch (error) {
     console.error("Upload product image action error:", error);
     return {
