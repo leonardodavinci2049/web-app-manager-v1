@@ -53,6 +53,13 @@ const nextConfig: NextConfig = {
         port: "5573",
         pathname: "/**",
       },
+      // Production assets domain
+      {
+        protocol: "https",
+        hostname: "assents01.comsuporte.com.br",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 };
