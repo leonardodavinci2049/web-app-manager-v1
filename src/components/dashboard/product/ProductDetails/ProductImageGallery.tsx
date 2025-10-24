@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import React, { useCallback, useState } from "react";
 import { toast } from "sonner";
+import { uploadProductImageAction } from "@/app/actions/action-product-images";
 // Comentado temporariamente até o componente AlertDialog ser criado
 // import {
 //   AlertDialog,
@@ -36,12 +37,14 @@ interface ProductImageGalleryProps {
   images: string[];
   productName: string;
   productId: number;
+  onImageUploadSuccess?: () => void | Promise<void>;
 }
 
 export function ProductImageGallery({
   images,
   productName,
   productId,
+  onImageUploadSuccess,
 }: ProductImageGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
@@ -59,29 +62,62 @@ export function ProductImageGallery({
   }, []);
 
   // Handle image upload via drag & drop or file input
-  const handleImageUpload = useCallback(async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+  const handleImageUpload = useCallback(
+    async (files: FileList | null) => {
+      if (!files || files.length === 0) return;
 
-    setIsUploading(true);
+      setIsUploading(true);
 
-    try {
-      // Mock upload process - in real app, this would call an API
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      try {
+        // Process each file
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
 
-      // Show success message
-      toast.success(`${files.length} imagem(s) adicionada(s) com sucesso!`);
+          // Validate file type
+          if (!file.type.startsWith("image/")) {
+            toast.error(
+              `${file.name} não é uma imagem válida. Por favor, selecione apenas imagens.`,
+            );
+            continue;
+          }
 
-      // In real implementation, you would:
-      // 1. Upload files to server/cloud storage
-      // 2. Update product images in database
-      // 3. Refresh the images prop or update local state
-    } catch (error) {
-      console.error("Error uploading images:", error);
-      toast.error("Erro ao fazer upload das imagens");
-    } finally {
-      setIsUploading(false);
-    }
-  }, []);
+          // Validate file size (10MB limit)
+          if (file.size > 10 * 1024 * 1024) {
+            toast.error(
+              `${file.name} é muito grande. O limite é 10MB por arquivo.`,
+            );
+            continue;
+          }
+
+          // Create FormData for upload
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("productId", productId.toString());
+          // Don't send tags to match the working test page pattern
+
+          // Call server action to upload
+          const result = await uploadProductImageAction(formData);
+
+          if (result.success) {
+            toast.success(`${file.name} enviada com sucesso!`);
+          } else {
+            toast.error(`Erro ao enviar ${file.name}: ${result.error}`);
+          }
+        }
+
+        // After all uploads complete, trigger refresh callback
+        if (onImageUploadSuccess) {
+          await onImageUploadSuccess();
+        }
+      } catch (error) {
+        console.error("Error uploading images:", error);
+        toast.error("Erro ao fazer upload das imagens");
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [productId, onImageUploadSuccess],
+  );
 
   // Handle drag events
   const handleDragOver = useCallback((e: React.DragEvent) => {
