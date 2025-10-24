@@ -374,6 +374,14 @@ export interface UpdateProductVariousRequest extends BaseProductRequest {
   pe_nome_produto: string;
 }
 
+/**
+ * Request for updating product image path (ENDPOINT 19)
+ */
+export interface UpdateProductImagePathRequest extends BaseProductRequest {
+  pe_id_produto: number;
+  pe_path_imagem: string;
+}
+
 // ========================================
 // RESPONSE TYPES - QUERY ENDPOINTS
 // ========================================

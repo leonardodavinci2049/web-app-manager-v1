@@ -70,6 +70,7 @@ export const PRODUCT_ENDPOINTS = {
   UPDATE_SHORT_DESCRIPTION: "/product/v2/product-upd-short-description",
   UPDATE_DESCRIPTION: "/product/v2/product-upd-description",
   UPDATE_VARIOUS: "/product/v2/product-upd-variou",
+  UPDATE_IMAGE_PATH: "/product/v2/product-upd-path-image",
 } as const;
 
 // Endpoints de Carrinho
