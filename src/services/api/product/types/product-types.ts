@@ -108,6 +108,7 @@ export interface ProductDetail {
   ID_TBL_PRODUTO: number;
   PRODUTO: string;
   REF: string;
+  SKU: number;
   MODELO: string;
   ETIQUETA: string;
   DESCRICAO_TAB: string;

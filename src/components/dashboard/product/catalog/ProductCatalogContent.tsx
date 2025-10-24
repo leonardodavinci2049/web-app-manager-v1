@@ -149,6 +149,34 @@ export function ProductCatalogContent({
     window.location.href = `/dashboard/product/${productId}`;
   };
 
+  // Handle image upload success - reload products to show updated images
+  const handleImageUploadSuccess = async () => {
+    try {
+      logger.info("Reloading products after image upload");
+
+      const result = await fetchProductsWithFilters(
+        filters.searchTerm,
+        filters.selectedCategory,
+        filters.onlyInStock,
+        filters.sortBy,
+        1, // First page
+        loadedQuantity, // Keep current loaded quantity
+      );
+
+      if (result.success) {
+        setProducts(result.products);
+        setTotal(result.total);
+      } else {
+        logger.error(
+          "Error reloading products after image upload:",
+          result.error,
+        );
+      }
+    } catch (error) {
+      logger.error("Unexpected error reloading products:", error);
+    }
+  };
+
   // Calculate display values
   const displayedProducts = products.length;
   const hasMore = !reachedEnd; // Show button unless we reached the end
@@ -195,6 +223,7 @@ export function ProductCatalogContent({
               hasMore={hasMore}
               onLoadMore={loadMore}
               onViewDetails={handleViewDetails}
+              onImageUploadSuccess={handleImageUploadSuccess}
             />
           </div>
         </div>
@@ -210,6 +239,7 @@ export function ProductCatalogContent({
           hasMore={hasMore}
           onLoadMore={loadMore}
           onViewDetails={handleViewDetails}
+          onImageUploadSuccess={handleImageUploadSuccess}
         />
       )}
     </>
