@@ -114,13 +114,10 @@ export class AssetsApiService {
 
       if (request.tags && request.tags.length > 0) {
         const tagsString = request.tags.join(",");
-        logger.debug("Appending tags to FormData", {
-          tags: request.tags,
-          tagsString,
-        });
+        // Debug info about tags removed for cleaner console output
         formData.append("tags", tagsString);
       } else {
-        logger.debug("No tags provided", { tags: request.tags });
+        // Debug info about tags removed for cleaner console output
       }
       if (request.description) {
         formData.append("description", request.description);
@@ -129,11 +126,7 @@ export class AssetsApiService {
         formData.append("altText", request.altText);
       }
 
-      logger.debug("Uploading file", {
-        fileName: request.file.name,
-        entityType: request.entityType,
-        entityId: request.entityId,
-      });
+      // Debug info about file upload removed for cleaner console output
 
       const response = await fetch(`${this.baseUrl}/file/v1/upload-file`, {
         method: "POST",

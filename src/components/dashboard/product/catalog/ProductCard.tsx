@@ -1,37 +1,28 @@
-"use client";
-
 import { Eye, Package, Plane, Shield, Star } from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Product } from "../../../../types/types";
 import { formatCurrency } from "../../../../utils/common-utils";
-import {
-  createImageErrorHandler,
-  getValidImageUrl,
-} from "../../../../utils/image-utils";
+import { ProductCardClient } from "./ProductCardClient";
 
 interface ProductCardProps {
   product: Product;
   viewMode: "grid" | "list";
   onViewDetails?: (productId: string) => void;
+  onImageUploadSuccess?: () => void;
 }
 
 export function ProductCard({
   product,
   viewMode,
   onViewDetails,
+  onImageUploadSuccess,
 }: ProductCardProps) {
-  const [imageError, setImageError] = useState(false);
   const isOutOfStock = product.stock === 0;
-  const hasPromotion =
-    product.promotionalPrice && product.promotionalPrice < product.normalPrice;
-
-  // Use validated image URL with fallback
-  const imageUrl = getValidImageUrl(product.image);
-  const imageErrorHandler = createImageErrorHandler();
+  const hasPromotion = Boolean(
+    product.promotionalPrice && product.promotionalPrice < product.normalPrice,
+  );
 
   const categoryLabels: Record<string, string> = {
     electronics: "Eletrônicos",
@@ -49,34 +40,11 @@ export function ProductCard({
         <CardContent className="p-4">
           <div className="flex gap-4">
             {/* Imagem */}
-            <div className="relative h-24 w-24 flex-shrink-0">
-              {imageError ? (
-                <div className="flex h-full w-full items-center justify-center rounded-md bg-muted">
-                  <Package className="h-8 w-8 text-muted-foreground" />
-                </div>
-              ) : (
-                <Image
-                  src={imageUrl}
-                  alt={`Imagem do produto ${product.name}`}
-                  fill
-                  className="rounded-md object-cover"
-                  sizes="(max-width: 96px) 100vw, 96px"
-                  loading="lazy"
-                  onError={(e) => {
-                    setImageError(true);
-                    imageErrorHandler.onError(e);
-                  }}
-                  onLoad={() => setImageError(false)}
-                />
-              )}
-              {isOutOfStock && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/50">
-                  <Badge variant="destructive" className="text-xs">
-                    Esgotado
-                  </Badge>
-                </div>
-              )}
-            </div>
+            <ProductCardClient
+              product={product}
+              viewMode={viewMode}
+              onImageUploadSuccess={onImageUploadSuccess}
+            />
 
             {/* Informações */}
             <div className="flex-1 space-y-2">
@@ -182,54 +150,12 @@ export function ProductCard({
     >
       <CardContent className="flex h-full flex-col p-4">
         {/* Imagem */}
-        <div className="relative aspect-square overflow-hidden rounded-md">
-          {imageError ? (
-            <div className="flex h-full w-full items-center justify-center bg-muted">
-              <Package className="h-12 w-12 text-muted-foreground" />
-            </div>
-          ) : (
-            <Image
-              src={imageUrl}
-              alt={`Imagem do produto ${product.name}`}
-              fill
-              className="object-cover transition-transform duration-200 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-              loading="lazy"
-              onError={(e) => {
-                setImageError(true);
-                imageErrorHandler.onError(e);
-              }}
-              onLoad={() => setImageError(false)}
-            />
-          )}
-
-          {/* Badges sobrepostos */}
-          <div className="absolute top-2 left-2 flex flex-col gap-1">
-            {hasPromotion && (
-              <Badge className="bg-red-500 text-xs hover:bg-red-600">
-                Promoção
-              </Badge>
-            )}
-            {product.isNew && (
-              <Badge className="bg-blue-500 text-xs hover:bg-blue-600">
-                <Star className="h-3 w-3 mr-1" />
-                Novo
-              </Badge>
-            )}
-            {product.isImported && (
-              <Badge variant="secondary" className="text-xs">
-                <Plane className="h-3 w-3 mr-1" />
-                Importado
-              </Badge>
-            )}
-          </div>
-
-          {isOutOfStock && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-              <Badge variant="destructive">Esgotado</Badge>
-            </div>
-          )}
-        </div>
+        <ProductCardClient
+          product={product}
+          viewMode={viewMode}
+          onImageUploadSuccess={onImageUploadSuccess}
+          hasPromotion={hasPromotion}
+        />
 
         {/* Conteúdo flexível */}
         <div className="mt-4 flex flex-1 flex-col gap-3">

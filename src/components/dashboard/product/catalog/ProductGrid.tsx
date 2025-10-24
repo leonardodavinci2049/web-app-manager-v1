@@ -14,6 +14,7 @@ interface ProductGridProps {
   hasMore?: boolean;
   onLoadMore?: () => void;
   onViewDetails?: (productId: string) => void;
+  onImageUploadSuccess?: () => void;
 }
 
 export function ProductGrid({
@@ -24,6 +25,7 @@ export function ProductGrid({
   hasMore = false,
   onLoadMore,
   onViewDetails,
+  onImageUploadSuccess,
 }: ProductGridProps) {
   // Initial Loading State
   if (isInitialLoading) {
@@ -56,6 +58,7 @@ export function ProductGrid({
             product={product}
             viewMode={viewMode}
             onViewDetails={onViewDetails}
+            onImageUploadSuccess={onImageUploadSuccess}
           />
         ))}
       </div>

@@ -401,6 +401,17 @@
         "priceMin": "Preço deve ser maior ou igual a 0",
         "stockMin": "Estoque deve ser maior ou igual a 0",
         "additionalInfoMaxLength": "Informações adicionais não podem ter mais de 500 caracteres"
+      },
+      "catalog": {
+        "upload": {
+          "addImage": "Adicionar Imagem",
+          "clickOrDrag": "Clique ou arraste",
+          "success": "Imagem enviada com sucesso!",
+          "error": "Erro ao enviar imagem",
+          "invalidFileType": "Por favor, selecione apenas arquivos de imagem",
+          "fileTooLarge": "Arquivo muito grande. Limite: 10MB",
+          "ariaLabel": "Enviar imagem do produto"
+        }
       }
     },
     "customers": {
