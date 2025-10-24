@@ -17,9 +17,10 @@ interface ProductImageGalleryServerProps {
  *
  * This component:
  * 1. Fetches images from the external assets API using the entity-gallery endpoint
- * 2. Transforms the response to extract image URLs
- * 3. Applies fallback image if gallery is empty or error occurs
- * 4. Wraps the client-side ProductImageGallery with refresh functionality
+ * 2. Sorts images by isPrimary (primary first), then displayOrder, then upload date
+ * 3. Transforms the response to extract image URLs in correct order
+ * 4. Applies fallback image if gallery is empty or error occurs
+ * 5. Wraps the client-side ProductImageGallery with refresh functionality
  */
 export async function ProductImageGalleryServer({
   productId,
@@ -44,35 +45,58 @@ export async function ProductImageGalleryServer({
           productId={productId}
           productName={productName}
           fallbackImage={fallbackImage}
-          initialImages={[fallbackImage]}
+          initialImages={[
+            { id: "fallback", url: fallbackImage, isPrimary: true },
+          ]}
         />
       );
     }
 
-    // Extract image URLs from the response
+    // Sort images: primary first, then by displayOrder, then by upload date
+    const sortedImages = [...galleryResponse.images].sort((a, b) => {
+      // Primary images first
+      if (a.isPrimary && !b.isPrimary) return -1;
+      if (!a.isPrimary && b.isPrimary) return 1;
+
+      // Then by display order
+      if (a.displayOrder !== b.displayOrder) {
+        return a.displayOrder - b.displayOrder;
+      }
+
+      // Finally by upload date (newest first)
+      return (
+        new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+      );
+    });
+
+    // Transform to gallery image structure with IDs
     // Using 'medium' resolution (400x400) for gallery display
-    const galleryImages = galleryResponse.images
-      .map((img) => img.urls.medium)
-      .filter((url): url is string => url !== undefined);
+    const galleryImages = sortedImages
+      .map((img) => ({
+        id: img.id,
+        url: img.urls.medium,
+        isPrimary: img.isPrimary,
+      }))
+      .filter(
+        (img): img is { id: string; url: string; isPrimary: boolean } =>
+          img.url !== undefined,
+      );
 
     // Apply fallback if gallery is empty
     if (galleryImages.length === 0) {
-      logger.debug(
-        `No images found in gallery for product ${productId}, using fallback`,
-      );
       return (
         <ProductImageGalleryRefresh
           productId={productId}
           productName={productName}
           fallbackImage={fallbackImage}
-          initialImages={fallbackImage ? [fallbackImage] : []}
+          initialImages={
+            fallbackImage
+              ? [{ id: "fallback", url: fallbackImage, isPrimary: true }]
+              : []
+          }
         />
       );
     }
-
-    logger.debug(
-      `Successfully fetched ${galleryImages.length} images for product ${productId}`,
-    );
 
     return (
       <ProductImageGalleryRefresh
@@ -93,7 +117,9 @@ export async function ProductImageGalleryServer({
         productId={productId}
         productName={productName}
         fallbackImage={fallbackImage}
-        initialImages={[fallbackImage]}
+        initialImages={[
+          { id: "fallback", url: fallbackImage, isPrimary: true },
+        ]}
       />
     );
   }

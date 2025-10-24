@@ -18,6 +18,11 @@ const refreshGallerySchema = z.object({
  * Refresh product gallery images by fetching from the external API
  * This endpoint is called from ProductImageGalleryRefresh component
  * after a successful image upload to get the updated gallery
+ *
+ * Images are sorted by:
+ * 1. isPrimary (primary images first)
+ * 2. displayOrder (ascending)
+ * 3. uploadedAt (newest first)
  */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
@@ -60,10 +65,34 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // Extract image URLs using medium resolution
-    const images = galleryResponse.images
-      .map((img) => img.urls.medium)
-      .filter((url): url is string => url !== undefined);
+    // Sort images: primary first, then by displayOrder, then by upload date
+    const sortedImages = [...galleryResponse.images].sort((a, b) => {
+      // Primary images first
+      if (a.isPrimary && !b.isPrimary) return -1;
+      if (!a.isPrimary && b.isPrimary) return 1;
+
+      // Then by display order
+      if (a.displayOrder !== b.displayOrder) {
+        return a.displayOrder - b.displayOrder;
+      }
+
+      // Finally by upload date (newest first)
+      return (
+        new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+      );
+    });
+
+    // Transform to gallery image structure with IDs from sorted images
+    const images = sortedImages
+      .map((img) => ({
+        id: img.id,
+        url: img.urls.medium,
+        isPrimary: img.isPrimary,
+      }))
+      .filter(
+        (img): img is { id: string; url: string; isPrimary: boolean } =>
+          img.url !== undefined,
+      );
 
     logger.debug(
       `Successfully fetched ${images.length} images for product ${productId}`,

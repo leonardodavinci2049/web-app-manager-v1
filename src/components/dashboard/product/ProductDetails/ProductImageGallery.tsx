@@ -3,6 +3,7 @@
 import {
   ChevronLeft,
   ChevronRight,
+  Crown,
   ImageIcon,
   Plus,
   X,
@@ -11,7 +12,11 @@ import {
 import Image from "next/image";
 import React, { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { uploadProductImageAction } from "@/app/actions/action-product-images";
+import {
+  deleteProductImageAction,
+  setPrimaryImageAction,
+  uploadProductImageAction,
+} from "@/app/actions/action-product-images";
 // Comentado temporariamente até o componente AlertDialog ser criado
 // import {
 //   AlertDialog,
@@ -33,8 +38,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+interface GalleryImageWithId {
+  id: string;
+  url: string;
+  isPrimary?: boolean;
+}
+
 interface ProductImageGalleryProps {
-  images: string[];
+  images: GalleryImageWithId[];
   productName: string;
   productId: number;
   onImageUploadSuccess?: () => void | Promise<void>;
@@ -51,9 +62,10 @@ export function ProductImageGallery({
   const [zoomedImageIndex, setZoomedImageIndex] = useState(0);
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
   const [isUploading, setIsUploading] = useState(false);
-  const [_deleteImageIndex, setDeleteImageIndex] = useState<number | null>(
-    null,
-  );
+  const [deleteImageIndex, setDeleteImageIndex] = useState<number | null>(null);
+  const [setPrimaryImageIndex, setSetPrimaryImageIndex] = useState<
+    number | null
+  >(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
   // Handle image loading errors
@@ -154,22 +166,41 @@ export function ProductImageGallery({
   );
 
   // Handle image deletion
-  const _handleDeleteImage = useCallback(
+  const handleDeleteImage = useCallback(
     async (index: number) => {
       try {
-        // Mock deletion process - in real app, this would call an API
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const imageToDelete = images[index];
+        if (!imageToDelete) {
+          toast.error("Imagem não encontrada");
+          return;
+        }
 
-        toast.success("Imagem removida com sucesso!");
+        // Special handling for primary image deletion
+        if (imageToDelete.isPrimary && images.length > 1) {
+          toast.success(
+            "Imagem principal removida! A próxima imagem será promovida automaticamente.",
+          );
+        }
 
-        // In real implementation, you would:
-        // 1. Delete image from server/cloud storage
-        // 2. Update product images in database
-        // 3. Update local state or refresh images
+        // Call server action to delete the image
+        const result = await deleteProductImageAction(imageToDelete.id);
 
-        // If we're deleting the currently selected image, select the first one
-        if (index === selectedImageIndex && images.length > 1) {
-          setSelectedImageIndex(0);
+        if (result.success) {
+          if (!imageToDelete.isPrimary) {
+            toast.success("Imagem removida com sucesso!");
+          }
+
+          // If we're deleting the currently selected image, select the first one
+          if (index === selectedImageIndex && images.length > 1) {
+            setSelectedImageIndex(0);
+          }
+
+          // Refresh gallery after deletion
+          if (onImageUploadSuccess) {
+            await onImageUploadSuccess();
+          }
+        } else {
+          toast.error(result.error || "Erro ao remover imagem");
         }
       } catch (error) {
         console.error("Error deleting image:", error);
@@ -178,7 +209,48 @@ export function ProductImageGallery({
         setDeleteImageIndex(null);
       }
     },
-    [selectedImageIndex, images.length],
+    [selectedImageIndex, images, onImageUploadSuccess],
+  );
+
+  // Handle setting image as primary
+  const handleSetPrimary = useCallback(
+    async (index: number) => {
+      try {
+        const imageToPromote = images[index];
+        if (!imageToPromote) {
+          toast.error("Imagem não encontrada");
+          return;
+        }
+
+        if (imageToPromote.isPrimary) {
+          toast.info("Esta imagem já é a principal");
+          return;
+        }
+
+        // Call server action to set as primary
+        const result = await setPrimaryImageAction(
+          productId.toString(),
+          imageToPromote.id,
+        );
+
+        if (result.success) {
+          toast.success("Nova imagem principal definida com sucesso!");
+
+          // Refresh gallery after promotion
+          if (onImageUploadSuccess) {
+            await onImageUploadSuccess();
+          }
+        } else {
+          toast.error(result.error || "Erro ao definir imagem principal");
+        }
+      } catch (error) {
+        console.error("Error setting primary image:", error);
+        toast.error("Erro ao definir imagem principal");
+      } finally {
+        setSetPrimaryImageIndex(null);
+      }
+    },
+    [images, productId, onImageUploadSuccess],
   );
 
   // Navigation functions for zoom modal
@@ -242,7 +314,7 @@ export function ProductImageGallery({
             {!imageErrors.has(selectedImageIndex) ? (
               <>
                 <Image
-                  src={images[selectedImageIndex]}
+                  src={images[selectedImageIndex]?.url || ""}
                   alt={`${productName} - Imagem principal`}
                   fill
                   className="object-cover transition-transform duration-300"
@@ -284,7 +356,7 @@ export function ProductImageGallery({
       <div className="grid grid-cols-4 gap-2">
         {images.map((image, index) => (
           <Card
-            key={`product-gallery-${index}-${productId || "unknown"}`}
+            key={`product-gallery-${image.id}-${index}`}
             className={`cursor-pointer overflow-hidden transition-all hover:ring-2 hover:ring-primary ${
               selectedImageIndex === index ? "ring-2 ring-primary" : ""
             } ${imageErrors.has(index) ? "opacity-50" : ""}`}
@@ -297,7 +369,7 @@ export function ProductImageGallery({
                 {!imageErrors.has(index) ? (
                   <>
                     <Image
-                      src={image}
+                      src={image.url}
                       alt={`${productName} - ${index + 1}`}
                       fill
                       className="object-cover"
@@ -305,18 +377,53 @@ export function ProductImageGallery({
                       onError={() => handleImageError(index)}
                     />
 
-                    {/* Delete button for non-primary images */}
-                    {index > 0 && (
+                    {/* Primary indicator badge - positioned at top left with higher z-index */}
+                    {image.isPrimary && (
+                      <div className="absolute left-0 top-0 bg-amber-500 text-white px-1.5 py-0.5 rounded-br-md text-xs font-semibold flex items-center gap-1 z-20 shadow-lg">
+                        <Crown className="h-3 w-3" />
+                        Principal
+                      </div>
+                    )}
+
+                    {/* Delete button - positioned to not overlap with primary badge */}
+                    <Button
+                      variant={image.isPrimary ? "outline" : "destructive"}
+                      size="icon"
+                      className="absolute right-1 top-1 h-7 w-7 opacity-80 hover:opacity-100 transition-opacity z-10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Check if it's the only image
+                        if (images.length === 1) {
+                          toast.error(
+                            "Não é possível excluir a única imagem do produto",
+                          );
+                          return;
+                        }
+
+                        setDeleteImageIndex(index);
+                      }}
+                      title={
+                        image.isPrimary
+                          ? "Excluir imagem principal (próxima será promovida)"
+                          : "Excluir imagem"
+                      }
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+
+                    {/* Set as Primary button - only for non-primary images, positioned at top left with same size as delete button */}
+                    {!image.isPrimary && (
                       <Button
-                        variant="destructive"
+                        variant="secondary"
                         size="icon"
-                        className="absolute -right-1 -top-1 h-6 w-6 opacity-0 hover:opacity-100 transition-opacity"
+                        className="absolute left-1 top-1 h-7 w-7 opacity-80 hover:opacity-100 transition-opacity z-10 bg-amber-500 hover:bg-amber-600 text-white border-none"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setDeleteImageIndex(index);
+                          setSetPrimaryImageIndex(index);
                         }}
+                        title="Definir como imagem principal"
                       >
-                        <X className="h-3 w-3" />
+                        <Crown className="h-4 w-4" />
                       </Button>
                     )}
                   </>
@@ -387,7 +494,7 @@ export function ProductImageGallery({
           <div className="relative flex-1 bg-black">
             {!imageErrors.has(zoomedImageIndex) ? (
               <Image
-                src={images[zoomedImageIndex]}
+                src={images[zoomedImageIndex]?.url || ""}
                 alt={`${productName} - Ampliada`}
                 fill
                 className="object-contain"
@@ -429,35 +536,100 @@ export function ProductImageGallery({
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog - Commented until AlertDialog component is available */}
-      {/* 
-      <AlertDialog
+      {/* Delete Confirmation Dialog */}
+      <Dialog
         open={deleteImageIndex !== null}
         onOpenChange={() => setDeleteImageIndex(null)}
       >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja remover esta imagem? Esta ação não pode ser
-              desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmar Exclusão</DialogTitle>
+          </DialogHeader>
+
+          <div className="py-4">
+            {deleteImageIndex !== null &&
+            images[deleteImageIndex]?.isPrimary ? (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Esta é a <strong>imagem principal</strong> do produto.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Ao removê-la, a próxima imagem será automaticamente promovida
+                  para imagem principal.
+                </p>
+                <p className="text-sm font-medium text-amber-600">
+                  Tem certeza que deseja continuar? Esta ação não pode ser
+                  desfeita.
+                </p>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Tem certeza que deseja remover esta imagem? Esta ação não pode
+                ser desfeita.
+              </p>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setDeleteImageIndex(null)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
               onClick={() =>
                 deleteImageIndex !== null && handleDeleteImage(deleteImageIndex)
               }
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              <Trash2 className="mr-2 h-4 w-4" />
+              <X className="mr-2 h-4 w-4" />
               Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      */}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Set Primary Confirmation Dialog */}
+      <Dialog
+        open={setPrimaryImageIndex !== null}
+        onOpenChange={() => setSetPrimaryImageIndex(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmar Nova Imagem Principal</DialogTitle>
+          </DialogHeader>
+
+          <div className="py-4">
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Deseja definir esta imagem como a{" "}
+                <strong>nova imagem principal</strong> do produto?
+              </p>
+              <p className="text-sm text-muted-foreground">
+                A imagem principal atual será automaticamente promovida para
+                imagem secundária.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setSetPrimaryImageIndex(null)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="default"
+              onClick={() =>
+                setPrimaryImageIndex !== null &&
+                handleSetPrimary(setPrimaryImageIndex)
+              }
+            >
+              <Crown className="mr-2 h-4 w-4" />
+              Definir como Principal
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
