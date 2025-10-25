@@ -25,7 +25,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -179,9 +178,6 @@ export function NewCategoryForm() {
                       }}
                     />
                   </FormControl>
-                  <FormDescription>
-                    {t("dashboard.category.help.name")}
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -200,9 +196,6 @@ export function NewCategoryForm() {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    {t("dashboard.category.help.slug")}
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -254,9 +247,6 @@ export function NewCategoryForm() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormDescription>
-                    {t("dashboard.category.help.parent")}
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -272,9 +262,6 @@ export function NewCategoryForm() {
                   <FormControl>
                     <Input {...field} value={field.value} disabled />
                   </FormControl>
-                  <FormDescription>
-                    {t("dashboard.category.help.level")}
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -309,9 +296,6 @@ export function NewCategoryForm() {
                       onChange={(e) => field.onChange(Number(e.target.value))}
                     />
                   </FormControl>
-                  <FormDescription>
-                    {t("dashboard.category.help.order")}
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -334,9 +318,6 @@ export function NewCategoryForm() {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    {t("dashboard.category.help.imagePath")}
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -370,9 +351,6 @@ export function NewCategoryForm() {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    {t("dashboard.category.help.metaTitle")}
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -396,9 +374,6 @@ export function NewCategoryForm() {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    {t("dashboard.category.help.metaDescription")}
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -428,9 +403,6 @@ export function NewCategoryForm() {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    {t("dashboard.category.help.notes")}
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
