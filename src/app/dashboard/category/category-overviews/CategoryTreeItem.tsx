@@ -84,14 +84,12 @@ export function CategoryTreeItem({
   return (
     <div className="select-none">
       {/* Item da categoria */}
-      <button
+      <div
         className={cn(
           "flex items-center gap-2 py-2 px-3 rounded-md transition-colors duration-150",
-          "hover:bg-muted cursor-pointer group w-full text-left",
+          "hover:bg-muted group w-full",
           isSelected && "bg-primary/10 border-l-2 border-primary",
         )}
-        type="button"
-        onKeyDown={handleKeyDown}
       >
         {/* Ícone expansor */}
         {hasChildren ? (
@@ -103,6 +101,7 @@ export function CategoryTreeItem({
               isExpanded && "rotate-180",
             )}
             aria-label={isExpanded ? "Colapsar" : "Expandir"}
+            aria-expanded={isExpanded}
             type="button"
           >
             <ChevronDown className="w-4 h-4 text-muted-foreground" />
@@ -122,6 +121,7 @@ export function CategoryTreeItem({
             type="button"
             onClick={handleSelect}
             onDoubleClick={handleDoubleClick}
+            onKeyDown={handleKeyDown}
             className={cn(
               "font-medium text-sm hover:underline cursor-pointer text-left bg-transparent border-none p-0 m-0 flex-1",
               isSelected && "font-semibold text-primary",
@@ -137,7 +137,7 @@ export function CategoryTreeItem({
             </span>
           )}
         </div>
-      </button>
+      </div>
 
       {/* Filhos (recursivo) */}
       {hasChildren && isExpanded && (

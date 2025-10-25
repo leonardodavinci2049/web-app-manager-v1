@@ -29,6 +29,7 @@ export function transformTaxonomyToHierarchy(
   for (const node of nodes) {
     const currentNode = nodeMap.get(node.id);
     if (!currentNode) continue;
+    if (node.parentId === node.id) continue;
 
     // Se é nó raiz (parentId é 0 ou null)
     if (!node.parentId || node.parentId === 0) {
@@ -46,7 +47,7 @@ export function transformTaxonomyToHierarchy(
   }
 
   // Ordenar nós em cada nível pela ordem especificada
-  return sortNodesByOrder(rootNodes);
+  return sortNodesByOrder([...rootNodes]);
 }
 
 /**
@@ -55,13 +56,18 @@ export function transformTaxonomyToHierarchy(
  * @returns CategoryNode formatado
  */
 function apiItemToCategoryNode(apiItem: TaxonomyData): CategoryNode {
+  const id = toNumber(apiItem.ID_TAXONOMY, 0);
+  const parentId = toOptionalNumber(apiItem.PARENT_ID);
+  const level = clampLevel(toNumber(apiItem.LEVEL, 1));
+
   return {
-    id: apiItem.ID_TAXONOMY,
+    id,
     name: apiItem.TAXONOMIA,
     slug: apiItem.SLUG || undefined,
-    level: (apiItem.LEVEL || 1) as 1 | 2 | 3,
-    parentId: apiItem.PARENT_ID === 0 ? null : apiItem.PARENT_ID,
-    quantity: apiItem.QT_RECORDS || undefined,
+    level,
+    parentId: parentId === 0 ? null : parentId,
+    quantity: toOptionalNumber(apiItem.QT_RECORDS),
+    order: toOptionalNumber(apiItem.ORDEM) ?? undefined,
     isActive: true, // Assumir ativo por padrão (dados virão apenas ativos)
   };
 }
@@ -73,15 +79,24 @@ function apiItemToCategoryNode(apiItem: TaxonomyData): CategoryNode {
  */
 function sortNodesByOrder(nodes: CategoryNode[]): CategoryNode[] {
   // Ordenar nós do nível atual (caso tenha informação de ordem)
-  const sortedNodes = nodes.sort((a, b) => {
-    // Se não tiver ordem específica, ordenar alfabeticamente
+  const filteredNodes = nodes.filter((node): node is CategoryNode =>
+    Boolean(node),
+  );
+  const sortedNodes = filteredNodes.sort((a, b) => {
+    const orderA = a.order ?? Number.POSITIVE_INFINITY;
+    const orderB = b.order ?? Number.POSITIVE_INFINITY;
+
+    if (orderA !== orderB) {
+      return orderA - orderB;
+    }
+
     return a.name.localeCompare(b.name);
   });
 
   // Ordenar recursivamente os filhos
   for (const node of sortedNodes) {
     if (node.children && node.children.length > 0) {
-      node.children = sortNodesByOrder(node.children);
+      node.children = sortNodesByOrder([...node.children]);
     }
   }
 
@@ -99,16 +114,16 @@ export function validateTaxonomyData(data: unknown): data is TaxonomyData[] {
   }
 
   return data.every((item) => {
-    return (
-      typeof item === "object" &&
-      item !== null &&
-      "ID_TAXONOMY" in item &&
-      "TAXONOMIA" in item &&
-      "PARENT_ID" in item &&
-      typeof item.ID_TAXONOMY === "number" &&
-      typeof item.TAXONOMIA === "string" &&
-      typeof item.PARENT_ID === "number"
-    );
+    if (!item || typeof item !== "object") {
+      return false;
+    }
+
+    const record = item as Record<string, unknown>;
+    const hasId = isNumberLike(record.ID_TAXONOMY);
+    const hasName = typeof record.TAXONOMIA === "string";
+    const hasParent = isNumberLike(record.PARENT_ID);
+
+    return hasId && hasName && hasParent;
   });
 }
 
@@ -187,4 +202,61 @@ export function extractAllNodeIds(
   }
 
   return ids;
+}
+
+function isNumberLike(value: unknown): boolean {
+  if (typeof value === "number") {
+    return Number.isFinite(value);
+  }
+
+  if (typeof value === "string" && value.trim() !== "") {
+    return Number.isFinite(Number(value));
+  }
+
+  return false;
+}
+
+function toNumber(
+  value: number | string | null | undefined,
+  fallback: number,
+): number {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return fallback;
+}
+
+function toOptionalNumber(
+  value: number | string | null | undefined,
+): number | undefined {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return undefined;
+}
+
+function clampLevel(level: number): 1 | 2 | 3 {
+  if (level <= 1) {
+    return 1;
+  }
+  if (level >= 3) {
+    return 3;
+  }
+  return 2;
 }
