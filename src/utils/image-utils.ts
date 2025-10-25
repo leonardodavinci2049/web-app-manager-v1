@@ -2,19 +2,12 @@
  * Image validation and fallback utilities
  */
 
-// Lista de domínios permitidos para imagens externas
-const ALLOWED_DOMAINS = [
-  "mundialmegastore.com.br",
-  "localhost",
-  "127.0.0.1",
-  // Adicione outros domínios conforme necessário
-];
-
 // Imagem padrão para fallback
 export const DEFAULT_PRODUCT_IMAGE = "/images/product/no-image.jpeg";
 
 /**
- * Valida se uma URL de imagem é válida e de um domínio permitido
+ * Valida se uma URL de imagem é válida
+ * Note: Domain validation is handled by Next.js Image component via next.config.ts
  */
 export function isValidImageUrl(url: string): boolean {
   if (!url || typeof url !== "string" || url.trim() === "") {
@@ -36,11 +29,8 @@ export function isValidImageUrl(url: string): boolean {
       return false;
     }
 
-    // Verifica se o domínio está na lista de permitidos
-    const hostname = urlObj.hostname.toLowerCase();
-    return ALLOWED_DOMAINS.some(
-      (domain) => hostname === domain || hostname.endsWith(`.${domain}`),
-    );
+    // Domínios são validados pelo Next.js Image component via next.config.ts
+    return true;
   } catch {
     return false;
   }

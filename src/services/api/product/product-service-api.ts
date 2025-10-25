@@ -149,7 +149,15 @@ export class ProductServiceApi extends BaseApiService {
       const response =
         await ProductServiceApi.executeProductSearch(requestBody);
 
-      return ProductServiceApi.handleSearchResponse(response);
+      const result = ProductServiceApi.handleSearchResponse(response);
+
+      // Log para visualizar a lista de produtos (JSON completo)
+      /*       logger.info(
+        "findProducts - Lista de produtos:",
+        JSON.stringify(result.data?.[0], null, 2),
+      ); */
+
+      return result;
     } catch (error) {
       logger.error("Erro no serviço de produto (busca)", error);
       throw error;
