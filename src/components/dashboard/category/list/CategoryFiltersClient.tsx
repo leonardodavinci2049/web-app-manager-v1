@@ -141,14 +141,37 @@ export function CategoryFiltersClient({
         </div>
       </div>
 
-      {/* Filtros Secundários */}
+      {/* Controles Secundários + Contador */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        {/* Espaçador vazio para empurrar controles para a direita */}
-        <div className="flex-1" />
+        <div className="flex flex-col gap-2 text-sm text-muted-foreground md:flex-row md:items-center md:gap-3">
+          <span>
+            {t("dashboard.category.list.showing", {
+              displayed: displayedCategories,
+              total: totalCategories,
+            })}
+          </span>
+          {activeFiltersCount > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span>
+                {t("dashboard.category.list.activeFilters", {
+                  count: activeFiltersCount,
+                  plural: activeFiltersCount !== 1 ? "s" : "",
+                })}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onClear}
+                className="gap-2"
+              >
+                <RotateCcw className="h-4 w-4" />
+                {t("dashboard.category.list.buttonClear")}
+              </Button>
+            </div>
+          )}
+        </div>
 
-        {/* Ordenação e Visualização - Alinhados à direita */}
-        <div className="flex items-center justify-end gap-3">
-          {/* Select de Ordenação */}
+        <div className="flex w-full items-center justify-between gap-3 md:w-auto md:justify-end">
           <Select value={currentSortValue} onValueChange={handleSortChange}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder={t("dashboard.category.list.sortBy")} />
@@ -165,7 +188,6 @@ export function CategoryFiltersClient({
             </SelectContent>
           </Select>
 
-          {/* Botões de Modo de Visualização - List primeiro por ser padrão */}
           <div className="flex gap-1">
             <Button
               variant={viewMode === "list" ? "default" : "outline"}
@@ -187,37 +209,6 @@ export function CategoryFiltersClient({
             </Button>
           </div>
         </div>
-
-        {/* Botão de Reset (se houver filtros ativos) */}
-        {activeFiltersCount > 0 && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onClear}
-            className="gap-2"
-          >
-            <RotateCcw className="h-4 w-4" />
-            {t("dashboard.category.list.buttonClear")} ({activeFiltersCount})
-          </Button>
-        )}
-      </div>
-
-      {/* Contador de Resultados */}
-      <div className="flex items-center justify-between border-t pt-4 text-sm text-muted-foreground">
-        <span>
-          {t("dashboard.category.list.showing", {
-            displayed: displayedCategories,
-            total: totalCategories,
-          })}
-        </span>
-        {activeFiltersCount > 0 && (
-          <span>
-            {t("dashboard.category.list.activeFilters", {
-              count: activeFiltersCount,
-              plural: activeFiltersCount !== 1 ? "s" : "",
-            })}
-          </span>
-        )}
       </div>
     </div>
   );
