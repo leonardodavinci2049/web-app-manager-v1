@@ -7,6 +7,7 @@
  * seguindo os padrões de segurança e arquitetura do projeto.
  */
 
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { createLogger } from "@/lib/logger";
@@ -316,18 +317,14 @@ export async function updateCategory(
 
 /**
  * Interface para parâmetros de criação de categoria
+ * Reflete APENAS os campos aceitos pelo endpoint POST /taxonomy/v2/taxonomy-create
  */
 export interface CreateCategoryParams {
-  name: string;
-  slug: string;
-  parentId?: number;
-  level?: number;
-  type?: number;
-  order?: number;
-  imagePath?: string;
-  metaTitle?: string;
-  metaDescription?: string;
-  notes?: string;
+  name: string; // pe_taxonomia - OBRIGATÓRIO
+  slug: string; // pe_slug - OBRIGATÓRIO
+  parentId?: number; // pe_parent_id - OBRIGATÓRIO (default: 0)
+  level?: number; // pe_level - OBRIGATÓRIO (default: 1)
+  type?: number; // pe_id_tipo - OBRIGATÓRIO (default: 2)
 }
 
 /**
@@ -381,6 +378,99 @@ export async function getCategoryOptions(): Promise<TaxonomyData[]> {
     return [];
   }
 }
+/**
+ * Server Action modernizado para criação de categoria
+ * Usa Next.js 15 FormData com validação Zod explícita
+ */
+export async function createCategoryAction(formData: FormData) {
+  "use server";
+
+  try {
+    // 1. Extrair dados do FormData
+    const rawData = {
+      name: formData.get("name") as string,
+      slug: formData.get("slug") as string,
+      parentId: formData.get("parentId") as string,
+      level: formData.get("level") as string,
+    };
+
+    // 2. Validar dados com Zod
+    const { CreateCategoryServerSchema } = await import(
+      "@/lib/validations/category-validations"
+    );
+
+    let validated: {
+      name: string;
+      slug: string;
+      parentId: number;
+      level: number;
+    };
+    try {
+      validated = CreateCategoryServerSchema.parse({
+        name: rawData.name,
+        slug: rawData.slug,
+        parentId: rawData.parentId,
+        level: rawData.level,
+      });
+    } catch (validationError) {
+      logger.error("Erro de validação", validationError);
+      throw new Error("Dados do formulário inválidos");
+    }
+
+    // 3. Verificar autenticação
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      logger.error("Usuário não autenticado");
+      throw new Error("Usuário não autenticado");
+    }
+
+    // 4. Chamar serviço da API para criar
+    const response = await TaxonomyServiceApi.createTaxonomy({
+      pe_taxonomia: validated.name,
+      pe_slug: validated.slug,
+      pe_parent_id: validated.parentId,
+      pe_level: validated.level,
+      pe_id_tipo: 2, // Valor padrão conforme API reference
+    });
+
+    // 5. Validar resposta
+    if (!TaxonomyServiceApi.isValidOperationResponse(response)) {
+      throw new Error("Resposta inválida da API");
+    }
+
+    // 6. Verificar se operação foi bem-sucedida
+    if (!TaxonomyServiceApi.isOperationSuccessful(response)) {
+      logger.error("Falha ao criar categoria");
+      throw new Error("Falha ao criar categoria");
+    }
+
+    logger.info("Categoria criada com sucesso", {
+      name: validated.name,
+      slug: validated.slug,
+    });
+
+    // 7. Redirect automático em caso de sucesso (Next.js 15 pattern)
+    const { redirect } = await import("next/navigation");
+    redirect("/dashboard/category/category-list");
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    logger.error("Erro ao criar categoria", error);
+
+    // Re-throw com mensagem user-friendly
+    if (error instanceof Error) {
+      throw error;
+    }
+
+    throw new Error("Erro interno do servidor");
+  }
+}
+
 export async function createCategory(
   params: CreateCategoryParams,
 ): Promise<CreateCategoryResponse> {
@@ -399,20 +489,16 @@ export async function createCategory(
       };
     }
 
+    // Extrair apenas os campos aceitos pelo endpoint de criação
     const {
       name,
       slug,
       parentId = 0,
       level = 1,
       type = 2, // Valor padrão conforme API reference
-      order = 1,
-      imagePath = "",
-      metaTitle = "",
-      metaDescription = "",
-      notes = "",
     } = params;
 
-    // Chamar serviço da API para criar
+    // Chamar serviço da API para criar (apenas campos suportados)
     const response = await TaxonomyServiceApi.createTaxonomy({
       pe_taxonomia: name,
       pe_slug: slug,
@@ -439,22 +525,6 @@ export async function createCategory(
 
     if (!recordId) {
       throw new Error("ID do registro criado não foi retornado");
-    }
-
-    // Se há campos opcionais, atualizar a categoria recém-criada
-    if (order !== 1 || imagePath || metaTitle || metaDescription || notes) {
-      await TaxonomyServiceApi.updateTaxonomy({
-        pe_id_taxonomy: recordId,
-        pe_taxonomia: name,
-        pe_slug: slug,
-        pe_parent_id: parentId,
-        pe_ordem: order,
-        pe_path_imagem: imagePath,
-        pe_meta_title: metaTitle,
-        pe_meta_description: metaDescription,
-        pe_info: notes,
-        pe_inativo: 0,
-      });
     }
 
     // Buscar dados da categoria criada

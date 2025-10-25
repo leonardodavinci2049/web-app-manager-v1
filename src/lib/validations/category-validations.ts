@@ -1,63 +1,73 @@
 /**
- * Schema de validação para criação de nova categoria
+ * Schema de validação para operações de categoria
+ *
+ * Este arquivo centraliza todas as validações relacionadas a categorias/taxonomias,
+ * incluindo schemas para criação, atualização e busca.
+ * Segue os padrões do projeto com validação dupla (client + server).
  */
 
 import { z } from "zod";
 
 /**
  * Schema para validação do formulário de criação de categoria
+ * Contém apenas campos essenciais para criação conforme API Reference
  */
 export const CreateCategoryFormSchema = z.object({
-  // Campos obrigatórios
+  // Campo obrigatório: Nome da categoria
   name: z
     .string()
     .min(2, "Nome deve ter pelo menos 2 caracteres")
     .max(100, "Nome não pode ter mais de 100 caracteres")
     .trim(),
 
+  // Campo obrigatório: Slug para URL amigável
   slug: z
     .string()
     .min(2, "Slug deve ter pelo menos 2 caracteres")
     .max(100, "Slug não pode ter mais de 100 caracteres")
-    .regex(
-      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-      "Slug deve conter apenas letras minúsculas, números e hífens",
-    )
     .trim(),
 
-  // Campos com valores padrão (não opcionais para o formulário)
+  // Campo obrigatório: ID da categoria pai (0 = raiz)
   parentId: z
     .number()
     .int()
     .min(0, "ID da categoria pai deve ser maior ou igual a 0"),
 
+  // Campo obrigatório: Nível na hierarquia (calculado automaticamente)
   level: z
     .number()
     .int()
     .min(1, "Nível deve ser no mínimo 1")
     .max(5, "Nível não pode ser maior que 5"),
-
-  order: z.number().int().min(1, "Ordem deve ser um número positivo"),
-
-  imagePath: z
-    .string()
-    .max(500, "Caminho da imagem não pode ter mais de 500 caracteres"),
-
-  metaTitle: z
-    .string()
-    .max(60, "Meta title não pode ter mais de 60 caracteres"),
-
-  metaDescription: z
-    .string()
-    .max(160, "Meta description não pode ter mais de 160 caracteres"),
-
-  notes: z.string(),
 });
 
 /**
- * Tipo inferido do schema de validação
+ * Schema para validação de Server Action (FormData)
+ * Usado para validar dados vindos do Next.js Form component
+ */
+export const CreateCategoryServerSchema = z.object({
+  name: z.string().min(2).max(100).trim(),
+  slug: z
+    .string()
+    .min(2)
+    .max(100)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+    .trim(),
+  parentId: z.coerce.number().int().min(0),
+  level: z.coerce.number().int().min(1).max(5),
+});
+
+/**
+ * Tipo inferido do schema de validação do formulário
  */
 export type CreateCategoryFormData = z.infer<typeof CreateCategoryFormSchema>;
+
+/**
+ * Tipo inferido do schema de validação do servidor
+ */
+export type CreateCategoryServerData = z.infer<
+  typeof CreateCategoryServerSchema
+>;
 
 /**
  * Função para gerar slug automaticamente baseado no nome
