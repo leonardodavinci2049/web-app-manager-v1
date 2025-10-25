@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { TaxonomyServiceApi } from "@/services/api/taxonomy/taxonomy-service-api";
+import type { TaxonomyData } from "@/services/api/taxonomy/types/taxonomy-types";
 import { CategoryTree } from "./CategoryTree";
 import { CategoryOverviewsHeaderClient } from "./category-overviews-header";
 import type { CategoryNode } from "./category-tree.types";
@@ -20,33 +21,7 @@ import {
  * Server Component que renderiza a estrutura de categorias em árvore interativa
  */
 export default async function CategoryOverviewsPage() {
-  // Buscar dados reais da API
-  let categories: CategoryNode[] = [];
-  let error: string | null = null;
-
-  try {
-    // Buscar taxonomias da API usando pe_parent_id = -1 para carregar todos os níveis
-    const response = await TaxonomyServiceApi.findTaxonomyMenu({
-      pe_parent_id: -1, // Carrega hierarquia completa
-    });
-
-    // Validar e extrair dados da resposta
-    if (TaxonomyServiceApi.isValidTaxonomyMenuResponse(response)) {
-      const taxonomyData = TaxonomyServiceApi.extractTaxonomyMenuList(response);
-
-      if (validateTaxonomyData(taxonomyData)) {
-        // Transformar dados planos em estrutura hierárquica
-        categories = transformTaxonomyToHierarchy(taxonomyData);
-      } else {
-        error = "Dados da API em formato inválido";
-      }
-    } else {
-      error = response.message || "Erro ao carregar categorias";
-    }
-  } catch (err) {
-    console.error("Erro ao buscar categorias:", err);
-    error = "Falha na conexão com a API. Tente novamente mais tarde.";
-  }
+  const { categories, error } = await fetchCategoryHierarchy();
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
       <div className="container mx-auto max-w-4xl">
@@ -186,4 +161,96 @@ export default async function CategoryOverviewsPage() {
       </div>
     </div>
   );
+}
+
+async function fetchCategoryHierarchy(): Promise<{
+  categories: CategoryNode[];
+  error: string | null;
+}> {
+  try {
+    const menuHierarchy = await tryBuildHierarchyFromMenu();
+    if (menuHierarchy.length > 0) {
+      return { categories: menuHierarchy, error: null };
+    }
+  } catch (error) {
+    console.error("Erro ao carregar categorias via menu:", error);
+  }
+
+  try {
+    const fallbackHierarchy = await tryBuildHierarchyFromList();
+    if (fallbackHierarchy.length > 0) {
+      return { categories: fallbackHierarchy, error: null };
+    }
+    return {
+      categories: [],
+      error: null,
+    };
+  } catch (error) {
+    console.error("Erro ao carregar categorias via fallback:", error);
+    return {
+      categories: [],
+      error: "Falha na conexão com a API. Tente novamente mais tarde.",
+    };
+  }
+}
+
+async function tryBuildHierarchyFromMenu(): Promise<CategoryNode[]> {
+  const response = await TaxonomyServiceApi.findTaxonomyMenu({
+    pe_parent_id: -1,
+    pe_id_tipo: 2,
+  });
+
+  if (!TaxonomyServiceApi.isValidTaxonomyMenuResponse(response)) {
+    return [];
+  }
+
+  const taxonomyData = TaxonomyServiceApi.extractTaxonomyMenuList(response);
+  if (!validateTaxonomyData(taxonomyData)) {
+    return [];
+  }
+
+  return transformTaxonomyToHierarchy(taxonomyData);
+}
+
+async function tryBuildHierarchyFromList(): Promise<CategoryNode[]> {
+  const perPage = 100;
+  const collected: TaxonomyData[] = [];
+  const maxPages = 5;
+
+  for (let page = 0; page < maxPages; page += 1) {
+    const response = await TaxonomyServiceApi.findTaxonomies({
+      pe_id_parent: -1,
+      pe_flag_inativo: 0,
+      pe_qt_registros: perPage,
+      pe_pagina_id: page,
+      pe_coluna_id: 2,
+      pe_ordem_id: 1,
+    });
+
+    if (!TaxonomyServiceApi.isValidTaxonomyResponse(response)) {
+      break;
+    }
+
+    const pageData = TaxonomyServiceApi.extractTaxonomyList(response);
+    if (!validateTaxonomyData(pageData)) {
+      break;
+    }
+
+    collected.push(...pageData);
+
+    const total = response.quantity ?? collected.length;
+    if (collected.length >= total) {
+      break;
+    }
+
+    if (pageData.length < perPage) {
+      break;
+    }
+  }
+
+  if (collected.length === 0) {
+    return [];
+  }
+
+  return transformTaxonomyToHierarchy(collected);
 }
