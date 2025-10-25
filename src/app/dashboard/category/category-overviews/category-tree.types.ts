@@ -29,6 +29,9 @@ export interface CategoryNode {
 
   /** Quantidade de registros (produtos) */
   quantity?: number;
+
+  /** Ordem de exibição */
+  order?: number;
 }
 
 export interface CategoryTreeProps {
