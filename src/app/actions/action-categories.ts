@@ -389,9 +389,7 @@ export async function createCategoryAction(formData: FormData) {
     // 1. Extrair dados do FormData
     const rawData = {
       name: formData.get("name") as string,
-      slug: formData.get("slug") as string,
       parentId: formData.get("parentId") as string,
-      level: formData.get("level") as string,
     };
 
     // 2. Validar dados com Zod
@@ -401,20 +399,28 @@ export async function createCategoryAction(formData: FormData) {
 
     let validated: {
       name: string;
-      slug: string;
       parentId: number;
-      level: number;
     };
     try {
       validated = CreateCategoryServerSchema.parse({
         name: rawData.name,
-        slug: rawData.slug,
         parentId: rawData.parentId,
-        level: rawData.level,
       });
     } catch (validationError) {
       logger.error("Erro de validação", validationError);
       throw new Error("Dados do formulário inválidos");
+    }
+
+    const { generateSlugFromName } = await import(
+      "@/lib/validations/category-validations"
+    );
+
+    const slug = generateSlugFromName(validated.name);
+    if (!slug) {
+      logger.error("Falha ao gerar slug a partir do nome", {
+        name: validated.name,
+      });
+      throw new Error("Não foi possível gerar o slug da categoria");
     }
 
     // 3. Verificar autenticação
@@ -430,9 +436,9 @@ export async function createCategoryAction(formData: FormData) {
     // 4. Chamar serviço da API para criar
     const response = await TaxonomyServiceApi.createTaxonomy({
       pe_taxonomia: validated.name,
-      pe_slug: validated.slug,
+      pe_slug: slug,
       pe_parent_id: validated.parentId,
-      pe_level: validated.level,
+      pe_level: 1,
       pe_id_tipo: 2, // Valor padrão conforme API reference
     });
 
@@ -449,7 +455,8 @@ export async function createCategoryAction(formData: FormData) {
 
     logger.info("Categoria criada com sucesso", {
       name: validated.name,
-      slug: validated.slug,
+      slug,
+      level: 1,
     });
 
     // 7. Redirect automático em caso de sucesso (Next.js 15 pattern)

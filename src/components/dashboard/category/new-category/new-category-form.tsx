@@ -23,10 +23,6 @@ import { Label } from "@/components/ui/label";
 
 import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "@/hooks/use-translation";
-import {
-  calculateLevelFromParent,
-  generateSlugFromName,
-} from "@/lib/validations/category-validations";
 import type { TaxonomyData } from "@/services/api/taxonomy/types/taxonomy-types";
 
 interface NewCategoryFormProps {
@@ -41,24 +37,15 @@ export function NewCategoryForm({ categories }: NewCategoryFormProps) {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
-    slug: "",
     parentId: "0",
-    level: "1",
   });
-
-  // Gerar slug automaticamente baseado no nome
   const handleNameChange = (name: string) => {
-    const slug = generateSlugFromName(name);
-    setFormData((prev) => ({ ...prev, name, slug }));
+    setFormData((prev) => ({ ...prev, name }));
   };
 
-  // Atualizar nível baseado na categoria pai selecionada
+  // Atualizar categoria pai selecionada
   const handleParentChange = (parentId: string) => {
-    const level = calculateLevelFromParent(
-      Number(parentId),
-      categories,
-    ).toString();
-    setFormData((prev) => ({ ...prev, parentId, level }));
+    setFormData((prev) => ({ ...prev, parentId }));
   };
 
   // Handler para ação de cancelar
@@ -83,17 +70,10 @@ export function NewCategoryForm({ categories }: NewCategoryFormProps) {
     <Form action={handleFormAction} className="space-y-6">
       {/* Seção: Informações Básicas */}
       <Card>
-        <CardHeader>
-          <CardTitle>
-            {t("dashboard.category.new.sections.basicInfo")}
-          </CardTitle>
-          <CardDescription>
-            {t("dashboard.category.new.sections.basicInfoDesc")}
-          </CardDescription>
-        </CardHeader>
+
         <CardContent className="space-y-4">
           {/* Nome da Categoria */}
-          <div className="space-y-2">
+          <div className="space-y-4">
             <Label htmlFor="name">{t("dashboard.category.fields.name")}</Label>
             <Input
               id="name"
@@ -107,27 +87,8 @@ export function NewCategoryForm({ categories }: NewCategoryFormProps) {
             />
           </div>
 
-          {/* Slug */}
-          <div className="space-y-2">
-            <Label htmlFor="slug">{t("dashboard.category.fields.slug")}</Label>
-            <Input
-              id="slug"
-              name="slug"
-              value={formData.slug}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, slug: e.target.value }))
-              }
-              placeholder={t("dashboard.category.placeholders.slug")}
-              required
-              minLength={2}
-              maxLength={100}
-              pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
-              title="Slug deve conter apenas letras minúsculas, números e hífens"
-            />
-          </div>
-
           {/* Categoria Pai */}
-          <div className="space-y-2">
+          <div className="space-y-6">
             <Label htmlFor="parentId">
               {t("dashboard.category.fields.parent")}
             </Label>
@@ -155,37 +116,14 @@ export function NewCategoryForm({ categories }: NewCategoryFormProps) {
               ))}
             </select>
           </div>
-
-          {/* Nível (somente leitura) */}
-          <div className="space-y-2">
-            <Label htmlFor="level">
-              {t("dashboard.category.fields.level")}
-            </Label>
-            <input type="hidden" name="level" value={formData.level} />
-            <Input
-              id="level"
-              name="level"
-              value={formData.level}
-              disabled
-              readOnly
-            />
-          </div>
         </CardContent>
       </Card>
 
-      {/* Informação sobre campos opcionais */}
-      <Card className="bg-muted/50">
-        <CardContent className="pt-6">
-          <p className="text-sm text-muted-foreground">
-            ℹ️ {t("dashboard.category.new.info.optionalFields")}
-          </p>
-        </CardContent>
-      </Card>
 
       {/* Ações do Formulário */}
       <Card>
         <CardContent className="pt-6">
-          <Separator className="mb-6" />
+ 
           <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
             <Button type="button" variant="outline" onClick={handleCancel}>
               {t("dashboard.category.buttons.cancel")}

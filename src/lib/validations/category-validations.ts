@@ -20,25 +20,11 @@ export const CreateCategoryFormSchema = z.object({
     .max(100, "Nome não pode ter mais de 100 caracteres")
     .trim(),
 
-  // Campo obrigatório: Slug para URL amigável
-  slug: z
-    .string()
-    .min(2, "Slug deve ter pelo menos 2 caracteres")
-    .max(100, "Slug não pode ter mais de 100 caracteres")
-    .trim(),
-
   // Campo obrigatório: ID da categoria pai (0 = raiz)
   parentId: z
     .number()
     .int()
     .min(0, "ID da categoria pai deve ser maior ou igual a 0"),
-
-  // Campo obrigatório: Nível na hierarquia (calculado automaticamente)
-  level: z
-    .number()
-    .int()
-    .min(1, "Nível deve ser no mínimo 1")
-    .max(5, "Nível não pode ser maior que 5"),
 });
 
 /**
@@ -47,14 +33,7 @@ export const CreateCategoryFormSchema = z.object({
  */
 export const CreateCategoryServerSchema = z.object({
   name: z.string().min(2).max(100).trim(),
-  slug: z
-    .string()
-    .min(2)
-    .max(100)
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
-    .trim(),
   parentId: z.coerce.number().int().min(0),
-  level: z.coerce.number().int().min(1).max(5),
 });
 
 /**
