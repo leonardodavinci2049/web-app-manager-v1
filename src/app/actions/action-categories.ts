@@ -367,12 +367,65 @@ export async function getCategoryOptions(): Promise<TaxonomyData[]> {
       pe_id_taxonomy: 0, // Sem filtro de ID
     });
 
-    // Extrair lista de taxonomias
+    // Extrair lista completa de taxonomias
     const categories = TaxonomyServiceApi.extractTaxonomyList(response);
 
-    logger.info(`Opções de categorias carregadas: ${categories.length}`);
+    // Separar categorias raiz e filhos diretos
+    const rootCategories = categories.filter(
+      (category) => category.PARENT_ID === 0,
+    );
+    const rootIds = new Set(
+      rootCategories.map((category) => category.ID_TAXONOMY),
+    );
 
-    return categories;
+    // Agrupar filhos por categoria raiz para manter hierarquia controlada
+    const directChildrenByParent = new Map<number, TaxonomyData[]>();
+    for (const category of categories) {
+      if (category.PARENT_ID === 0) {
+        continue;
+      }
+
+      if (!rootIds.has(category.PARENT_ID)) {
+        continue;
+      }
+
+      const existingChildren =
+        directChildrenByParent.get(category.PARENT_ID) ?? [];
+      existingChildren.push(category);
+      directChildrenByParent.set(category.PARENT_ID, existingChildren);
+    }
+
+    // Ordenação consistente considerando locale pt-BR
+    const collator = new Intl.Collator("pt-BR", { sensitivity: "base" });
+    const orderedOptions: TaxonomyData[] = [];
+
+    // Ordenar categorias raiz e agregar filhos diretos ordenados
+    [...rootCategories]
+      .sort((a, b) => collator.compare(a.TAXONOMIA, b.TAXONOMIA))
+      .forEach((rootCategory) => {
+        orderedOptions.push({
+          ...rootCategory,
+          LEVEL: rootCategory.LEVEL ?? 1,
+        });
+
+        const children = directChildrenByParent.get(rootCategory.ID_TAXONOMY);
+        if (!children) {
+          return;
+        }
+
+        [...children]
+          .sort((a, b) => collator.compare(a.TAXONOMIA, b.TAXONOMIA))
+          .forEach((childCategory) => {
+            orderedOptions.push({
+              ...childCategory,
+              LEVEL: childCategory.LEVEL ?? 2,
+            });
+          });
+      });
+
+    logger.info(`Opções de categorias carregadas: ${orderedOptions.length}`);
+
+    return orderedOptions;
   } catch (error) {
     logger.error("Erro ao buscar opções de categorias", error);
     return [];
