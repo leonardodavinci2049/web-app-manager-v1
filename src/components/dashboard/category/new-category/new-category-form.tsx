@@ -11,17 +11,9 @@ import { toast } from "sonner";
 import { createCategoryAction } from "@/app/actions/action-categories";
 import { SubmitButton } from "@/components/forms/submit-button";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "@/hooks/use-translation";
 import type { TaxonomyData } from "@/services/api/taxonomy/types/taxonomy-types";
 
@@ -70,7 +62,6 @@ export function NewCategoryForm({ categories }: NewCategoryFormProps) {
     <Form action={handleFormAction} className="space-y-6">
       {/* Seção: Informações Básicas */}
       <Card>
-
         <CardContent className="space-y-4">
           {/* Nome da Categoria */}
           <div className="space-y-4">
@@ -118,13 +109,10 @@ export function NewCategoryForm({ categories }: NewCategoryFormProps) {
           </div>
         </CardContent>
       </Card>
-
-
       {/* Ações do Formulário */}
       <Card>
         <CardContent className="pt-6">
- 
-          <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
             <Button type="button" variant="outline" onClick={handleCancel}>
               {t("dashboard.category.buttons.cancel")}
             </Button>
