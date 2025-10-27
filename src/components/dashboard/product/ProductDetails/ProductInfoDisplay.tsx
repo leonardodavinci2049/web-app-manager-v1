@@ -2,6 +2,7 @@ import { Package, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ProductDetail } from "@/services/api/product/types/product-types";
+import { ShortDescriptionEditor } from "./ShortDescriptionEditor";
 
 interface ProductInfoDisplayProps {
   product: ProductDetail;
@@ -238,22 +239,11 @@ export function ProductInfoDisplay({
         </CardContent>
       </Card>
 
-      {/* Quick Actions - Future implementation for inline editing */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Ações Rápidas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-4">
-            <p className="text-muted-foreground text-sm">
-              Funcionalidades de edição inline serão implementadas em breve
-            </p>
-            <p className="text-xs text-muted-foreground mt-2">
-              Veja a aba "Edição Inline" para demonstração
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Short Description Editor - Inline editing for sales description */}
+      <ShortDescriptionEditor
+        productId={product.ID_PRODUTO}
+        initialDescription={product.DESCRICAO_VENDA}
+      />
     </div>
   );
 }
