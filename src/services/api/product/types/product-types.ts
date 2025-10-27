@@ -103,16 +103,17 @@ interface BaseProductResponse {
 
 /**
  * Product detail data structure (ENDPOINT 1)
+ * Based on actual API response from product-find-id endpoint
  */
 export interface ProductDetail {
-  ID_TBL_PRODUTO: number;
+  ID_PRODUTO: number; // Correct field name from API (was ID_TBL_PRODUTO)
   PRODUTO: string;
   REF: string;
   SKU: number;
   MODELO: string;
   ETIQUETA: string;
   DESCRICAO_TAB: string;
-  ID_FORNECEDOR: number;
+  ID_FORNECEDOR?: number; // Optional - may not be returned by API
   ID_TIPO: number;
   ID_MARCA: number;
   ID_FAMILIA: number;
@@ -123,11 +124,12 @@ export interface ProductDetail {
   LARGURA_MM: number;
   ALTURA_MM: number;
   DIAMETRO_MM: number;
-  TEMPODEGARANTIA_MES: number;
-  VL_VENDA_ATACADO: number;
-  VL_VENDA_VAREJO: number;
-  VL_CORPORATIVO: number;
-  QT_ESTOQUE: number;
+  TEMPODEGARANTIA_DIA: number; // API returns days (was TEMPODEGARANTIA_MES)
+  VL_ATACADO: string;
+  VL_CORPORATIVO: string;
+  VL_VAREJO: string;
+  ESTOQUE_LOJA: number; // Stock quantity from API
+  QT_ESTOQUE: number; // Legacy field - kept for compatibility
   FLAG_WEBSITE_OFF: number;
   FLAG_IMPORTADO: number;
   INATIVO: number;
@@ -136,7 +138,7 @@ export interface ProductDetail {
   META_TITLE: string;
   META_DESCRIPTION: string;
   DATADOCADASTRO: string;
-  DT_UPDATE: string;
+  DT_UPDATE?: string; // Optional - not returned by API, use DATADOCADASTRO as fallback
 }
 
 /**
