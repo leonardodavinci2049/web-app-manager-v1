@@ -1,8 +1,10 @@
-import { Package, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ProductDetail } from "@/services/api/product/types/product-types";
 import { ProductNameEditor } from "./ProductNameEditor";
+import { ProductPricingCard } from "./ProductPricingCard";
+import { ProductStockCard } from "./ProductStockCard";
 import { ShortDescriptionEditor } from "./ShortDescriptionEditor";
 
 interface ProductInfoDisplayProps {
@@ -14,6 +16,9 @@ interface ProductInfoDisplayProps {
   retailPrice: string | null;
   wholesalePrice: string | null;
   corporatePrice: string | null;
+  retailPriceRaw: number;
+  wholesalePriceRaw: number;
+  corporatePriceRaw: number;
   stockLevel: number;
   isOutOfStock: boolean;
   isLowStock: boolean;
@@ -25,6 +30,9 @@ export function ProductInfoDisplay({
   retailPrice,
   wholesalePrice,
   corporatePrice,
+  retailPriceRaw,
+  wholesalePriceRaw,
+  corporatePriceRaw,
   stockLevel,
   isOutOfStock,
   isLowStock,
@@ -78,103 +86,24 @@ export function ProductInfoDisplay({
       </div>
 
       {/* Pricing Card */}
-      {(retailPrice || wholesalePrice || corporatePrice) && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Preços de Venda</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {/* Table-like layout aligned to left */}
-              <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
-                {retailPrice && (
-                  <>
-                    <span className="text-muted-foreground font-medium">
-                      Preço Varejo:
-                    </span>
-                    <span className="text-lg font-bold text-green-600">
-                      {retailPrice}
-                    </span>
-                  </>
-                )}
-                {wholesalePrice && (
-                  <>
-                    <span className="text-muted-foreground font-medium">
-                      Preço Atacado:
-                    </span>
-                    <span className="text-lg font-bold text-blue-600">
-                      {wholesalePrice}
-                    </span>
-                  </>
-                )}
-                {corporatePrice && (
-                  <>
-                    <span className="text-muted-foreground font-medium">
-                      Preço Corporativo:
-                    </span>
-                    <span className="text-lg font-bold text-purple-600">
-                      {corporatePrice}
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <ProductPricingCard
+        productId={product.ID_PRODUTO}
+        retailPrice={retailPrice}
+        wholesalePrice={wholesalePrice}
+        corporatePrice={corporatePrice}
+        retailPriceRaw={retailPriceRaw}
+        wholesalePriceRaw={wholesalePriceRaw}
+        corporatePriceRaw={corporatePriceRaw}
+      />
 
       {/* Stock Info Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
-            Estoque
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {/* Table-like layout aligned to left */}
-            <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
-              <span className="text-muted-foreground font-medium">
-                Disponível:
-              </span>
-              <span
-                className={`text-lg font-bold ${
-                  isOutOfStock
-                    ? "text-destructive"
-                    : isLowStock
-                      ? "text-yellow-600"
-                      : "text-green-600"
-                }`}
-              >
-                {stockLevel} {stockLevel === 1 ? "unidade" : "unidades"}
-              </span>
-
-              <span className="text-muted-foreground font-medium">Status:</span>
-              <span className="text-sm">
-                <Badge variant={stockStatus.variant}>{stockStatus.label}</Badge>
-              </span>
-            </div>
-
-            {/* Additional stock info */}
-            {isOutOfStock && (
-              <div className="mt-2 p-2 bg-destructive/10 rounded-md">
-                <p className="text-sm text-destructive">
-                  Produto sem estoque disponível
-                </p>
-              </div>
-            )}
-
-            {isLowStock && !isOutOfStock && (
-              <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/10 rounded-md">
-                <p className="text-sm text-yellow-700 dark:text-yellow-600">
-                  Estoque baixo - apenas {stockLevel} unidades restantes
-                </p>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <ProductStockCard
+        productId={product.ID_PRODUTO}
+        stockLevel={stockLevel}
+        isOutOfStock={isOutOfStock}
+        isLowStock={isLowStock}
+        stockStatus={stockStatus}
+      />
 
       {/* Product Categories/Classification */}
       <Card>

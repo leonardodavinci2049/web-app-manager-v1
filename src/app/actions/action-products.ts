@@ -663,3 +663,216 @@ export async function createProduct(data: CreateProductData): Promise<{
     };
   }
 }
+
+// ========================================
+// UPDATE PRODUCT ACTIONS
+// ========================================
+
+/**
+ * Server Action to update general product data
+ */
+export async function updateProductGeneral(data: {
+  productId: number;
+  productName: string;
+  descriptionTab: string;
+  label: string;
+  reference: string;
+  model: string;
+}): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    logger.info("Updating product general data:", data);
+
+    const response = await ProductServiceApi.updateProductGeneral({
+      pe_id_produto: data.productId,
+      pe_nome_produto: data.productName,
+      pe_ref: data.reference,
+      pe_modelo: data.model,
+      pe_etiqueta: data.label,
+      pe_descricao_tab: data.descriptionTab,
+    });
+
+    if (!ProductServiceApi.isValidOperationResponse(response)) {
+      logger.error("Invalid API response:", response);
+      return {
+        success: false,
+        error: "Resposta inválida da API",
+      };
+    }
+
+    if (!ProductServiceApi.isOperationSuccessful(response)) {
+      const spResponse =
+        ProductServiceApi.extractStoredProcedureResponse(response);
+      const errorMessage =
+        spResponse?.sp_message || "Erro ao atualizar dados gerais";
+      logger.error("API returned error:", { spResponse, errorMessage });
+
+      return {
+        success: false,
+        error: errorMessage,
+      };
+    }
+
+    logger.info("Product general data updated successfully");
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    logger.error("Error updating product general data:", error);
+
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Erro desconhecido ao atualizar dados gerais";
+
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
+
+/**
+ * Server Action to update product characteristics
+ */
+export async function updateProductCharacteristics(data: {
+  productId: number;
+  weightGr: number;
+  lengthMm: number;
+  widthMm: number;
+  heightMm: number;
+  diameterMm: number;
+  warrantyDays: number;
+  warrantyMonths: number;
+}): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    logger.info("Updating product characteristics:", data);
+
+    const response = await ProductServiceApi.updateProductCharacteristics({
+      pe_id_produto: data.productId,
+      pe_peso_gr: data.weightGr,
+      pe_comprimento_mm: data.lengthMm,
+      pe_largura_mm: data.widthMm,
+      pe_altura_mm: data.heightMm,
+      pe_diametro_mm: data.diameterMm,
+      pe_tempodegarantia_dia: data.warrantyDays,
+      pe_tempodegarantia_mes: data.warrantyMonths,
+    });
+
+    if (!ProductServiceApi.isValidOperationResponse(response)) {
+      logger.error("Invalid API response:", response);
+      return {
+        success: false,
+        error: "Resposta inválida da API",
+      };
+    }
+
+    if (!ProductServiceApi.isOperationSuccessful(response)) {
+      const spResponse =
+        ProductServiceApi.extractStoredProcedureResponse(response);
+      const errorMessage =
+        spResponse?.sp_message || "Erro ao atualizar características";
+      logger.error("API returned error:", { spResponse, errorMessage });
+
+      return {
+        success: false,
+        error: errorMessage,
+      };
+    }
+
+    logger.info("Product characteristics updated successfully");
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    logger.error("Error updating product characteristics:", error);
+
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Erro desconhecido ao atualizar características";
+
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
+
+/**
+ * Server Action to update product tax values
+ */
+export async function updateProductTaxValues(data: {
+  productId: number;
+  cfop: string;
+  cst: string;
+  ean: string;
+  ncm: number;
+  nbm: string;
+  ppb: number;
+  temp: string;
+}): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    logger.info("Updating product tax values:", data);
+
+    const response = await ProductServiceApi.updateProductTaxValues({
+      pe_id_produto: data.productId,
+      pe_cfop: data.cfop,
+      pe_cst: data.cst,
+      pe_ean: data.ean,
+      pe_nbm: data.nbm,
+      pe_ncm: data.ncm,
+      pe_ppb: data.ppb,
+      pe_temp: Number(data.temp),
+    });
+
+    if (!ProductServiceApi.isValidOperationResponse(response)) {
+      logger.error("Invalid API response:", response);
+      return {
+        success: false,
+        error: "Resposta inválida da API",
+      };
+    }
+
+    if (!ProductServiceApi.isOperationSuccessful(response)) {
+      const spResponse =
+        ProductServiceApi.extractStoredProcedureResponse(response);
+      const errorMessage =
+        spResponse?.sp_message || "Erro ao atualizar valores fiscais";
+      logger.error("API returned error:", { spResponse, errorMessage });
+
+      return {
+        success: false,
+        error: errorMessage,
+      };
+    }
+
+    logger.info("Product tax values updated successfully");
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    logger.error("Error updating product tax values:", error);
+
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Erro desconhecido ao atualizar valores fiscais";
+
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}

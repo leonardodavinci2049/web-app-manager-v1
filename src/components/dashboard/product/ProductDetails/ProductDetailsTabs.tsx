@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -8,7 +7,10 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ProductDetail } from "@/services/api/product/types/product-types";
+import { ProductCharacteristicsCard } from "./ProductCharacteristicsCard";
 import { ProductDescriptionEditor } from "./ProductDescriptionEditor";
+import { ProductGeneralDataCard } from "./ProductGeneralDataCard";
+import { ProductTaxValuesCard } from "./ProductTaxValuesCard";
 
 // Helper function to format date
 function formatDate(dateString: string): string {
@@ -73,50 +75,38 @@ export function ProductDetailsTabs({
       </TabsContent>
 
       <TabsContent value="specifications" className="space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Especificações</CardTitle>
-            <CardDescription>
-              Informações básicas e identificação do produto
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-3">
-              <div className="flex justify-between py-2 border-b">
-                <span className="font-medium">ID do Produto:</span>
-                <span className="font-mono text-sm">{product.ID_PRODUTO}</span>
-              </div>
+        {/* Card 1 - Dados Gerais */}
+        <ProductGeneralDataCard
+          productId={productId}
+          productName={product.PRODUTO}
+          descriptionTab={product.DESCRICAO_TAB || ""}
+          label={product.ETIQUETA || ""}
+          reference={product.REF || ""}
+          model={product.MODELO || ""}
+        />
 
-              {product.SKU && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">SKU:</span>
-                  <span className="font-mono text-sm">{product.SKU}</span>
-                </div>
-              )}
+        {/* Card 2 - Características */}
+        <ProductCharacteristicsCard
+          productId={productId}
+          warrantyDays={product.TEMPODEGARANTIA_DIA}
+          weightGr={product.PESO_GR}
+          lengthMm={product.COMPRIMENTO_MM}
+          widthMm={product.LARGURA_MM}
+          heightMm={product.ALTURA_MM}
+          diameterMm={product.DIAMETRO_MM}
+        />
 
-              {product.MODELO && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">Modelo:</span>
-                  <span>{product.MODELO}</span>
-                </div>
-              )}
-
-              {product.ETIQUETA && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">Etiqueta:</span>
-                  <span>{product.ETIQUETA}</span>
-                </div>
-              )}
-
-              <div className="flex justify-between py-2 border-b">
-                <span className="font-medium">Status:</span>
-                <Badge variant={product.INATIVO ? "destructive" : "default"}>
-                  {product.INATIVO ? "Inativo" : "Ativo"}
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Card 3 - Taxas */}
+        <ProductTaxValuesCard
+          productId={productId}
+          cfop={product.CFOP}
+          cst={product.CST}
+          ean={product.EAN}
+          ncm={product.NCM}
+          nbm={product.NBM}
+          ppb={product.PPB}
+          temp={product.TEMP}
+        />
       </TabsContent>
 
       <TabsContent value="technical" className="space-y-4">
