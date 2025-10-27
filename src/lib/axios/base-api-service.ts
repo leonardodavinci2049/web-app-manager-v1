@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { AxiosResponse } from "axios";
 import { AxiosError } from "axios";
 import {

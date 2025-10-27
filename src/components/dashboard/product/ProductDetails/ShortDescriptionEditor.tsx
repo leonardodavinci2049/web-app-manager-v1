@@ -3,11 +3,11 @@
 import { Check, Edit2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { updateProductShortDescription } from "@/app/actions/action-product-updates";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
-import { ProductServiceApi } from "@/services/api/product/product-service-api";
 
 interface ShortDescriptionEditorProps {
   productId: number;
@@ -66,14 +66,14 @@ export function ShortDescriptionEditor({
     try {
       setIsSaving(true);
 
-      // Call API to update short description
-      const response = await ProductServiceApi.updateProductShortDescription({
-        pe_id_produto: productId,
-        pe_descricao_venda: tempDescription,
-      });
+      // Call Server Action to update short description
+      const result = await updateProductShortDescription(
+        productId,
+        tempDescription,
+      );
 
       // Check if update was successful
-      if (ProductServiceApi.isOperationSuccessful(response)) {
+      if (result.success) {
         setDescription(tempDescription);
         setIsEditing(false);
         toast.success(
@@ -86,7 +86,8 @@ export function ShortDescriptionEditor({
         }
       } else {
         toast.error(
-          t("dashboard.products.details.shortDescription.updateError"),
+          result.error ||
+            t("dashboard.products.details.shortDescription.updateError"),
         );
       }
     } catch (error) {

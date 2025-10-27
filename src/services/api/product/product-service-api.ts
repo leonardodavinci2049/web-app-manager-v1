@@ -3,6 +3,8 @@
  * Based on API Reference: .github/api-reference/api-product-reference.md
  */
 
+import "server-only";
+
 import { envs } from "@/core/config";
 import { BaseApiService } from "@/lib/axios/base-api-service";
 import {

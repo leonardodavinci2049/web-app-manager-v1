@@ -2,6 +2,7 @@ import { Package, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ProductDetail } from "@/services/api/product/types/product-types";
+import { ProductNameEditor } from "./ProductNameEditor";
 import { ShortDescriptionEditor } from "./ShortDescriptionEditor";
 
 interface ProductInfoDisplayProps {
@@ -46,9 +47,10 @@ export function ProductInfoDisplay({
         </div>
 
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {product.PRODUTO}
-          </h1>
+          <ProductNameEditor
+            productId={product.ID_PRODUTO}
+            initialName={product.PRODUTO}
+          />
           {product.SKU && (
             <p className="text-muted-foreground mt-1">SKU: {product.SKU}</p>
           )}
