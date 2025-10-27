@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -73,47 +72,192 @@ export function ProductDetailsTabs({
       </TabsContent>
 
       <TabsContent value="specifications" className="space-y-4">
+        {/* Card 1 - Dados Gerais */}
         <Card>
           <CardHeader>
-            <CardTitle>Especificações</CardTitle>
+            <CardTitle>Dados Gerais</CardTitle>
             <CardDescription>
               Informações básicas e identificação do produto
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-3">
-              <div className="flex justify-between py-2 border-b">
-                <span className="font-medium">ID do Produto:</span>
-                <span className="font-mono text-sm">{product.ID_PRODUTO}</span>
-              </div>
+          <CardContent>
+            <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
+              <span className="text-muted-foreground font-medium">
+                Descrição Tab:
+              </span>
+              <span>{product.DESCRICAO_TAB || "—"}</span>
 
-              {product.SKU && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">SKU:</span>
-                  <span className="font-mono text-sm">{product.SKU}</span>
-                </div>
-              )}
+              <span className="text-muted-foreground font-medium">
+                Etiqueta:
+              </span>
+              <span>{product.ETIQUETA || "—"}</span>
 
-              {product.MODELO && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">Modelo:</span>
-                  <span>{product.MODELO}</span>
-                </div>
-              )}
+              <span className="text-muted-foreground font-medium">
+                Referência:
+              </span>
+              <span className="font-mono text-sm">{product.REF || "—"}</span>
 
-              {product.ETIQUETA && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">Etiqueta:</span>
-                  <span>{product.ETIQUETA}</span>
-                </div>
-              )}
+              <span className="text-muted-foreground font-medium">Modelo:</span>
+              <span>{product.MODELO || "—"}</span>
+            </div>
+          </CardContent>
+        </Card>
 
-              <div className="flex justify-between py-2 border-b">
-                <span className="font-medium">Status:</span>
-                <Badge variant={product.INATIVO ? "destructive" : "default"}>
-                  {product.INATIVO ? "Inativo" : "Ativo"}
-                </Badge>
-              </div>
+        {/* Card 2 - Características */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Características</CardTitle>
+            <CardDescription>
+              Dimensões e características físicas do produto
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
+              <span className="text-muted-foreground font-medium">
+                Tempo de Garantia:
+              </span>
+              <span>
+                {product.TEMPODEGARANTIA_DIA > 0 ? (
+                  <>
+                    {product.TEMPODEGARANTIA_DIA} dias
+                    {product.TEMPODEGARANTIA_DIA >= 30 && (
+                      <span className="text-muted-foreground text-sm ml-1">
+                        ({Math.floor(product.TEMPODEGARANTIA_DIA / 30)}{" "}
+                        {Math.floor(product.TEMPODEGARANTIA_DIA / 30) === 1
+                          ? "mês"
+                          : "meses"}
+                        )
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  "—"
+                )}
+              </span>
+
+              <span className="text-muted-foreground font-medium">Peso:</span>
+              <span>
+                {product.PESO_GR > 0 ? (
+                  <>
+                    {product.PESO_GR} g
+                    {product.PESO_GR >= 1000 && (
+                      <span className="text-muted-foreground text-sm ml-1">
+                        ({(product.PESO_GR / 1000).toFixed(2)} kg)
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  "—"
+                )}
+              </span>
+
+              <span className="text-muted-foreground font-medium">
+                Comprimento:
+              </span>
+              <span>
+                {product.COMPRIMENTO_MM > 0 ? (
+                  <>
+                    {product.COMPRIMENTO_MM} mm
+                    {product.COMPRIMENTO_MM >= 10 && (
+                      <span className="text-muted-foreground text-sm ml-1">
+                        ({(product.COMPRIMENTO_MM / 10).toFixed(1)} cm)
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  "—"
+                )}
+              </span>
+
+              <span className="text-muted-foreground font-medium">
+                Largura:
+              </span>
+              <span>
+                {product.LARGURA_MM > 0 ? (
+                  <>
+                    {product.LARGURA_MM} mm
+                    {product.LARGURA_MM >= 10 && (
+                      <span className="text-muted-foreground text-sm ml-1">
+                        ({(product.LARGURA_MM / 10).toFixed(1)} cm)
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  "—"
+                )}
+              </span>
+
+              <span className="text-muted-foreground font-medium">Altura:</span>
+              <span>
+                {product.ALTURA_MM > 0 ? (
+                  <>
+                    {product.ALTURA_MM} mm
+                    {product.ALTURA_MM >= 10 && (
+                      <span className="text-muted-foreground text-sm ml-1">
+                        ({(product.ALTURA_MM / 10).toFixed(1)} cm)
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  "—"
+                )}
+              </span>
+
+              <span className="text-muted-foreground font-medium">
+                Diâmetro:
+              </span>
+              <span>
+                {product.DIAMETRO_MM > 0 ? (
+                  <>
+                    {product.DIAMETRO_MM} mm
+                    {product.DIAMETRO_MM >= 10 && (
+                      <span className="text-muted-foreground text-sm ml-1">
+                        ({(product.DIAMETRO_MM / 10).toFixed(1)} cm)
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  "—"
+                )}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Card 3 - Taxas */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Informações Fiscais</CardTitle>
+            <CardDescription>
+              Dados tributários e fiscais do produto
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
+              <span className="text-muted-foreground font-medium">CFOP:</span>
+              <span className="font-mono text-sm">{product.CFOP || "—"}</span>
+
+              <span className="text-muted-foreground font-medium">CST:</span>
+              <span className="font-mono text-sm">{product.CST || "—"}</span>
+
+              <span className="text-muted-foreground font-medium">EAN:</span>
+              <span className="font-mono text-sm">{product.EAN || "—"}</span>
+
+              <span className="text-muted-foreground font-medium">NCM:</span>
+              <span className="font-mono text-sm">
+                {product.NCM && product.NCM > 0 ? product.NCM : "—"}
+              </span>
+
+              <span className="text-muted-foreground font-medium">NBM:</span>
+              <span className="font-mono text-sm">{product.NBM || "—"}</span>
+
+              <span className="text-muted-foreground font-medium">PPB:</span>
+              <span>
+                {product.PPB && product.PPB > 0 ? `${product.PPB}%` : "—"}
+              </span>
+
+              <span className="text-muted-foreground font-medium">TEMP:</span>
+              <span>{product.TEMP || "—"}</span>
             </div>
           </CardContent>
         </Card>

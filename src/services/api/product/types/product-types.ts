@@ -141,6 +141,14 @@ export interface ProductDetail {
   DT_UPDATE?: string; // Optional - not returned by API, use DATADOCADASTRO as fallback
   ANOTACOES: string | null; // Product description/notes - used in description tab
   DESCRICAO_VENDA: string | null; // Short description for sales
+  // Tax/Fiscal information fields (from ENDPOINT 15)
+  CFOP?: string; // Código Fiscal de Operações e Prestações
+  CST?: string; // Código de Situação Tributária
+  EAN?: string; // Código de Barras EAN
+  NCM?: number; // Nomenclatura Comum do Mercosul
+  NBM?: string; // Nomenclatura Brasileira de Mercadorias
+  PPB?: number; // Percentual de Conteúdo de Importação
+  TEMP?: string; // Campo temporário/auxiliar
 }
 
 /**

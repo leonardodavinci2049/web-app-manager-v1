@@ -75,15 +75,22 @@ export function ProductDetailsLayout({
   const productImage = getProductImageUrl();
 
   // Format prices - API returns strings like "320.000000"
-  const retailPrice = product.VL_VAREJO
-    ? formatCurrency(Number.parseFloat(product.VL_VAREJO))
-    : null;
-  const wholesalePrice = product.VL_ATACADO
-    ? formatCurrency(Number.parseFloat(product.VL_ATACADO))
-    : null;
-  const corporatePrice = product.VL_CORPORATIVO
-    ? formatCurrency(Number.parseFloat(product.VL_CORPORATIVO))
-    : null;
+  const retailPriceRaw = product.VL_VAREJO
+    ? Number.parseFloat(product.VL_VAREJO)
+    : 0;
+  const wholesalePriceRaw = product.VL_ATACADO
+    ? Number.parseFloat(product.VL_ATACADO)
+    : 0;
+  const corporatePriceRaw = product.VL_CORPORATIVO
+    ? Number.parseFloat(product.VL_CORPORATIVO)
+    : 0;
+
+  const retailPrice =
+    retailPriceRaw > 0 ? formatCurrency(retailPriceRaw) : null;
+  const wholesalePrice =
+    wholesalePriceRaw > 0 ? formatCurrency(wholesalePriceRaw) : null;
+  const corporatePrice =
+    corporatePriceRaw > 0 ? formatCurrency(corporatePriceRaw) : null;
 
   // Stock status - use ESTOQUE_LOJA from API (not QT_ESTOQUE)
   const stockLevel = product.ESTOQUE_LOJA ?? 0;
@@ -139,6 +146,9 @@ export function ProductDetailsLayout({
           retailPrice={retailPrice}
           wholesalePrice={wholesalePrice}
           corporatePrice={corporatePrice}
+          retailPriceRaw={retailPriceRaw}
+          wholesalePriceRaw={wholesalePriceRaw}
+          corporatePriceRaw={corporatePriceRaw}
           stockLevel={stockLevel}
           isOutOfStock={isOutOfStock}
           isLowStock={isLowStock}
