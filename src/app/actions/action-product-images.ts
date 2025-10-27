@@ -60,9 +60,9 @@ async function updateProductImagePathIfEmpty(
     }
 
     // PATH_IMAGEM is empty, update it with the new image URL
-    logger.debug(
+    /*     logger.debug(
       `Updating PATH_IMAGEM for product ${productId} with URL: ${imageUrl}`,
-    );
+    ); */
 
     const updateResponse = await ProductServiceApi.updateProductImagePath({
       pe_id_produto: productId,
@@ -71,7 +71,7 @@ async function updateProductImagePathIfEmpty(
 
     // Check if update was successful
     if (ProductServiceApi.isOperationSuccessful(updateResponse)) {
-      logger.debug(`Successfully updated PATH_IMAGEM for product ${productId}`);
+      // logger.debug(`Successfully updated PATH_IMAGEM for product ${productId}`);
     } else {
       const spResponse =
         ProductServiceApi.extractStoredProcedureResponse(updateResponse);

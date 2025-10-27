@@ -1,4 +1,4 @@
-import { ArrowLeft, Edit, MoreHorizontal, Trash2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -100,19 +100,19 @@ export function ProductDetailsLayout({
 
   const productImage = getProductImageUrl();
 
-  // Format prices
-  const retailPrice = product.VL_VENDA_VAREJO
-    ? formatCurrency(product.VL_VENDA_VAREJO)
+  // Format prices - API returns strings like "320.000000"
+  const retailPrice = product.VL_VAREJO
+    ? formatCurrency(Number.parseFloat(product.VL_VAREJO))
     : null;
-  const wholesalePrice = product.VL_VENDA_ATACADO
-    ? formatCurrency(product.VL_VENDA_ATACADO)
+  const wholesalePrice = product.VL_ATACADO
+    ? formatCurrency(Number.parseFloat(product.VL_ATACADO))
     : null;
   const corporatePrice = product.VL_CORPORATIVO
-    ? formatCurrency(product.VL_CORPORATIVO)
+    ? formatCurrency(Number.parseFloat(product.VL_CORPORATIVO))
     : null;
 
-  // Stock status
-  const stockLevel = product.QT_ESTOQUE;
+  // Stock status - use ESTOQUE_LOJA from API (not QT_ESTOQUE)
+  const stockLevel = product.ESTOQUE_LOJA ?? 0;
   const isOutOfStock = stockLevel === 0;
   const isLowStock = stockLevel > 0 && stockLevel <= 5;
 
@@ -147,20 +147,6 @@ export function ProductDetailsLayout({
             Voltar ao Catálogo
           </Link>
         </Button>
-
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Edit className="mr-2 h-4 w-4" />
-            Editar
-          </Button>
-          <Button variant="outline" size="sm">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-          <Button variant="destructive" size="sm">
-            <Trash2 className="mr-2 h-4 w-4" />
-            Excluir
-          </Button>
-        </div>
       </div>
 
       {/* Main Product Layout */}
@@ -255,7 +241,7 @@ export function ProductDetailsLayout({
                 <div className="flex justify-between py-2 border-b">
                   <span className="font-medium">ID do Produto:</span>
                   <span className="font-mono text-sm">
-                    {product.ID_TBL_PRODUTO}
+                    {product.ID_PRODUTO}
                   </span>
                 </div>
 
@@ -329,12 +315,13 @@ export function ProductDetailsLayout({
                   </div>
                 )}
 
-                {product.TEMPODEGARANTIA_MES > 0 && (
+                {product.TEMPODEGARANTIA_DIA > 0 && (
                   <div className="flex justify-between py-2 border-b">
                     <span className="font-medium">Garantia:</span>
                     <span>
-                      {product.TEMPODEGARANTIA_MES}{" "}
-                      {product.TEMPODEGARANTIA_MES === 1 ? "mês" : "meses"}
+                      {product.TEMPODEGARANTIA_DIA} dias
+                      {product.TEMPODEGARANTIA_DIA >= 30 &&
+                        ` (${Math.floor(product.TEMPODEGARANTIA_DIA / 30)} ${Math.floor(product.TEMPODEGARANTIA_DIA / 30) === 1 ? "mês" : "meses"})`}
                     </span>
                   </div>
                 )}
@@ -344,7 +331,7 @@ export function ProductDetailsLayout({
                   product.COMPRIMENTO_MM > 0 ||
                   product.LARGURA_MM > 0 ||
                   product.ALTURA_MM > 0 ||
-                  product.TEMPODEGARANTIA_MES > 0
+                  product.TEMPODEGARANTIA_DIA > 0
                 ) && (
                   <p className="text-muted-foreground italic">
                     Nenhuma informação técnica disponível para este produto.
@@ -372,7 +359,9 @@ export function ProductDetailsLayout({
 
                 <div className="flex justify-between py-2 border-b">
                   <span className="font-medium">Última Atualização:</span>
-                  <span>{formatDate(product.DT_UPDATE)}</span>
+                  <span>
+                    {formatDate(product.DT_UPDATE || product.DATADOCADASTRO)}
+                  </span>
                 </div>
 
                 {product.SLUG && (

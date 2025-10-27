@@ -78,31 +78,44 @@ export function ProductInfoDisplay({
       {(retailPrice || wholesalePrice || corporatePrice) && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">Preços</CardTitle>
+            <CardTitle className="text-xl">Preços de Venda</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {retailPrice && (
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Preço Varejo:</span>
-                <span className="text-2xl font-bold text-green-600">
-                  {retailPrice}
-                </span>
+          <CardContent>
+            <div className="space-y-2">
+              {/* Table-like layout aligned to left */}
+              <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
+                {retailPrice && (
+                  <>
+                    <span className="text-muted-foreground font-medium">
+                      Preço Varejo:
+                    </span>
+                    <span className="text-lg font-bold text-green-600">
+                      {retailPrice}
+                    </span>
+                  </>
+                )}
+                {wholesalePrice && (
+                  <>
+                    <span className="text-muted-foreground font-medium">
+                      Preço Atacado:
+                    </span>
+                    <span className="text-lg font-bold text-blue-600">
+                      {wholesalePrice}
+                    </span>
+                  </>
+                )}
+                {corporatePrice && (
+                  <>
+                    <span className="text-muted-foreground font-medium">
+                      Preço Corporativo:
+                    </span>
+                    <span className="text-lg font-bold text-purple-600">
+                      {corporatePrice}
+                    </span>
+                  </>
+                )}
               </div>
-            )}
-            {wholesalePrice && (
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Preço Atacado:</span>
-                <span className="text-lg font-semibold">{wholesalePrice}</span>
-              </div>
-            )}
-            {corporatePrice && (
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">
-                  Preço Corporativo:
-                </span>
-                <span className="text-lg font-semibold">{corporatePrice}</span>
-              </div>
-            )}
+            </div>
           </CardContent>
         </Card>
       )}
@@ -116,37 +129,47 @@ export function ProductInfoDisplay({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Disponível:</span>
-            <span
-              className={`text-lg font-semibold ${
-                isOutOfStock
-                  ? "text-destructive"
-                  : isLowStock
-                    ? "text-yellow-600"
-                    : "text-green-600"
-              }`}
-            >
-              {stockLevel} {stockLevel === 1 ? "unidade" : "unidades"}
-            </span>
+          <div className="space-y-2">
+            {/* Table-like layout aligned to left */}
+            <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
+              <span className="text-muted-foreground font-medium">
+                Disponível:
+              </span>
+              <span
+                className={`text-lg font-bold ${
+                  isOutOfStock
+                    ? "text-destructive"
+                    : isLowStock
+                      ? "text-yellow-600"
+                      : "text-green-600"
+                }`}
+              >
+                {stockLevel} {stockLevel === 1 ? "unidade" : "unidades"}
+              </span>
+
+              <span className="text-muted-foreground font-medium">Status:</span>
+              <span className="text-sm">
+                <Badge variant={stockStatus.variant}>{stockStatus.label}</Badge>
+              </span>
+            </div>
+
+            {/* Additional stock info */}
+            {isOutOfStock && (
+              <div className="mt-2 p-2 bg-destructive/10 rounded-md">
+                <p className="text-sm text-destructive">
+                  Produto sem estoque disponível
+                </p>
+              </div>
+            )}
+
+            {isLowStock && !isOutOfStock && (
+              <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/10 rounded-md">
+                <p className="text-sm text-yellow-700 dark:text-yellow-600">
+                  Estoque baixo - apenas {stockLevel} unidades restantes
+                </p>
+              </div>
+            )}
           </div>
-
-          {/* Additional stock info */}
-          {isOutOfStock && (
-            <div className="mt-2 p-2 bg-destructive/10 rounded-md">
-              <p className="text-sm text-destructive">
-                Produto sem estoque disponível
-              </p>
-            </div>
-          )}
-
-          {isLowStock && !isOutOfStock && (
-            <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/10 rounded-md">
-              <p className="text-sm text-yellow-700 dark:text-yellow-600">
-                Estoque baixo - apenas {stockLevel} unidades restantes
-              </p>
-            </div>
-          )}
         </CardContent>
       </Card>
 
@@ -192,7 +215,7 @@ export function ProductInfoDisplay({
               </div>
             )}
 
-            {product.ID_FORNECEDOR > 0 && (
+            {product.ID_FORNECEDOR && product.ID_FORNECEDOR > 0 && (
               <div className="flex justify-between py-1">
                 <span className="text-muted-foreground">Fornecedor ID:</span>
                 <span>{product.ID_FORNECEDOR}</span>
@@ -206,7 +229,7 @@ export function ProductInfoDisplay({
             product.ID_FAMILIA > 0 ||
             product.ID_GRUPO > 0 ||
             product.ID_SUBGRUPO > 0 ||
-            product.ID_FORNECEDOR > 0
+            (product.ID_FORNECEDOR && product.ID_FORNECEDOR > 0)
           ) && (
             <p className="text-muted-foreground italic text-sm">
               Nenhuma classificação definida

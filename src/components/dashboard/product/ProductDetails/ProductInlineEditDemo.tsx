@@ -37,7 +37,7 @@ export function ProductInlineEditDemo({ product }: ProductInlineEditDemoProps) {
 
     // Here you would call the ProductServiceApi.updateProductName
     // const response = await ProductServiceApi.updateProductName({
-    //   pe_id_produto: localProduct.ID_TBL_PRODUTO,
+    //   pe_id_produto: localProduct.ID_PRODUTO,
     //   pe_nome_produto: value
     // });
 
@@ -49,7 +49,7 @@ export function ProductInlineEditDemo({ product }: ProductInlineEditDemoProps) {
 
     // Here you would call the ProductServiceApi.updateProductGeneral
     // const response = await ProductServiceApi.updateProductGeneral({
-    //   pe_id_produto: localProduct.ID_TBL_PRODUTO,
+    //   pe_id_produto: localProduct.ID_PRODUTO,
     //   pe_nome_produto: localProduct.PRODUTO,
     //   pe_ref: value,
     //   pe_modelo: localProduct.MODELO,
@@ -72,25 +72,25 @@ export function ProductInlineEditDemo({ product }: ProductInlineEditDemoProps) {
 
     // Here you would call the ProductServiceApi.updateProductPrice
     // const response = await ProductServiceApi.updateProductPrice({
-    //   pe_id_produto: localProduct.ID_TBL_PRODUTO,
-    //   pe_preco_venda_atac: localProduct.VL_VENDA_ATACADO,
+    //   pe_id_produto: localProduct.ID_PRODUTO,
+    //   pe_preco_venda_atac: localProduct.VL_ATACADO,
     //   pe_preco_venda_corporativo: localProduct.VL_CORPORATIVO,
     //   pe_preco_venda_vare: value
     // });
 
-    setLocalProduct((prev) => ({ ...prev, VL_VENDA_VAREJO: value }));
+    setLocalProduct((prev) => ({ ...prev, VL_VAREJO: value.toString() }));
   };
 
   const updateWholesalePrice = async (value: number) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    setLocalProduct((prev) => ({ ...prev, VL_VENDA_ATACADO: value }));
+    setLocalProduct((prev) => ({ ...prev, VL_ATACADO: value.toString() }));
   };
 
   const updateCorporatePrice = async (value: number) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    setLocalProduct((prev) => ({ ...prev, VL_CORPORATIVO: value }));
+    setLocalProduct((prev) => ({ ...prev, VL_CORPORATIVO: value.toString() }));
   };
 
   const updateStock = async (value: number) => {
@@ -98,12 +98,12 @@ export function ProductInlineEditDemo({ product }: ProductInlineEditDemoProps) {
 
     // Here you would call the ProductServiceApi.updateProductStock
     // const response = await ProductServiceApi.updateProductStock({
-    //   pe_id_produto: localProduct.ID_TBL_PRODUTO,
+    //   pe_id_produto: localProduct.ID_PRODUTO,
     //   pe_qt_estoque: value,
     //   pe_qt_minimo: 0 // This would come from another field
     // });
 
-    setLocalProduct((prev) => ({ ...prev, QT_ESTOQUE: value }));
+    setLocalProduct((prev) => ({ ...prev, ESTOQUE_LOJA: value }));
   };
 
   const updateWeight = async (value: number) => {
@@ -162,7 +162,7 @@ export function ProductInlineEditDemo({ product }: ProductInlineEditDemoProps) {
         <CardContent className="space-y-4">
           <InlineNumberEdit
             label="Preço Varejo"
-            value={localProduct.VL_VENDA_VAREJO ?? 0}
+            value={Number.parseFloat(localProduct.VL_VAREJO || "0")}
             onSave={updateRetailPrice}
             type="currency"
             min={0}
@@ -170,7 +170,7 @@ export function ProductInlineEditDemo({ product }: ProductInlineEditDemoProps) {
 
           <InlineNumberEdit
             label="Preço Atacado"
-            value={localProduct.VL_VENDA_ATACADO ?? 0}
+            value={Number.parseFloat(localProduct.VL_ATACADO || "0")}
             onSave={updateWholesalePrice}
             type="currency"
             min={0}
@@ -178,7 +178,7 @@ export function ProductInlineEditDemo({ product }: ProductInlineEditDemoProps) {
 
           <InlineNumberEdit
             label="Preço Corporativo"
-            value={localProduct.VL_CORPORATIVO ?? 0}
+            value={Number.parseFloat(localProduct.VL_CORPORATIVO || "0")}
             onSave={updateCorporatePrice}
             type="currency"
             min={0}
@@ -197,7 +197,7 @@ export function ProductInlineEditDemo({ product }: ProductInlineEditDemoProps) {
         <CardContent className="space-y-4">
           <InlineNumberEdit
             label="Quantidade em Estoque"
-            value={localProduct.QT_ESTOQUE ?? 0}
+            value={localProduct.ESTOQUE_LOJA ?? 0}
             onSave={updateStock}
             type="number"
             min={0}
