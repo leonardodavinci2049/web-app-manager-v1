@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ProductDetail } from "@/services/api/product/types/product-types";
 import { ProductNameEditor } from "./ProductNameEditor";
+import { ProductPricingCard } from "./ProductPricingCard";
 import { ShortDescriptionEditor } from "./ShortDescriptionEditor";
 
 interface ProductInfoDisplayProps {
@@ -78,50 +79,11 @@ export function ProductInfoDisplay({
       </div>
 
       {/* Pricing Card */}
-      {(retailPrice || wholesalePrice || corporatePrice) && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Preços de Venda</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {/* Table-like layout aligned to left */}
-              <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
-                {retailPrice && (
-                  <>
-                    <span className="text-muted-foreground font-medium">
-                      Preço Varejo:
-                    </span>
-                    <span className="text-lg font-bold text-green-600">
-                      {retailPrice}
-                    </span>
-                  </>
-                )}
-                {wholesalePrice && (
-                  <>
-                    <span className="text-muted-foreground font-medium">
-                      Preço Atacado:
-                    </span>
-                    <span className="text-lg font-bold text-blue-600">
-                      {wholesalePrice}
-                    </span>
-                  </>
-                )}
-                {corporatePrice && (
-                  <>
-                    <span className="text-muted-foreground font-medium">
-                      Preço Corporativo:
-                    </span>
-                    <span className="text-lg font-bold text-purple-600">
-                      {corporatePrice}
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <ProductPricingCard
+        retailPrice={retailPrice}
+        wholesalePrice={wholesalePrice}
+        corporatePrice={corporatePrice}
+      />
 
       {/* Stock Info Card */}
       <Card>
