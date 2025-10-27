@@ -421,13 +421,6 @@ export async function createProductFromForm(formData: FormData): Promise<{
       };
     }
 
-    logger.info("Creating new product with data:", {
-      name,
-      slug,
-      reference,
-      model,
-    });
-
     // Prepare API request data - todos os parâmetros conforme API Reference
     const apiData = {
       // Tipo de negócio (obrigatório)
@@ -507,8 +500,6 @@ export async function createProductFromForm(formData: FormData): Promise<{
       };
     }
 
-    logger.info("Product created successfully:", { productId });
-
     return {
       success: true,
       productId,
@@ -556,13 +547,6 @@ export async function createProduct(data: CreateProductData): Promise<{
           "Não foi possível gerar um slug válido a partir do nome do produto",
       };
     }
-
-    logger.info("Creating new product with data:", {
-      name: data.name,
-      slug,
-      reference: data.reference,
-      model: data.model,
-    });
 
     // Prepare API request data - todos os parâmetros conforme API Reference
     const apiData = {
@@ -643,8 +627,6 @@ export async function createProduct(data: CreateProductData): Promise<{
       };
     }
 
-    logger.info("Product created successfully:", { productId });
-
     return {
       success: true,
       productId,
@@ -683,8 +665,6 @@ export async function updateProductGeneral(data: {
   error?: string;
 }> {
   try {
-    logger.info("Updating product general data:", data);
-
     const response = await ProductServiceApi.updateProductGeneral({
       pe_id_produto: data.productId,
       pe_nome_produto: data.productName,
@@ -714,8 +694,6 @@ export async function updateProductGeneral(data: {
         error: errorMessage,
       };
     }
-
-    logger.info("Product general data updated successfully");
 
     return {
       success: true,
@@ -752,8 +730,6 @@ export async function updateProductCharacteristics(data: {
   error?: string;
 }> {
   try {
-    logger.info("Updating product characteristics:", data);
-
     const response = await ProductServiceApi.updateProductCharacteristics({
       pe_id_produto: data.productId,
       pe_peso_gr: data.weightGr,
@@ -785,8 +761,6 @@ export async function updateProductCharacteristics(data: {
         error: errorMessage,
       };
     }
-
-    logger.info("Product characteristics updated successfully");
 
     return {
       success: true,
@@ -823,8 +797,6 @@ export async function updateProductTaxValues(data: {
   error?: string;
 }> {
   try {
-    logger.info("Updating product tax values:", data);
-
     const response = await ProductServiceApi.updateProductTaxValues({
       pe_id_produto: data.productId,
       pe_cfop: data.cfop,
@@ -857,8 +829,6 @@ export async function updateProductTaxValues(data: {
       };
     }
 
-    logger.info("Product tax values updated successfully");
-
     return {
       success: true,
     };
@@ -869,6 +839,76 @@ export async function updateProductTaxValues(data: {
       error instanceof Error
         ? error.message
         : "Erro desconhecido ao atualizar valores fiscais";
+
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
+
+/**
+ * Server Action to update product flags
+ */
+export async function updateProductFlags(data: {
+  productId: number;
+  controleFisico: number;
+  controlarEstoque: number;
+  consignado: number;
+  destaque: number;
+  promocao: number;
+  servico: number;
+  websiteOff: number;
+  inativo: number;
+  importado: number;
+}): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    const response = await ProductServiceApi.updateProductFlags({
+      pe_id_produto: data.productId,
+      pe_flag_controle_fisico: data.controleFisico,
+      pe_flag_controle_estoque: data.controlarEstoque,
+      pe_flag_descontinuado: data.consignado,
+      pe_flag_destaque: data.destaque,
+      pe_flag_promocao: data.promocao,
+      pe_flag_servico: data.servico,
+      pe_flag_website_off: data.websiteOff,
+      pe_flag_inativo: data.inativo,
+      pe_flag_importado: data.importado,
+    });
+
+    if (!ProductServiceApi.isValidOperationResponse(response)) {
+      logger.error("Invalid API response:", response);
+      return {
+        success: false,
+        error: "Resposta inválida da API",
+      };
+    }
+
+    if (!ProductServiceApi.isOperationSuccessful(response)) {
+      const spResponse =
+        ProductServiceApi.extractStoredProcedureResponse(response);
+      const errorMessage = spResponse?.sp_message || "Erro ao atualizar flags";
+      logger.error("API returned error:", { spResponse, errorMessage });
+
+      return {
+        success: false,
+        error: errorMessage,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    logger.error("Error updating product flags:", error);
+
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Erro desconhecido ao atualizar flags";
 
     return {
       success: false,

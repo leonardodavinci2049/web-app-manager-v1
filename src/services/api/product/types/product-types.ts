@@ -133,6 +133,14 @@ export interface ProductDetail {
   FLAG_WEBSITE_OFF: number;
   FLAG_IMPORTADO: number;
   INATIVO: number;
+  // Additional flags (from API response)
+  FLAG_CONTROLE_FISICO: number; // SIM = 1 / NÃO = 0
+  CONTROLAR_ESTOQUE: number; // SIM = 1 / NÃO = 0
+  CONSIGNADO: number; // SIM = 1 / NÃO = 0
+  DESTAQUE: number; // SIM = 1 / NÃO = 0
+  PROMOCAO: number; // SIM = 1 / NÃO = 0
+  FLAG_SERVICO: number; // SIM = 1 / NÃO = 0
+  IMPORTADO: number; // SIM = 1 / NÃO = 2
   SLUG: string;
   PATH_IMAGEM: string;
   META_TITLE: string;
