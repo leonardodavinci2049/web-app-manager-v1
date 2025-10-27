@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ProductDetail } from "@/services/api/product/types/product-types";
 import { ProductCharacteristicsCard } from "./ProductCharacteristicsCard";
 import { ProductDescriptionEditor } from "./ProductDescriptionEditor";
+import { ProductFlagsCard } from "./ProductFlagsCard";
 import { ProductGeneralDataCard } from "./ProductGeneralDataCard";
 import { ProductTaxValuesCard } from "./ProductTaxValuesCard";
 
@@ -110,68 +111,19 @@ export function ProductDetailsTabs({
       </TabsContent>
 
       <TabsContent value="technical" className="space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Dados Técnicos</CardTitle>
-            <CardDescription>
-              Características físicas e técnicas do produto
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-3">
-              {product.PESO_GR > 0 && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">Peso:</span>
-                  <span>{product.PESO_GR}g</span>
-                </div>
-              )}
-
-              {product.COMPRIMENTO_MM > 0 && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">Comprimento:</span>
-                  <span>{product.COMPRIMENTO_MM}mm</span>
-                </div>
-              )}
-
-              {product.LARGURA_MM > 0 && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">Largura:</span>
-                  <span>{product.LARGURA_MM}mm</span>
-                </div>
-              )}
-
-              {product.ALTURA_MM > 0 && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">Altura:</span>
-                  <span>{product.ALTURA_MM}mm</span>
-                </div>
-              )}
-
-              {product.TEMPODEGARANTIA_DIA > 0 && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">Garantia:</span>
-                  <span>
-                    {product.TEMPODEGARANTIA_DIA} dias
-                    {product.TEMPODEGARANTIA_DIA >= 30 &&
-                      ` (${Math.floor(product.TEMPODEGARANTIA_DIA / 30)} ${Math.floor(product.TEMPODEGARANTIA_DIA / 30) === 1 ? "mês" : "meses"})`}
-                  </span>
-                </div>
-              )}
-
-              {!(
-                product.PESO_GR > 0 ||
-                product.COMPRIMENTO_MM > 0 ||
-                product.LARGURA_MM > 0 ||
-                product.ALTURA_MM > 0 ||
-                product.TEMPODEGARANTIA_DIA > 0
-              ) && (
-                <p className="text-muted-foreground italic">
-                  Nenhuma informação técnica disponível para este produto.
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Card 1 - Flags */}
+        <ProductFlagsCard
+          productId={productId}
+          controleFisico={product.FLAG_CONTROLE_FISICO}
+          controlarEstoque={product.CONTROLAR_ESTOQUE}
+          consignado={product.CONSIGNADO}
+          destaque={product.DESTAQUE}
+          promocao={product.PROMOCAO}
+          servico={product.FLAG_SERVICO}
+          websiteOff={product.FLAG_WEBSITE_OFF}
+          inativo={product.INATIVO}
+          importado={product.IMPORTADO}
+        />
       </TabsContent>
 
       <TabsContent value="metadata" className="space-y-4">
