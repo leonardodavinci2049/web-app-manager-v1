@@ -299,6 +299,20 @@
           "maxLengthError": "Description cannot exceed {{max}} characters",
           "charactersRemaining": "{{count}} characters remaining",
           "overLimit": "{{over}} characters over limit"
+        },
+        "productName": {
+          "editButton": "Edit",
+          "saveButton": "Save",
+          "cancelButton": "Cancel",
+          "placeholder": "Enter product name...",
+          "updateSuccess": "Product name updated successfully!",
+          "updateError": "Error updating product name",
+          "emptyError": "Product name cannot be empty",
+          "maxLengthError": "Name cannot exceed {{max}} characters",
+          "charactersRemaining": "{{count}} characters remaining",
+          "overLimit": "{{over}} characters over limit",
+          "doubleClickHint": "Double-click to edit",
+          "keyboardHint": "Press Ctrl+Enter to save or Esc to cancel"
         }
       },
       "catalog": {

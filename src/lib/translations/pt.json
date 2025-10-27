@@ -309,6 +309,20 @@
           "maxLengthError": "A descrição não pode ter mais de {{max}} caracteres",
           "charactersRemaining": "{{count}} caracteres restantes",
           "overLimit": "{{over}} caracteres acima do limite"
+        },
+        "productName": {
+          "editButton": "Editar",
+          "saveButton": "Salvar",
+          "cancelButton": "Cancelar",
+          "placeholder": "Digite o nome do produto...",
+          "updateSuccess": "Nome do produto atualizado com sucesso!",
+          "updateError": "Erro ao atualizar nome do produto",
+          "emptyError": "O nome do produto não pode estar vazio",
+          "maxLengthError": "O nome não pode ter mais de {{max}} caracteres",
+          "charactersRemaining": "{{count}} caracteres restantes",
+          "overLimit": "{{over}} caracteres acima do limite",
+          "doubleClickHint": "Clique duas vezes para editar",
+          "keyboardHint": "Pressione Ctrl+Enter para salvar ou Esc para cancelar"
         }
       },
       "filters": {

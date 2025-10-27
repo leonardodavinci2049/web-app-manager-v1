@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import axios from "axios";
 import { envs } from "@/core/config";
@@ -32,7 +34,8 @@ class ServerAxiosClient {
     this.baseURL = EXTERNAL_API_BASE_URL;
     this.apiKey = envs.API_KEY || "";
 
-    if (!this.apiKey) {
+    // Only warn in server environment, not during client bundle
+    if (!this.apiKey && typeof window === "undefined") {
       console.warn("⚠️  Atenção: API_KEY não configurada no servidor");
     }
   }
