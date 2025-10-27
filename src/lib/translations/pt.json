@@ -295,6 +295,20 @@
             "positiveNumber": "Valor deve ser um número positivo"
           },
           "notInformed": "Não informado"
+        },
+        "shortDescription": {
+          "title": "Descrição Curta de Vendas",
+          "editButton": "Editar",
+          "saveButton": "Salvar",
+          "cancelButton": "Cancelar",
+          "placeholder": "Digite a descrição curta de vendas do produto...",
+          "empty": "Nenhuma descrição curta cadastrada. Clique em editar para adicionar.",
+          "updateSuccess": "Descrição curta atualizada com sucesso!",
+          "updateError": "Erro ao atualizar descrição curta",
+          "emptyError": "A descrição curta não pode estar vazia",
+          "maxLengthError": "A descrição não pode ter mais de {{max}} caracteres",
+          "charactersRemaining": "{{count}} caracteres restantes",
+          "overLimit": "{{over}} caracteres acima do limite"
         }
       },
       "filters": {

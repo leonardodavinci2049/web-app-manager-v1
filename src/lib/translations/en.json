@@ -285,6 +285,20 @@
             "positiveNumber": "Value must be a positive number"
           },
           "notInformed": "Not informed"
+        },
+        "shortDescription": {
+          "title": "Short Sales Description",
+          "editButton": "Edit",
+          "saveButton": "Save",
+          "cancelButton": "Cancel",
+          "placeholder": "Enter product short sales description...",
+          "empty": "No short description registered. Click edit to add.",
+          "updateSuccess": "Short description updated successfully!",
+          "updateError": "Error updating short description",
+          "emptyError": "Short description cannot be empty",
+          "maxLengthError": "Description cannot exceed {{max}} characters",
+          "charactersRemaining": "{{count}} characters remaining",
+          "overLimit": "{{over}} characters over limit"
         }
       },
       "catalog": {
