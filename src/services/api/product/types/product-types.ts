@@ -139,6 +139,8 @@ export interface ProductDetail {
   META_DESCRIPTION: string;
   DATADOCADASTRO: string;
   DT_UPDATE?: string; // Optional - not returned by API, use DATADOCADASTRO as fallback
+  ANOTACOES: string | null; // Product description/notes - used in description tab
+  DESCRICAO_VENDA: string | null; // Short description for sales
 }
 
 /**
