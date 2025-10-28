@@ -125,7 +125,7 @@ export interface DeleteTaxonomyRequest extends BaseTaxonomyRequest {
  */
 export interface CreateTaxonomyRelRequest extends BaseTaxonomyRequest {
   pe_id_taxonomy: number;
-  pe_id_produto: number;
+  pe_id_record: number;
 }
 
 /**
