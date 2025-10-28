@@ -73,7 +73,7 @@ export const DeleteTaxonomySchema = z.object({
  */
 export const CreateTaxonomyRelSchema = z.object({
   pe_id_taxonomy: z.number().int().positive(),
-  pe_id_produto: z.number().int().positive(),
+  pe_id_record: z.number().int().positive(),
 });
 
 /**

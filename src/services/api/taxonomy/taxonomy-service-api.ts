@@ -407,14 +407,14 @@ export class TaxonomyServiceApi extends BaseApiService {
   static async createTaxonomyRel(
     params: Partial<CreateTaxonomyRelRequest> & {
       pe_id_taxonomy: number;
-      pe_id_produto: number;
+      pe_id_record: number;
     },
   ): Promise<CreateTaxonomyRelResponse> {
     try {
       // Validar parâmetros
       const validatedParams = CreateTaxonomyRelSchema.parse({
         pe_id_taxonomy: params.pe_id_taxonomy,
-        pe_id_produto: params.pe_id_produto,
+        pe_id_record: params.pe_id_record,
       });
 
       const instance = new TaxonomyServiceApi();

@@ -313,6 +313,16 @@
           "overLimit": "{{over}} characters over limit",
           "doubleClickHint": "Double-click to edit",
           "keyboardHint": "Press Ctrl+Enter to save or Esc to cancel"
+        },
+        "categories": {
+          "add": "Add Category",
+          "addDialog": {
+            "title": "Add Category to Product",
+            "description": "Select a category to add to the product",
+            "searchPlaceholder": "Search categories...",
+            "noResults": "No categories found",
+            "level": "Level"
+          }
         }
       },
       "catalog": {

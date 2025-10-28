@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { ProductRelatedTaxonomy } from "@/services/api/product/types/product-types";
+import { AddCategoryDialog } from "./AddCategoryDialog";
 import { DeleteCategoryButton } from "./DeleteCategoryButton";
 
 interface ProductCategoriesCardProps {
@@ -21,21 +22,28 @@ interface ProductCategoriesCardProps {
  *
  * Displays product related categories in a table format.
  * Shows a message when no categories are defined.
- * Allows deleting category relationships.
+ * Allows adding and deleting category relationships.
  */
 export function ProductCategoriesCard({
   relatedTaxonomies,
   productId,
 }: ProductCategoriesCardProps) {
   const hasTaxonomies = relatedTaxonomies.length > 0;
+  const existingCategoryIds = relatedTaxonomies.map((t) => t.ID_TAXONOMY);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <FolderTree className="h-5 w-5" />
-          Categorias Relacionadas
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <FolderTree className="h-5 w-5" />
+            Categorias Relacionadas
+          </CardTitle>
+          <AddCategoryDialog
+            productId={productId}
+            existingCategoryIds={existingCategoryIds}
+          />
+        </div>
       </CardHeader>
       <CardContent>
         {hasTaxonomies ? (

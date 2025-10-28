@@ -323,6 +323,16 @@
           "overLimit": "{{over}} caracteres acima do limite",
           "doubleClickHint": "Clique duas vezes para editar",
           "keyboardHint": "Pressione Ctrl+Enter para salvar ou Esc para cancelar"
+        },
+        "categories": {
+          "add": "Adicionar Categoria",
+          "addDialog": {
+            "title": "Adicionar Categoria ao Produto",
+            "description": "Selecione uma categoria para adicionar ao produto",
+            "searchPlaceholder": "Pesquisar categorias...",
+            "noResults": "Nenhuma categoria encontrada",
+            "level": "Nível"
+          }
         }
       },
       "filters": {
