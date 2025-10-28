@@ -333,6 +333,34 @@
             "noResults": "Nenhuma categoria encontrada",
             "level": "Nível"
           }
+        },
+        "type": {
+          "changeButton": "Alterar",
+          "changeDialog": {
+            "title": "Alterar Tipo do Produto",
+            "description": "Tipo atual: {{currentType}}. Selecione um novo tipo para o produto",
+            "searchPlaceholder": "Pesquisar tipos...",
+            "noResults": "Nenhum tipo encontrado",
+            "currentType": "Tipo atual",
+            "sameTypeSelected": "Este já é o tipo atual do produto",
+            "successMessage": "Tipo do produto atualizado com sucesso!",
+            "errorMessage": "Erro ao atualizar tipo do produto",
+            "loadError": "Erro ao carregar tipos"
+          }
+        },
+        "brand": {
+          "changeButton": "Alterar",
+          "changeDialog": {
+            "title": "Alterar Marca do Produto",
+            "description": "Marca atual: {{currentBrand}}. Selecione uma nova marca para o produto",
+            "searchPlaceholder": "Pesquisar marcas...",
+            "noResults": "Nenhuma marca encontrada",
+            "currentBrand": "Marca atual",
+            "sameBrandSelected": "Esta já é a marca atual do produto",
+            "successMessage": "Marca do produto atualizada com sucesso!",
+            "errorMessage": "Erro ao atualizar marca do produto",
+            "loadError": "Erro ao carregar marcas"
+          }
         }
       },
       "filters": {

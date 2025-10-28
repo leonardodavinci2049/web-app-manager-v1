@@ -117,6 +117,7 @@ export interface ProductDetail {
   ID_TIPO: number;
   TIPO: string; // Product type name
   ID_MARCA: number;
+  MARCA_NOME: string; // Brand name
   ID_FAMILIA: number;
   ID_GRUPO: number;
   ID_SUBGRUPO: number;
