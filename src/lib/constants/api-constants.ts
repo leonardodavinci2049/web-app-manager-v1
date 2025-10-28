@@ -121,6 +121,21 @@ export const TAXONOMY_ENDPOINTS = {
   REL_DELETE: "/taxonomy/v2/taxonomy-rel-delete",
 } as const;
 
+// Endpoints de Product Type
+export const PTYPE_ENDPOINTS = {
+  FIND_ALL: "/ptype/v2/ptype-find-all",
+} as const;
+
+// Endpoints de Brand
+export const BRAND_ENDPOINTS = {
+  FIND_ALL: "/brand/v2/find-all",
+} as const;
+
+// Endpoints de Supplier
+export const SUPPLIER_ENDPOINTS = {
+  FIND_ALL: "/supplier/v2/supplier-find-all",
+} as const;
+
 // Endpoints de Account (Dashboard da Conta)
 export const ACCOUNT_ENDPOINTS = {
   // Endpoints de consulta (01-09)
