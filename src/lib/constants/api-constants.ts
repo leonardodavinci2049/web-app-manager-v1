@@ -128,7 +128,7 @@ export const PTYPE_ENDPOINTS = {
 
 // Endpoints de Brand
 export const BRAND_ENDPOINTS = {
-  FIND_ALL: "/brand/v2/find-all",
+  FIND_ALL: "/brand/v2/brand-find-all",
 } as const;
 
 // Endpoints de Supplier

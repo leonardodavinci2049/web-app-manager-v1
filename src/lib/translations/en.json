@@ -323,6 +323,34 @@
             "noResults": "No categories found",
             "level": "Level"
           }
+        },
+        "type": {
+          "changeButton": "Change",
+          "changeDialog": {
+            "title": "Change Product Type",
+            "description": "Current type: {{currentType}}. Select a new type for the product",
+            "searchPlaceholder": "Search types...",
+            "noResults": "No types found",
+            "currentType": "Current type",
+            "sameTypeSelected": "This is already the current product type",
+            "successMessage": "Product type updated successfully!",
+            "errorMessage": "Error updating product type",
+            "loadError": "Error loading types"
+          }
+        },
+        "brand": {
+          "changeButton": "Change",
+          "changeDialog": {
+            "title": "Change Product Brand",
+            "description": "Current brand: {{currentBrand}}. Select a new brand for the product",
+            "searchPlaceholder": "Search brands...",
+            "noResults": "No brands found",
+            "currentBrand": "Current brand",
+            "sameBrandSelected": "This is already the current product brand",
+            "successMessage": "Product brand updated successfully!",
+            "errorMessage": "Error updating product brand",
+            "loadError": "Error loading brands"
+          }
         }
       },
       "catalog": {
