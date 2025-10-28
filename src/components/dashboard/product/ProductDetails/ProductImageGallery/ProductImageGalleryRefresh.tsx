@@ -81,6 +81,7 @@ export function ProductImageGalleryRefresh({
       images={images}
       productName={productName}
       productId={productId}
+      fallbackImage={fallbackImage}
       onImageUploadSuccess={isRefreshing ? undefined : handleImageUploadSuccess}
     />
   );

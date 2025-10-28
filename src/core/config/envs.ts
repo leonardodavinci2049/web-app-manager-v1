@@ -102,11 +102,11 @@ const envsSchema = z.object({
   EXTERNAL_API_ASSETS_URL: z
     .string()
     .url("EXTERNAL_API_ASSETS_URL must be a valid URL")
-    .default("http://localhost:5573/api"), // Next.js Application Base URL (for BetterAuth and internal references)
+    .default("http://localhost:5558/api"), // Next.js Application Base URL (for BetterAuth and internal references)
   NEXT_APP_BASE_URL: z
     .string()
     .url("NEXT_APP_BASE_URL must be a valid URL")
-    .default("http://localhost:5557"),
+    .default("http://localhost:5558"),
 });
 
 // Inferir o tipo automaticamente a partir do schema
@@ -181,7 +181,7 @@ if (typeof window === "undefined") {
     EXTERNAL_API_ASSETS_URL: "http://localhost:5573/api",
 
     // Next.js App URL - pode ser acessada no cliente se necessário
-    NEXT_APP_BASE_URL: "http://localhost:5557",
+    NEXT_APP_BASE_URL: "http://localhost:5558",
   };
 }
 

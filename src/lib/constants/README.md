@@ -77,12 +77,12 @@ As constantes de URL agora possuem nomenclatura melhorada e validação rigorosa
 
 ### EXTERNAL_API_BASE_URL (API Externa - NestJS)
 - **Em produção**: Lança erro se `EXTERNAL_API_BASE_URL` não estiver definida
-- **Em desenvolvimento**: Mostra warning e usa `http://localhost:5572/api` como fallback
+- **Em desenvolvimento**: Mostra warning e usa `http://localhost:5558/api` como fallback
 - **Uso**: Para requisições ao servidor NestJS (backend REST API)
 
 ### NEXT_APP_BASE_URL (Aplicação Next.js)
 - **Em produção**: Lança erro se `NEXT_APP_BASE_URL` não estiver definida  
-- **Em desenvolvimento**: Mostra warning e usa `http://localhost:5557` como fallback
+- **Em desenvolvimento**: Mostra warning e usa `http://localhost:5558` como fallback
 - **Uso**: Para BetterAuth, API Route Handlers (/api/*) e referências internas
 
 **Exemplo de uso correto:**
@@ -105,10 +105,10 @@ Adicionadas ao `.env.example`:
 
 ```bash
 # ===== API EXTERNA (Servidor NestJS) =====
-EXTERNAL_API_BASE_URL=http://localhost:5572/api
+EXTERNAL_API_BASE_URL=http://localhost:5558/api
 
 # ===== APLICAÇÃO NEXT.JS =====  
-NEXT_APP_BASE_URL=http://localhost:5557
+NEXT_APP_BASE_URL=http://localhost:5558
 
 # API Authentication Key
 API_KEY=your_api_key_here_minimum_32_characters_long_secret
