@@ -24,6 +24,7 @@ import type {
   FindProductsResponse,
   ProductDetail,
   ProductListItem,
+  ProductRelatedTaxonomy,
   StoredProcedureResponse,
   UpdateProductBrandRequest,
   UpdateProductCharacteristicsRequest,
@@ -840,6 +841,17 @@ export class ProductServiceApi extends BaseApiService {
     response: FindProductByIdResponse,
   ): ProductDetail | null {
     return response.data?.[0]?.[0] ?? null;
+  }
+
+  /**
+   * Extract related taxonomies/categories from API response
+   * @param response - API response
+   * @returns Related taxonomies array or empty array
+   */
+  static extractRelatedTaxonomies(
+    response: FindProductByIdResponse,
+  ): ProductRelatedTaxonomy[] {
+    return response.data?.[1] ?? [];
   }
 
   /**

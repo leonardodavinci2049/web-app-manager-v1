@@ -1,6 +1,9 @@
 import { Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import type { ProductDetail } from "@/services/api/product/types/product-types";
+import type {
+  ProductDetail,
+  ProductRelatedTaxonomy,
+} from "@/services/api/product/types/product-types";
 import { ProductCategoriesCard } from "./ProductCategoriesCard";
 import { ProductNameEditor } from "./ProductNameEditor";
 import { ProductPricingCard } from "./ProductPricingCard";
@@ -9,6 +12,7 @@ import { ProductStockCard } from "./tab-card-components/ProductStockCard";
 
 interface ProductInfoDisplayProps {
   product: ProductDetail;
+  relatedTaxonomies: ProductRelatedTaxonomy[];
   stockStatus: {
     label: string;
     variant: "default" | "destructive" | "secondary";
@@ -26,6 +30,7 @@ interface ProductInfoDisplayProps {
 
 export function ProductInfoDisplay({
   product,
+  relatedTaxonomies,
   stockStatus,
   retailPrice,
   wholesalePrice,
@@ -106,11 +111,7 @@ export function ProductInfoDisplay({
       />
 
       {/* Categories Card */}
-      <ProductCategoriesCard
-        familyId={product.ID_FAMILIA}
-        groupId={product.ID_GRUPO}
-        subgroupId={product.ID_SUBGRUPO}
-      />
+      <ProductCategoriesCard relatedTaxonomies={relatedTaxonomies} />
 
       {/* Short Description Editor - Inline editing for sales description */}
       <ShortDescriptionEditor

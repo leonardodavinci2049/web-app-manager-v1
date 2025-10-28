@@ -160,6 +160,19 @@ export interface ProductDetail {
 }
 
 /**
+ * Product related taxonomy/category structure
+ * Returned in the second array of findProductById response
+ */
+export interface ProductRelatedTaxonomy {
+  ID_TAXONOMY: number;
+  PARENT_ID: number;
+  TAXONOMIA: string;
+  SLUG: string | null;
+  ORDEM: number;
+  LEVEL: number | null;
+}
+
+/**
  * Product list item data structure (ENDPOINT 2)
  */
 export interface ProductListItem {
@@ -409,9 +422,18 @@ export interface UpdateProductImagePathRequest extends BaseProductRequest {
 
 /**
  * Response for finding product by ID (ENDPOINT 1)
+ * data[0] = Product details array
+ * data[1] = Related taxonomies/categories array
+ * data[2] = Stored procedure response
+ * data[3] = MySQL metadata
  */
 export interface FindProductByIdResponse extends BaseProductResponse {
-  data: [ProductDetail[], MySQLMetadata];
+  data: [
+    ProductDetail[],
+    ProductRelatedTaxonomy[],
+    [StoredProcedureResponse],
+    MySQLMetadata,
+  ];
 }
 
 /**

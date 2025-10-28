@@ -1,56 +1,67 @@
+import { FolderTree } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import type { ProductRelatedTaxonomy } from "@/services/api/product/types/product-types";
 
 interface ProductCategoriesCardProps {
-  familyId: number;
-  groupId: number;
-  subgroupId: number;
+  relatedTaxonomies: ProductRelatedTaxonomy[];
 }
 
 /**
  * ProductCategoriesCard Component
  *
- * Displays product taxonomy information (family, group, subgroup IDs).
+ * Displays product related categories in a table format.
  * Shows a message when no categories are defined.
  */
 export function ProductCategoriesCard({
-  familyId,
-  groupId,
-  subgroupId,
+  relatedTaxonomies,
 }: ProductCategoriesCardProps) {
-  const hasCategories = familyId > 0 || groupId > 0 || subgroupId > 0;
+  const hasTaxonomies = relatedTaxonomies.length > 0;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Categorias</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <FolderTree className="h-5 w-5" />
+          Categorias Relacionadas
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="grid gap-2">
-          {familyId > 0 && (
-            <div className="flex justify-between py-1">
-              <span className="text-muted-foreground">Família ID:</span>
-              <span>{familyId}</span>
-            </div>
-          )}
-
-          {groupId > 0 && (
-            <div className="flex justify-between py-1">
-              <span className="text-muted-foreground">Grupo ID:</span>
-              <span>{groupId}</span>
-            </div>
-          )}
-
-          {subgroupId > 0 && (
-            <div className="flex justify-between py-1">
-              <span className="text-muted-foreground">Subgrupo ID:</span>
-              <span>{subgroupId}</span>
-            </div>
-          )}
-        </div>
-
-        {!hasCategories && (
+      <CardContent>
+        {hasTaxonomies ? (
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[80px]">ID</TableHead>
+                  <TableHead>Nome da Categoria</TableHead>
+                  <TableHead className="w-[80px] text-center">Nível</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {relatedTaxonomies.map((taxonomy) => (
+                  <TableRow key={taxonomy.ID_TAXONOMY}>
+                    <TableCell className="font-medium">
+                      {taxonomy.ID_TAXONOMY}
+                    </TableCell>
+                    <TableCell>{taxonomy.TAXONOMIA}</TableCell>
+                    <TableCell className="text-center">
+                      {taxonomy.LEVEL ?? "-"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        ) : (
           <p className="text-muted-foreground italic text-sm">
-            Nenhuma categoria definida
+            Nenhuma categoria relacionada
           </p>
         )}
       </CardContent>

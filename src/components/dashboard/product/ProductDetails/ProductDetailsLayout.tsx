@@ -3,7 +3,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 // Server Component - não usar hooks de cliente
-import type { ProductDetail } from "@/services/api/product/types/product-types";
+import type {
+  ProductDetail,
+  ProductRelatedTaxonomy,
+} from "@/services/api/product/types/product-types";
 import { formatCurrency } from "@/utils/common-utils";
 import { ProductDetailsTabs } from "./ProductDetailsTabs";
 import { ProductImageGalleryServer } from "./ProductImageGallery/ProductImageGalleryServer";
@@ -12,11 +15,13 @@ import { ProductInfoDisplay } from "./ProductInfoDisplay";
 interface ProductDetailsLayoutProps {
   product: ProductDetail;
   productId: number;
+  relatedTaxonomies: ProductRelatedTaxonomy[];
 }
 
 export function ProductDetailsLayout({
   product,
   productId,
+  relatedTaxonomies,
 }: ProductDetailsLayoutProps) {
   // Helper function to validate and get product image URL
   const getProductImageUrl = (): string => {
@@ -142,6 +147,7 @@ export function ProductDetailsLayout({
         {/* Right Column - Product Info (Server Component) */}
         <ProductInfoDisplay
           product={product}
+          relatedTaxonomies={relatedTaxonomies}
           stockStatus={stockStatus}
           retailPrice={retailPrice}
           wholesalePrice={wholesalePrice}
