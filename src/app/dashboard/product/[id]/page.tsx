@@ -8,7 +8,10 @@ import {
 } from "@/components/dashboard/product/ProductDetails/ProductDetailsLayout";
 import { createLogger } from "@/lib/logger";
 import { ProductServiceApi } from "@/services/api/product/product-service-api";
-import type { ProductDetail } from "@/services/api/product/types/product-types";
+import type {
+  ProductDetail,
+  ProductRelatedTaxonomy,
+} from "@/services/api/product/types/product-types";
 
 const logger = createLogger("ProductDetailsPageV2");
 
@@ -27,6 +30,7 @@ interface ProductDetailsPageProps {
 // Server Component - Fetch data directly
 async function ProductDetailsPageContent({ productId }: { productId: number }) {
   let product: ProductDetail | null = null;
+  let relatedTaxonomies: ProductRelatedTaxonomy[] = [];
   let hasError = false;
 
   try {
@@ -43,6 +47,8 @@ async function ProductDetailsPageContent({ productId }: { productId: number }) {
       logger.error("Invalid product detail response:", response);
     } else {
       product = ProductServiceApi.extractProductDetail(response);
+      relatedTaxonomies = ProductServiceApi.extractRelatedTaxonomies(response);
+
       if (!product) {
         hasError = true;
         logger.error("Product not found in response:", response);
@@ -65,7 +71,11 @@ async function ProductDetailsPageContent({ productId }: { productId: number }) {
         <div className="flex flex-col gap-6 py-6">
           <div className="px-4 lg:px-6">
             {/* New Modern Product Details Layout */}
-            <ProductDetailsLayout product={product} productId={productId} />
+            <ProductDetailsLayout
+              product={product}
+              productId={productId}
+              relatedTaxonomies={relatedTaxonomies}
+            />
           </div>
         </div>
       </div>

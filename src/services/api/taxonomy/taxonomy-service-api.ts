@@ -488,20 +488,20 @@ export class TaxonomyServiceApi extends BaseApiService {
 
   /**
    * Endpoint 09 - Deleta relacionamento entre taxonomia e produto
-   * @param params - Parâmetros com IDs de taxonomia e produto
+   * @param params - Parâmetros com IDs de taxonomia e produto (pe_id_record)
    * @returns Promise com resposta da exclusão do relacionamento
    */
   static async deleteTaxonomyRel(
     params: Partial<DeleteTaxonomyRelRequest> & {
       pe_id_taxonomy: number;
-      pe_id_produto: number;
+      pe_id_record: number;
     },
   ): Promise<DeleteTaxonomyRelResponse> {
     try {
       // Validar parâmetros
       const validatedParams = DeleteTaxonomyRelSchema.parse({
         pe_id_taxonomy: params.pe_id_taxonomy,
-        pe_id_produto: params.pe_id_produto,
+        pe_id_record: params.pe_id_record,
       });
 
       const instance = new TaxonomyServiceApi();

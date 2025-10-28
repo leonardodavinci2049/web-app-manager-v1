@@ -1,7 +1,10 @@
 import { Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { ProductDetail } from "@/services/api/product/types/product-types";
+import type {
+  ProductDetail,
+  ProductRelatedTaxonomy,
+} from "@/services/api/product/types/product-types";
+import { ProductCategoriesCard } from "./ProductCategoriesCard";
 import { ProductNameEditor } from "./ProductNameEditor";
 import { ProductPricingCard } from "./ProductPricingCard";
 import { ShortDescriptionEditor } from "./ShortDescriptionEditor";
@@ -9,6 +12,7 @@ import { ProductStockCard } from "./tab-card-components/ProductStockCard";
 
 interface ProductInfoDisplayProps {
   product: ProductDetail;
+  relatedTaxonomies: ProductRelatedTaxonomy[];
   stockStatus: {
     label: string;
     variant: "default" | "destructive" | "secondary";
@@ -26,6 +30,7 @@ interface ProductInfoDisplayProps {
 
 export function ProductInfoDisplay({
   product,
+  relatedTaxonomies,
   stockStatus,
   retailPrice,
   wholesalePrice,
@@ -105,46 +110,11 @@ export function ProductInfoDisplay({
         stockStatus={stockStatus}
       />
 
-      {/* Card 1 - Categorias */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Categorias</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid gap-2">
-            {product.ID_FAMILIA > 0 && (
-              <div className="flex justify-between py-1">
-                <span className="text-muted-foreground">Família ID:</span>
-                <span>{product.ID_FAMILIA}</span>
-              </div>
-            )}
-
-            {product.ID_GRUPO > 0 && (
-              <div className="flex justify-between py-1">
-                <span className="text-muted-foreground">Grupo ID:</span>
-                <span>{product.ID_GRUPO}</span>
-              </div>
-            )}
-
-            {product.ID_SUBGRUPO > 0 && (
-              <div className="flex justify-between py-1">
-                <span className="text-muted-foreground">Subgrupo ID:</span>
-                <span>{product.ID_SUBGRUPO}</span>
-              </div>
-            )}
-          </div>
-
-          {!(
-            product.ID_FAMILIA > 0 ||
-            product.ID_GRUPO > 0 ||
-            product.ID_SUBGRUPO > 0
-          ) && (
-            <p className="text-muted-foreground italic text-sm">
-              Nenhuma categoria definida
-            </p>
-          )}
-        </CardContent>
-      </Card>
+      {/* Categories Card */}
+      <ProductCategoriesCard
+        relatedTaxonomies={relatedTaxonomies}
+        productId={product.ID_PRODUTO}
+      />
 
       {/* Short Description Editor - Inline editing for sales description */}
       <ShortDescriptionEditor
