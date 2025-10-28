@@ -505,3 +505,74 @@ export async function updateProductType(
     };
   }
 }
+
+/**
+ * Server Action: Update product brand
+ * @param productId - Product ID to update
+ * @param brandId - New brand ID
+ * @returns Success status and error message if any
+ */
+export async function updateProductBrand(
+  productId: number,
+  brandId: number,
+): Promise<{
+  success: boolean;
+  message?: string;
+  error?: string;
+}> {
+  try {
+    // Validate inputs
+    if (!productId || productId <= 0) {
+      return {
+        success: false,
+        error: "ID do produto inválido",
+      };
+    }
+
+    if (!brandId || brandId <= 0) {
+      return {
+        success: false,
+        error: "ID da marca inválido",
+      };
+    }
+
+    // Call API service
+    const response = await ProductServiceApi.updateProductBrand({
+      pe_id_produto: productId,
+      pe_id_marca: brandId,
+    });
+
+    // Check if operation was successful
+    if (!ProductServiceApi.isOperationSuccessful(response)) {
+      const spResponse =
+        ProductServiceApi.extractStoredProcedureResponse(response);
+      const errorMessage =
+        spResponse?.sp_message || "Erro ao atualizar marca do produto";
+
+      return {
+        success: false,
+        error: errorMessage,
+      };
+    }
+
+    const spResponse =
+      ProductServiceApi.extractStoredProcedureResponse(response);
+
+    return {
+      success: true,
+      message: spResponse?.sp_message || "Marca atualizada com sucesso",
+    };
+  } catch (error) {
+    logger.error("Error updating product brand:", error);
+
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Erro desconhecido ao atualizar marca";
+
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}

@@ -347,6 +347,20 @@
             "errorMessage": "Erro ao atualizar tipo do produto",
             "loadError": "Erro ao carregar tipos"
           }
+        },
+        "brand": {
+          "changeButton": "Alterar",
+          "changeDialog": {
+            "title": "Alterar Marca do Produto",
+            "description": "Marca atual: {{currentBrand}}. Selecione uma nova marca para o produto",
+            "searchPlaceholder": "Pesquisar marcas...",
+            "noResults": "Nenhuma marca encontrada",
+            "currentBrand": "Marca atual",
+            "sameBrandSelected": "Esta já é a marca atual do produto",
+            "successMessage": "Marca do produto atualizada com sucesso!",
+            "errorMessage": "Erro ao atualizar marca do produto",
+            "loadError": "Erro ao carregar marcas"
+          }
         }
       },
       "filters": {
