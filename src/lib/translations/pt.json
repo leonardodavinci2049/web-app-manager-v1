@@ -333,6 +333,20 @@
             "noResults": "Nenhuma categoria encontrada",
             "level": "Nível"
           }
+        },
+        "type": {
+          "changeButton": "Alterar",
+          "changeDialog": {
+            "title": "Alterar Tipo do Produto",
+            "description": "Tipo atual: {{currentType}}. Selecione um novo tipo para o produto",
+            "searchPlaceholder": "Pesquisar tipos...",
+            "noResults": "Nenhum tipo encontrado",
+            "currentType": "Tipo atual",
+            "sameTypeSelected": "Este já é o tipo atual do produto",
+            "successMessage": "Tipo do produto atualizado com sucesso!",
+            "errorMessage": "Erro ao atualizar tipo do produto",
+            "loadError": "Erro ao carregar tipos"
+          }
         }
       },
       "filters": {

@@ -1,16 +1,18 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ProductDetail } from "@/services/api/product/types/product-types";
+import { ChangeProductTypeDialog } from "../ChangeProductTypeDialog";
 import { ProductFlagsCard } from "./ProductFlagsCard";
 
 interface ProductTechnicalDataCardProps {
   product: ProductDetail;
   productId: number;
+  onDataChange?: () => void;
 }
 
 export function ProductTechnicalDataCard({
   product,
   productId,
+  onDataChange,
 }: ProductTechnicalDataCardProps) {
   return (
     <div className="space-y-4">
@@ -41,9 +43,12 @@ export function ProductTechnicalDataCard({
                     <td className="py-2 px-2 text-sm">{product.ID_TIPO}</td>
                     <td className="py-2 px-2 text-sm">{product.TIPO}</td>
                     <td className="py-2 px-2">
-                      <Button variant="outline" size="sm">
-                        Alterar
-                      </Button>
+                      <ChangeProductTypeDialog
+                        productId={productId}
+                        currentTypeId={product.ID_TIPO}
+                        currentTypeName={product.TIPO}
+                        onSuccess={onDataChange}
+                      />
                     </td>
                   </tr>
                 </tbody>

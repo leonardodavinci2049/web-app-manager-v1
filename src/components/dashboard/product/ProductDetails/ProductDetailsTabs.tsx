@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ProductDetail } from "@/services/api/product/types/product-types";
 import { ProductCharacteristicsCard } from "./ProductCharacteristicsCard";
@@ -16,6 +19,13 @@ export function ProductDetailsTabs({
   product,
   productId,
 }: ProductDetailsTabsProps) {
+  const router = useRouter();
+
+  // Refresh data after successful updates
+  const handleDataChange = () => {
+    router.refresh();
+  };
+
   return (
     <Tabs defaultValue="description" className="w-full">
       <TabsList className="w-full justify-start overflow-x-auto">
@@ -88,7 +98,11 @@ export function ProductDetailsTabs({
       </TabsContent>
 
       <TabsContent value="technical" className="space-y-4">
-        <ProductTechnicalDataCard product={product} productId={productId} />
+        <ProductTechnicalDataCard
+          product={product}
+          productId={productId}
+          onDataChange={handleDataChange}
+        />
       </TabsContent>
 
       <TabsContent value="metadata" className="space-y-4">
