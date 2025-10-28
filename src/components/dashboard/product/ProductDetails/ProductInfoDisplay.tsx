@@ -111,7 +111,10 @@ export function ProductInfoDisplay({
       />
 
       {/* Categories Card */}
-      <ProductCategoriesCard relatedTaxonomies={relatedTaxonomies} />
+      <ProductCategoriesCard
+        relatedTaxonomies={relatedTaxonomies}
+        productId={product.ID_PRODUTO}
+      />
 
       {/* Short Description Editor - Inline editing for sales description */}
       <ShortDescriptionEditor

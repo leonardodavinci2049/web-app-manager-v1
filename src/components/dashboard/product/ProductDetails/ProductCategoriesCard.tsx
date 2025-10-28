@@ -9,9 +9,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { ProductRelatedTaxonomy } from "@/services/api/product/types/product-types";
+import { DeleteCategoryButton } from "./DeleteCategoryButton";
 
 interface ProductCategoriesCardProps {
   relatedTaxonomies: ProductRelatedTaxonomy[];
+  productId: number;
 }
 
 /**
@@ -19,9 +21,11 @@ interface ProductCategoriesCardProps {
  *
  * Displays product related categories in a table format.
  * Shows a message when no categories are defined.
+ * Allows deleting category relationships.
  */
 export function ProductCategoriesCard({
   relatedTaxonomies,
+  productId,
 }: ProductCategoriesCardProps) {
   const hasTaxonomies = relatedTaxonomies.length > 0;
 
@@ -42,6 +46,7 @@ export function ProductCategoriesCard({
                   <TableHead className="w-[80px]">ID</TableHead>
                   <TableHead>Nome da Categoria</TableHead>
                   <TableHead className="w-[80px] text-center">Nível</TableHead>
+                  <TableHead className="w-[80px] text-center">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -53,6 +58,13 @@ export function ProductCategoriesCard({
                     <TableCell>{taxonomy.TAXONOMIA}</TableCell>
                     <TableCell className="text-center">
                       {taxonomy.LEVEL ?? "-"}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <DeleteCategoryButton
+                        taxonomyId={taxonomy.ID_TAXONOMY}
+                        taxonomyName={taxonomy.TAXONOMIA}
+                        productId={productId}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}
