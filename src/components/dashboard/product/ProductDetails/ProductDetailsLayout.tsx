@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { ProductDetail } from "@/services/api/product/types/product-types";
 import { formatCurrency } from "@/utils/common-utils";
 import { ProductDetailsTabs } from "./ProductDetailsTabs";
-import { ProductImageGalleryServer } from "./ProductImageGalleryServer";
+import { ProductImageGalleryServer } from "./ProductImageGallery/ProductImageGalleryServer";
 import { ProductInfoDisplay } from "./ProductInfoDisplay";
 
 interface ProductDetailsLayoutProps {

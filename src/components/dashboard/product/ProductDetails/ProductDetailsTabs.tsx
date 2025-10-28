@@ -1,34 +1,11 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ProductDetail } from "@/services/api/product/types/product-types";
 import { ProductCharacteristicsCard } from "./ProductCharacteristicsCard";
 import { ProductDescriptionEditor } from "./ProductDescriptionEditor";
-import { ProductFlagsCard } from "./ProductFlagsCard";
 import { ProductGeneralDataCard } from "./ProductGeneralDataCard";
-import { ProductTaxValuesCard } from "./ProductTaxValuesCard";
-
-// Helper function to format date
-function formatDate(dateString: string): string {
-  if (!dateString) return "—";
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("pt-BR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return dateString;
-  }
-}
+import { ProductMetadataCard } from "./tab-card-components/ProductMetadataCard";
+import { ProductTaxValuesCard } from "./tab-card-components/ProductTaxValuesCard";
+import { ProductTechnicalDataCard } from "./tab-card-components/ProductTechnicalDataCard";
 
 interface ProductDetailsTabsProps {
   product: ProductDetail;
@@ -111,66 +88,17 @@ export function ProductDetailsTabs({
       </TabsContent>
 
       <TabsContent value="technical" className="space-y-4">
-        {/* Card 1 - Flags */}
-        <ProductFlagsCard
-          productId={productId}
-          controleFisico={product.FLAG_CONTROLE_FISICO}
-          controlarEstoque={product.CONTROLAR_ESTOQUE}
-          consignado={product.CONSIGNADO}
-          destaque={product.DESTAQUE}
-          promocao={product.PROMOCAO}
-          servico={product.FLAG_SERVICO}
-          websiteOff={product.FLAG_WEBSITE_OFF}
-          inativo={product.INATIVO}
-          importado={product.IMPORTADO}
-        />
+        <ProductTechnicalDataCard product={product} productId={productId} />
       </TabsContent>
 
       <TabsContent value="metadata" className="space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Metadados</CardTitle>
-            <CardDescription>
-              Informações de registro e atualização do produto
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-3">
-              <div className="flex justify-between py-2 border-b">
-                <span className="font-medium">Data de Criação:</span>
-                <span>{formatDate(product.DATADOCADASTRO)}</span>
-              </div>
-
-              <div className="flex justify-between py-2 border-b">
-                <span className="font-medium">Última Atualização:</span>
-                <span>
-                  {formatDate(product.DT_UPDATE || product.DATADOCADASTRO)}
-                </span>
-              </div>
-
-              {product.SLUG && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">Slug:</span>
-                  <span className="font-mono text-sm">{product.SLUG}</span>
-                </div>
-              )}
-
-              {product.META_TITLE && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">Meta Title:</span>
-                  <span className="text-sm">{product.META_TITLE}</span>
-                </div>
-              )}
-
-              {product.META_DESCRIPTION && (
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">Meta Description:</span>
-                  <span className="text-sm">{product.META_DESCRIPTION}</span>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <ProductMetadataCard
+          metaTitle={product.META_TITLE}
+          metaDescription={product.META_DESCRIPTION}
+          createdAt={product.DATADOCADASTRO}
+          updatedAt={product.DATADOCADASTRO}
+          slug={product.SLUG}
+        />
       </TabsContent>
     </Tabs>
   );

@@ -39,7 +39,8 @@ export async function ProductImageGalleryServer({
       logger.warn(
         `Failed to fetch gallery for product ${productId}: ${galleryResponse.message}`,
       );
-      // Use fallback image on error with refresh wrapper
+
+      // Use fallback image (from PATH_IMAGEM) on error with refresh wrapper
       return (
         <ProductImageGalleryRefresh
           productId={productId}
@@ -84,16 +85,15 @@ export async function ProductImageGalleryServer({
 
     // Apply fallback if gallery is empty
     if (galleryImages.length === 0) {
+      // Use fallback image from PATH_IMAGEM when gallery is empty
       return (
         <ProductImageGalleryRefresh
           productId={productId}
           productName={productName}
           fallbackImage={fallbackImage}
-          initialImages={
-            fallbackImage
-              ? [{ id: "fallback", url: fallbackImage, isPrimary: true }]
-              : []
-          }
+          initialImages={[
+            { id: "fallback", url: fallbackImage, isPrimary: true },
+          ]}
         />
       );
     }
@@ -111,6 +111,7 @@ export async function ProductImageGalleryServer({
       `Unexpected error fetching gallery for product ${productId}:`,
       error,
     );
+
     // Use fallback image on unexpected error with refresh wrapper
     return (
       <ProductImageGalleryRefresh

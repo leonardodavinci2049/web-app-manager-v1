@@ -44,9 +44,9 @@ export function ProductTaxValuesCard({
     cfop: cfop || "",
     cst: cst || "",
     ean: ean || "",
-    ncm: ncm.toString(),
+    ncm: (ncm ?? 0).toString(),
     nbm: nbm || "",
-    ppb: ppb.toString(),
+    ppb: (ppb ?? 0).toString(),
     temp: temp || "",
   });
 
@@ -60,9 +60,9 @@ export function ProductTaxValuesCard({
       cfop: cfop || "",
       cst: cst || "",
       ean: ean || "",
-      ncm: ncm.toString(),
+      ncm: (ncm ?? 0).toString(),
       nbm: nbm || "",
-      ppb: ppb.toString(),
+      ppb: (ppb ?? 0).toString(),
       temp: temp || "",
     });
     setIsEditing(false);

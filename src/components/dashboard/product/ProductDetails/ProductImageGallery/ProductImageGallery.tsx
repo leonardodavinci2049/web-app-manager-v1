@@ -4,7 +4,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Crown,
-  ImageIcon,
   Plus,
   X,
   ZoomIn,
@@ -48,6 +47,7 @@ interface ProductImageGalleryProps {
   images: GalleryImageWithId[];
   productName: string;
   productId: number;
+  fallbackImage?: string; // Fallback image URL (from PATH_IMAGEM)
   onImageUploadSuccess?: () => void | Promise<void>;
 }
 
@@ -55,12 +55,16 @@ export function ProductImageGallery({
   images,
   productName,
   productId,
+  fallbackImage,
   onImageUploadSuccess,
 }: ProductImageGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
   const [zoomedImageIndex, setZoomedImageIndex] = useState(0);
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
+  const [fallbackAttempted, setFallbackAttempted] = useState<Set<number>>(
+    new Set(),
+  );
   const [isUploading, setIsUploading] = useState(false);
   const [deleteImageIndex, setDeleteImageIndex] = useState<number | null>(null);
   const [setPrimaryImageIndex, setSetPrimaryImageIndex] = useState<
@@ -68,10 +72,53 @@ export function ProductImageGallery({
   >(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
-  // Handle image loading errors
-  const handleImageError = useCallback((index: number) => {
-    setImageErrors((prev) => new Set(prev).add(index));
-  }, []);
+  // Get the image URL with fallback logic
+  const getImageUrl = useCallback(
+    (index: number): string => {
+      const currentImage = images[index];
+
+      // If no image at this index, use fallback or default
+      if (!currentImage) {
+        return fallbackImage || "/images/product/no-image.jpeg";
+      }
+
+      // If this is already a fallback image (id = "fallback"), return as-is
+      if (currentImage.id === "fallback") {
+        return currentImage.url;
+      }
+
+      // If gallery image has error and we have PATH_IMAGEM fallback and haven't tried it yet
+      if (
+        imageErrors.has(index) &&
+        fallbackImage &&
+        !fallbackAttempted.has(index)
+      ) {
+        return fallbackImage;
+      }
+
+      // If both gallery and fallback failed, use default image
+      if (imageErrors.has(index) && fallbackAttempted.has(index)) {
+        return "/images/product/no-image.jpeg";
+      }
+
+      // Use original gallery image URL
+      return currentImage.url;
+    },
+    [images, imageErrors, fallbackImage, fallbackAttempted],
+  );
+
+  // Handle image loading errors with fallback logic
+  const handleImageError = useCallback(
+    (index: number) => {
+      setImageErrors((prev) => new Set(prev).add(index));
+
+      // If we have a PATH_IMAGEM fallback and haven't tried it yet, mark as attempted
+      if (fallbackImage && !fallbackAttempted.has(index)) {
+        setFallbackAttempted((prev) => new Set(prev).add(index));
+      }
+    },
+    [fallbackImage, fallbackAttempted],
+  );
 
   // Handle image upload via drag & drop or file input
   const handleImageUpload = useCallback(
@@ -311,16 +358,21 @@ export function ProductImageGallery({
       <Card className="overflow-hidden">
         <CardContent className="p-0">
           <div className="relative aspect-square bg-muted group">
-            {!imageErrors.has(selectedImageIndex) ? (
+            {!imageErrors.has(selectedImageIndex) ||
+            (fallbackImage && !fallbackAttempted.has(selectedImageIndex)) ? (
               <>
                 <Image
-                  src={images[selectedImageIndex]?.url || ""}
+                  src={getImageUrl(selectedImageIndex)}
                   alt={`${productName} - Imagem principal`}
                   fill
                   className="object-cover transition-transform duration-300"
                   priority
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   onError={() => handleImageError(selectedImageIndex)}
+                  unoptimized={
+                    getImageUrl(selectedImageIndex).startsWith("http://") ||
+                    getImageUrl(selectedImageIndex).startsWith("https://")
+                  }
                 />
 
                 {/* Zoom button - appears on hover */}
@@ -342,10 +394,13 @@ export function ProductImageGallery({
               </>
             ) : (
               <div className="flex h-full items-center justify-center">
-                <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                  <ImageIcon className="h-12 w-12" />
-                  <p className="text-sm">Imagem não disponível</p>
-                </div>
+                <Image
+                  src="/images/product/no-image.jpeg"
+                  alt="Imagem não disponível"
+                  fill
+                  className="object-cover opacity-50"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
               </div>
             )}
           </div>
@@ -366,15 +421,20 @@ export function ProductImageGallery({
           >
             <CardContent className="p-0 relative">
               <div className="relative aspect-square bg-muted">
-                {!imageErrors.has(index) ? (
+                {!imageErrors.has(index) ||
+                (fallbackImage && !fallbackAttempted.has(index)) ? (
                   <>
                     <Image
-                      src={image.url}
+                      src={getImageUrl(index)}
                       alt={`${productName} - ${index + 1}`}
                       fill
                       className="object-cover"
                       sizes="100px"
                       onError={() => handleImageError(index)}
+                      unoptimized={
+                        getImageUrl(index).startsWith("http://") ||
+                        getImageUrl(index).startsWith("https://")
+                      }
                     />
 
                     {/* Primary indicator badge - positioned at top left with higher z-index */}
@@ -428,9 +488,13 @@ export function ProductImageGallery({
                     )}
                   </>
                 ) : (
-                  <div className="flex h-full items-center justify-center">
-                    <ImageIcon className="h-6 w-6 text-muted-foreground" />
-                  </div>
+                  <Image
+                    src="/images/product/no-image.jpeg"
+                    alt="Imagem não disponível"
+                    fill
+                    className="object-cover opacity-50"
+                    sizes="100px"
+                  />
                 )}
               </div>
             </CardContent>
@@ -492,21 +556,30 @@ export function ProductImageGallery({
           </DialogHeader>
 
           <div className="relative flex-1 bg-black">
-            {!imageErrors.has(zoomedImageIndex) ? (
+            {!imageErrors.has(zoomedImageIndex) ||
+            (fallbackImage && !fallbackAttempted.has(zoomedImageIndex)) ? (
               <Image
-                src={images[zoomedImageIndex]?.url || ""}
+                src={getImageUrl(zoomedImageIndex)}
                 alt={`${productName} - Ampliada`}
                 fill
                 className="object-contain"
                 priority
                 sizes="(max-width: 1200px) 100vw, 80vw"
+                onError={() => handleImageError(zoomedImageIndex)}
+                unoptimized={
+                  getImageUrl(zoomedImageIndex).startsWith("http://") ||
+                  getImageUrl(zoomedImageIndex).startsWith("https://")
+                }
               />
             ) : (
               <div className="flex h-full items-center justify-center">
-                <div className="flex flex-col items-center gap-2 text-white">
-                  <ImageIcon className="h-16 w-16" />
-                  <p>Imagem não disponível</p>
-                </div>
+                <Image
+                  src="/images/product/no-image.jpeg"
+                  alt="Imagem não disponível"
+                  fill
+                  className="object-contain opacity-50"
+                  sizes="(max-width: 1200px) 100vw, 80vw"
+                />
               </div>
             )}
 

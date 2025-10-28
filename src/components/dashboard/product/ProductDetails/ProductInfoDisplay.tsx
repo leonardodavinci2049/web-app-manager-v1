@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ProductDetail } from "@/services/api/product/types/product-types";
 import { ProductNameEditor } from "./ProductNameEditor";
 import { ProductPricingCard } from "./ProductPricingCard";
-import { ProductStockCard } from "./ProductStockCard";
 import { ShortDescriptionEditor } from "./ShortDescriptionEditor";
+import { ProductStockCard } from "./tab-card-components/ProductStockCard";
 
 interface ProductInfoDisplayProps {
   product: ProductDetail;
@@ -105,27 +105,13 @@ export function ProductInfoDisplay({
         stockStatus={stockStatus}
       />
 
-      {/* Product Categories/Classification */}
+      {/* Card 1 - Categorias */}
       <Card>
         <CardHeader>
-          <CardTitle>Classificação</CardTitle>
+          <CardTitle>Categorias</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid gap-2">
-            {product.ID_TIPO > 0 && (
-              <div className="flex justify-between py-1">
-                <span className="text-muted-foreground">Tipo ID:</span>
-                <span>{product.ID_TIPO}</span>
-              </div>
-            )}
-
-            {product.ID_MARCA > 0 && (
-              <div className="flex justify-between py-1">
-                <span className="text-muted-foreground">Marca ID:</span>
-                <span>{product.ID_MARCA}</span>
-              </div>
-            )}
-
             {product.ID_FAMILIA > 0 && (
               <div className="flex justify-between py-1">
                 <span className="text-muted-foreground">Família ID:</span>
@@ -146,25 +132,15 @@ export function ProductInfoDisplay({
                 <span>{product.ID_SUBGRUPO}</span>
               </div>
             )}
-
-            {product.ID_FORNECEDOR && product.ID_FORNECEDOR > 0 && (
-              <div className="flex justify-between py-1">
-                <span className="text-muted-foreground">Fornecedor ID:</span>
-                <span>{product.ID_FORNECEDOR}</span>
-              </div>
-            )}
           </div>
 
           {!(
-            product.ID_TIPO > 0 ||
-            product.ID_MARCA > 0 ||
             product.ID_FAMILIA > 0 ||
             product.ID_GRUPO > 0 ||
-            product.ID_SUBGRUPO > 0 ||
-            (product.ID_FORNECEDOR && product.ID_FORNECEDOR > 0)
+            product.ID_SUBGRUPO > 0
           ) && (
             <p className="text-muted-foreground italic text-sm">
-              Nenhuma classificação definida
+              Nenhuma categoria definida
             </p>
           )}
         </CardContent>

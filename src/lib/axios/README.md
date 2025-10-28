@@ -174,10 +174,10 @@ export const productService = new ProductService();
 API_KEY=your-secret-api-key
 
 # ===== API EXTERNA (Servidor NestJS) =====
-EXTERNAL_API_BASE_URL=http://localhost:5572/api
+EXTERNAL_API_BASE_URL=http://localhost:5558/api
 
 # ===== APLICAÇÃO NEXT.JS =====
-NEXT_APP_BASE_URL=http://localhost:5557
+NEXT_APP_BASE_URL=http://localhost:5558
 
 # ❌ NÃO usar NEXT_PUBLIC_API_KEY
 # NEXT_PUBLIC_* é exposto no cliente
