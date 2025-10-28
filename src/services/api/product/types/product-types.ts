@@ -115,6 +115,7 @@ export interface ProductDetail {
   DESCRICAO_TAB: string;
   ID_FORNECEDOR?: number; // Optional - may not be returned by API
   ID_TIPO: number;
+  TIPO: string; // Product type name
   ID_MARCA: number;
   ID_FAMILIA: number;
   ID_GRUPO: number;
