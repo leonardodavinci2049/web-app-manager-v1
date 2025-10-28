@@ -31,19 +31,57 @@ export function ProductPricingCard({
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // State for each price field
+  // State for each price field (stored as Brazilian format string with comma)
   const [tempRetailPrice, setTempRetailPrice] = useState(
-    retailPriceRaw.toString(),
+    retailPriceRaw.toString().replace(".", ","),
   );
   const [tempWholesalePrice, setTempWholesalePrice] = useState(
-    wholesalePriceRaw.toString(),
+    wholesalePriceRaw.toString().replace(".", ","),
   );
   const [tempCorporatePrice, setTempCorporatePrice] = useState(
-    corporatePriceRaw.toString(),
+    corporatePriceRaw.toString().replace(".", ","),
   );
 
   // Validation constants
   const MIN_PRICE = 0.1;
+
+  /**
+   * Convert Brazilian format (comma) to API format (dot)
+   * Example: "1.234,5678" -> 1234.5678
+   */
+  const brazilianToNumber = (value: string): number => {
+    // Remove dots (thousand separators) and replace comma with dot
+    const normalized = value.replace(/\./g, "").replace(",", ".");
+    return Number.parseFloat(normalized);
+  };
+
+  /**
+   * Format input value to Brazilian monetary format
+   * Allows comma as decimal separator and up to 4 decimal places
+   */
+  const formatBrazilianInput = (value: string): string => {
+    // Remove any character that is not a digit or comma
+    let cleaned = value.replace(/[^\d,]/g, "");
+
+    // Only allow one comma
+    const commaCount = (cleaned.match(/,/g) || []).length;
+    if (commaCount > 1) {
+      const firstCommaIndex = cleaned.indexOf(",");
+      cleaned =
+        cleaned.substring(0, firstCommaIndex + 1) +
+        cleaned.substring(firstCommaIndex + 1).replace(/,/g, "");
+    }
+
+    // Limit to 4 decimal places after comma
+    if (cleaned.includes(",")) {
+      const [integer, decimal] = cleaned.split(",");
+      cleaned = decimal
+        ? `${integer},${decimal.substring(0, 4)}`
+        : `${integer},`;
+    }
+
+    return cleaned;
+  };
 
   // Don't render if no prices are available
   if (!retailPrice && !wholesalePrice && !corporatePrice) {
@@ -51,23 +89,23 @@ export function ProductPricingCard({
   }
 
   const handleEdit = () => {
-    setTempRetailPrice(retailPriceRaw.toString());
-    setTempWholesalePrice(wholesalePriceRaw.toString());
-    setTempCorporatePrice(corporatePriceRaw.toString());
+    setTempRetailPrice(retailPriceRaw.toString().replace(".", ","));
+    setTempWholesalePrice(wholesalePriceRaw.toString().replace(".", ","));
+    setTempCorporatePrice(corporatePriceRaw.toString().replace(".", ","));
     setIsEditing(true);
   };
 
   const handleCancel = () => {
-    setTempRetailPrice(retailPriceRaw.toString());
-    setTempWholesalePrice(wholesalePriceRaw.toString());
-    setTempCorporatePrice(corporatePriceRaw.toString());
+    setTempRetailPrice(retailPriceRaw.toString().replace(".", ","));
+    setTempWholesalePrice(wholesalePriceRaw.toString().replace(".", ","));
+    setTempCorporatePrice(corporatePriceRaw.toString().replace(".", ","));
     setIsEditing(false);
   };
 
   const validatePrices = (): { valid: boolean; error?: string } => {
-    const retail = Number.parseFloat(tempRetailPrice);
-    const wholesale = Number.parseFloat(tempWholesalePrice);
-    const corporate = Number.parseFloat(tempCorporatePrice);
+    const retail = brazilianToNumber(tempRetailPrice);
+    const wholesale = brazilianToNumber(tempWholesalePrice);
+    const corporate = brazilianToNumber(tempCorporatePrice);
 
     // Check if all values are valid numbers
     if (
@@ -85,7 +123,7 @@ export function ProductPricingCard({
     if (retail < MIN_PRICE || wholesale < MIN_PRICE || corporate < MIN_PRICE) {
       return {
         valid: false,
-        error: `Todos os preços devem ser maiores ou iguais a R$ ${MIN_PRICE.toFixed(2)}`,
+        error: `Todos os preços devem ser maiores ou iguais a R$ ${MIN_PRICE.toFixed(2).replace(".", ",")}`,
       };
     }
 
@@ -108,9 +146,10 @@ export function ProductPricingCard({
       return;
     }
 
-    const retail = Number.parseFloat(tempRetailPrice);
-    const wholesale = Number.parseFloat(tempWholesalePrice);
-    const corporate = Number.parseFloat(tempCorporatePrice);
+    // Convert Brazilian format to API format (number with dot)
+    const retail = brazilianToNumber(tempRetailPrice);
+    const wholesale = brazilianToNumber(tempWholesalePrice);
+    const corporate = brazilianToNumber(tempCorporatePrice);
 
     // Check if any price changed
     if (
@@ -184,14 +223,14 @@ export function ProductPricingCard({
               </Label>
               <Input
                 id="retail-price"
-                type="number"
-                step="0.01"
-                min={MIN_PRICE}
+                type="text"
                 value={tempRetailPrice}
-                onChange={(e) => setTempRetailPrice(e.target.value)}
+                onChange={(e) =>
+                  setTempRetailPrice(formatBrazilianInput(e.target.value))
+                }
                 disabled={isSaving}
                 className="font-mono"
-                placeholder="0.00"
+                placeholder="0,00"
               />
               <p className="text-xs text-muted-foreground">
                 Valor formatado: {formatCurrency(tempRetailPrice)}
@@ -205,14 +244,14 @@ export function ProductPricingCard({
               </Label>
               <Input
                 id="wholesale-price"
-                type="number"
-                step="0.01"
-                min={MIN_PRICE}
+                type="text"
                 value={tempWholesalePrice}
-                onChange={(e) => setTempWholesalePrice(e.target.value)}
+                onChange={(e) =>
+                  setTempWholesalePrice(formatBrazilianInput(e.target.value))
+                }
                 disabled={isSaving}
                 className="font-mono"
-                placeholder="0.00"
+                placeholder="0,00"
               />
               <p className="text-xs text-muted-foreground">
                 Valor formatado: {formatCurrency(tempWholesalePrice)}
@@ -226,14 +265,14 @@ export function ProductPricingCard({
               </Label>
               <Input
                 id="corporate-price"
-                type="number"
-                step="0.01"
-                min={MIN_PRICE}
+                type="text"
                 value={tempCorporatePrice}
-                onChange={(e) => setTempCorporatePrice(e.target.value)}
+                onChange={(e) =>
+                  setTempCorporatePrice(formatBrazilianInput(e.target.value))
+                }
                 disabled={isSaving}
                 className="font-mono"
-                placeholder="0.00"
+                placeholder="0,00"
               />
               <p className="text-xs text-muted-foreground">
                 Valor formatado: {formatCurrency(tempCorporatePrice)}
@@ -243,7 +282,8 @@ export function ProductPricingCard({
             {/* Validation message */}
             <p className="text-xs text-muted-foreground border-t pt-3">
               ⚠️ Todos os três preços devem ser maiores que R${" "}
-              {MIN_PRICE.toFixed(2)}
+              {MIN_PRICE.toFixed(2).replace(".", ",")} | Use vírgula para
+              separar decimais (ex: 10,50 ou 99,9999)
             </p>
 
             {/* Action buttons */}

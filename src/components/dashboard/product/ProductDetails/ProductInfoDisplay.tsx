@@ -47,15 +47,53 @@ export function ProductInfoDisplay({
       {/* Product Header */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Badge variant={product.INATIVO ? "destructive" : "default"}>
-            {product.INATIVO ? "Inativo" : "Ativo"}
-          </Badge>
-          <Badge variant={stockStatus.variant}>{stockStatus.label}</Badge>
-          {product.FLAG_IMPORTADO === 1 && (
-            <Badge variant="outline">Importado</Badge>
+          {product.INATIVO === 1 ? (
+            <Badge
+              variant="destructive"
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Inativo
+            </Badge>
+          ) : (
+            <Badge
+              variant="default"
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Ativo
+            </Badge>
           )}
-          {product.FLAG_WEBSITE_OFF === 0 && (
-            <Badge variant="outline">Online</Badge>
+
+          {/* Stock badge based on ESTOQUE_LOJA */}
+          {product.ESTOQUE_LOJA > 3 && (
+            <Badge
+              variant="default"
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Estoque
+            </Badge>
+          )}
+          {product.ESTOQUE_LOJA > 0 && product.ESTOQUE_LOJA < 2 && (
+            <Badge variant="secondary">Estoque Baixo</Badge>
+          )}
+          {product.ESTOQUE_LOJA <= 0 && (
+            <Badge variant="destructive">Sem Estoque</Badge>
+          )}
+
+          {/* Online/Offline status */}
+          {product.FLAG_WEBSITE_OFF === 1 ? (
+            <Badge
+              variant="secondary"
+              className="bg-orange-600 hover:bg-orange-700 text-white dark:bg-orange-700 dark:hover:bg-orange-800"
+            >
+              Offline
+            </Badge>
+          ) : (
+            <Badge
+              variant="default"
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Online
+            </Badge>
           )}
         </div>
 
