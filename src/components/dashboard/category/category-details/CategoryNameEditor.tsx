@@ -139,22 +139,23 @@ export function CategoryNameEditor({
           </div>
           <div className="flex gap-2">
             <Button
-              variant="ghost"
-              size="icon"
+              variant="outline"
+              size="sm"
               onClick={handleCancel}
               disabled={isSaving}
-              className="shrink-0"
+              className="gap-2"
             >
-              <X className="h-4 w-4 text-red-600" />
+              <X className="h-4 w-4" />
+              {t("dashboard.category.buttons.cancel")}
             </Button>
             <Button
-              variant="ghost"
-              size="icon"
+              size="sm"
               onClick={handleSave}
               disabled={isSaving || isOverLimit || !tempName.trim()}
-              className="shrink-0"
+              className="gap-2"
             >
-              <Check className="h-4 w-4 text-green-600" />
+              <Check className="h-4 w-4" />
+              {t("dashboard.category.buttons.save")}
             </Button>
           </div>
         </div>
