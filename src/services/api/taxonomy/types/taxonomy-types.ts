@@ -61,7 +61,7 @@ interface BaseTaxonomyRequest {
  */
 export interface FindTaxonomyMenuRequest extends BaseTaxonomyRequest {
   pe_id_tipo: number;
-  pe_parent_id: number;
+  pe_parent_id?: number;
 }
 
 /**
@@ -216,6 +216,7 @@ export interface TaxonomyData {
   ANOTACOES?: string | null;
   CREATEDAT?: string;
   UPDATEDAT?: string;
+  children?: TaxonomyData[]; // For hierarchical menu structure
 }
 
 /**
@@ -255,7 +256,7 @@ interface BaseTaxonomyResponse {
  * Resposta da busca de taxonomias do menu
  */
 export interface FindTaxonomyMenuResponse extends BaseTaxonomyResponse {
-  data: [TaxonomyData[], MySQLMetadata];
+  data: [TaxonomyData[], [StoredProcedureResponse], MySQLMetadata];
 }
 
 /**
