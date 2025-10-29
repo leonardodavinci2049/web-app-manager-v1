@@ -79,10 +79,11 @@ export interface FindTaxonomyRequest extends BaseTaxonomyRequest {
 }
 
 /**
- * Requisição para buscar taxonomy por ID
+ * Requisição para buscar taxonomy por ID ou slug
+ * Pelo menos um dos campos (pe_id_taxonomy ou pe_slug_taxonomy) deve ser fornecido
  */
 export interface FindTaxonomyByIdRequest extends BaseTaxonomyRequest {
-  pe_id_taxonomy: number;
+  pe_id_taxonomy?: number;
   pe_slug_taxonomy?: string;
 }
 
@@ -188,21 +189,33 @@ export interface UpdateTaxonomyParentIdRequest extends BaseTaxonomyRequest {
 }
 
 /**
+ * Requisição para atualizar caminho da imagem de taxonomy
+ */
+export interface UpdateTaxonomyPathImageRequest extends BaseTaxonomyRequest {
+  pe_id_taxonomy: number;
+  pe_path_imagem: string;
+}
+
+/**
  * Estrutura de dados da taxonomy
  */
 export interface TaxonomyData {
   ID_TAXONOMY: number;
   PARENT_ID: number;
   TAXONOMIA: string;
-  ANOTACOES?: string | null;
+  PARENT_CATEGORY?: string | null;
   PATH_IMAGEM?: string | null;
   SLUG?: string | null;
   LEVEL?: number | null;
   ORDEM: number;
   ID_IMAGEM?: number | null;
   QT_RECORDS?: number | null;
+  INATIVO: number;
   META_TITLE?: string | null;
   META_DESCRIPTION?: string | null;
+  ANOTACOES?: string | null;
+  CREATEDAT?: string;
+  UPDATEDAT?: string;
 }
 
 /**
@@ -347,5 +360,12 @@ export interface UpdateTaxonomyOrdemResponse extends BaseTaxonomyResponse {
  * Resposta da atualização de ID pai
  */
 export interface UpdateTaxonomyParentIdResponse extends BaseTaxonomyResponse {
+  data: [[StoredProcedureResponse], MySQLMetadata];
+}
+
+/**
+ * Resposta da atualização de caminho de imagem
+ */
+export interface UpdateTaxonomyPathImageResponse extends BaseTaxonomyResponse {
   data: [[StoredProcedureResponse], MySQLMetadata];
 }
