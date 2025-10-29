@@ -11,11 +11,12 @@ import { z } from "zod";
 
 /**
  * Schema for finding product by ID (ENDPOINT 1)
+ * Based on API Reference: product-find-id.md
  */
 export const FindProductByIdSchema = z.object({
   pe_type_business: z.number().int().min(1).max(2), // 1 = B2B, 2 = B2C
-  pe_id_produto: z.number().int().min(0),
-  pe_slug_produto: z.string().max(255).optional(),
+  pe_id_produto: z.number().int().positive(),
+  pe_slug_produto: z.string().max(300).optional(), // Optional - for URL-friendly validation
 });
 
 /**

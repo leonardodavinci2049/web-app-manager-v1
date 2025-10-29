@@ -25,6 +25,7 @@ import type {
   ProductDetail,
   ProductListItem,
   ProductRelatedTaxonomy,
+  ProductSupplier,
   StoredProcedureResponse,
   UpdateProductBrandRequest,
   UpdateProductCharacteristicsRequest,
@@ -96,6 +97,7 @@ export class ProductServiceApi extends BaseApiService {
 
   /**
    * ENDPOINT 1 - Find product by ID or slug
+   * Based on API Reference: product-find-id.md
    * @param params - Search parameters
    * @returns Promise with product details
    */
@@ -115,7 +117,6 @@ export class ProductServiceApi extends BaseApiService {
 
       const instance = new ProductServiceApi();
       const requestBody = ProductServiceApi.buildBasePayload({
-        pe_slug_produto: "", // Default value - search by ID
         ...validatedParams,
       });
 
@@ -890,6 +891,17 @@ export class ProductServiceApi extends BaseApiService {
     response: FindProductByIdResponse,
   ): ProductRelatedTaxonomy[] {
     return response.data?.[1] ?? [];
+  }
+
+  /**
+   * Extract suppliers from API response
+   * @param response - API response
+   * @returns Suppliers array or empty array
+   */
+  static extractSuppliers(
+    response: FindProductByIdResponse,
+  ): ProductSupplier[] {
+    return response.data?.[2] ?? [];
   }
 
   /**

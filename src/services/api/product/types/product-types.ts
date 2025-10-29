@@ -107,58 +107,60 @@ interface BaseProductResponse {
  */
 export interface ProductDetail {
   ID_PRODUTO: number; // Correct field name from API (was ID_TBL_PRODUTO)
-  PRODUTO: string;
-  REF: string;
   SKU: number;
-  MODELO: string;
-  ETIQUETA: string;
+  PRODUTO: string;
   DESCRICAO_TAB: string;
-  ID_FORNECEDOR?: number; // Optional - may not be returned by API
+  ETIQUETA: string;
+  REF: string;
+  MODELO: string;
+  ID_IMAGEM: number;
+  PATH_IMAGEM: string;
+  SLUG: string | null;
+  ID_IMAGEM_MARCA: number;
   ID_TIPO: number;
   TIPO: string; // Product type name
   ID_MARCA: number;
-  MARCA_NOME: string; // Brand name
+  MARCA: string; // Brand name (API returns MARCA, not MARCA_NOME)
+  ID_FORNECEDOR: number;
+  FORNECEDOR: string; // Supplier name
   ID_FAMILIA: number;
   ID_GRUPO: number;
   ID_SUBGRUPO: number;
+  VL_ATACADO: string;
+  VL_CORPORATIVO: string;
+  VL_VAREJO: string;
+  OURO: string; // Price level 1
+  PRATA: string; // Price level 2
+  BRONZE: string; // Price level 3
+  ESTOQUE_LOJA: number; // Stock quantity from API
+  TEMPODEGARANTIA_DIA: number; // API returns days
   PESO_GR: number;
   COMPRIMENTO_MM: number;
   LARGURA_MM: number;
   ALTURA_MM: number;
   DIAMETRO_MM: number;
-  TEMPODEGARANTIA_DIA: number; // API returns days (was TEMPODEGARANTIA_MES)
-  VL_ATACADO: string;
-  VL_CORPORATIVO: string;
-  VL_VAREJO: string;
-  ESTOQUE_LOJA: number; // Stock quantity from API
-  QT_ESTOQUE: number; // Legacy field - kept for compatibility
-  FLAG_WEBSITE_OFF: number;
-  FLAG_IMPORTADO: number;
-  INATIVO: number;
-  // Additional flags (from API response)
-  FLAG_CONTROLE_FISICO: number; // SIM = 1 / NÃO = 0
-  CONTROLAR_ESTOQUE: number; // SIM = 1 / NÃO = 0
-  CONSIGNADO: number; // SIM = 1 / NÃO = 0
-  DESTAQUE: number; // SIM = 1 / NÃO = 0
-  PROMOCAO: number; // SIM = 1 / NÃO = 0
-  FLAG_SERVICO: number; // SIM = 1 / NÃO = 0
-  IMPORTADO: number; // SIM = 1 / NÃO = 2
-  SLUG: string;
-  PATH_IMAGEM: string;
-  META_TITLE: string;
-  META_DESCRIPTION: string;
-  DATADOCADASTRO: string;
-  DT_UPDATE?: string; // Optional - not returned by API, use DATADOCADASTRO as fallback
-  ANOTACOES: string | null; // Product description/notes - used in description tab
+  CFOP: string; // Código Fiscal de Operações e Prestações
+  CST: string; // Código de Situação Tributária
+  EAN: string; // Código de Barras EAN
+  NCM: number; // Nomenclatura Comum do Mercosul
+  NBM: string; // Nomenclatura Brasileira de Mercadorias
+  PPB: number; // Percentual de Conteúdo de Importação
+  TEMP: string; // Campo temporário/auxiliar
+  FLAG_CONTROLE_FISICO: number; // 1 = SIM / 0 = NÃO
+  CONTROLAR_ESTOQUE: number; // 1 = SIM / 0 = NÃO
+  CONSIGNADO: number; // 1 = SIM / 0 = NÃO
+  DESTAQUE: number; // 1 = SIM / 0 = NÃO
+  PROMOCAO: number; // 1 = SIM / 0 = NÃO
+  FLAG_SERVICO: number; // 1 = SIM / 0 = NÃO
+  FLAG_WEBSITE_OFF: number; // 1 = OFF / 0 = ON
+  INATIVO: number; // 2 = Ativo / 1 = Inativo
+  IMPORTADO: number; // 1 = SIM / 2 = NÃO
   DESCRICAO_VENDA: string | null; // Short description for sales
-  // Tax/Fiscal information fields (from ENDPOINT 15)
-  CFOP?: string; // Código Fiscal de Operações e Prestações
-  CST?: string; // Código de Situação Tributária
-  EAN?: string; // Código de Barras EAN
-  NCM?: number; // Nomenclatura Comum do Mercosul
-  NBM?: string; // Nomenclatura Brasileira de Mercadorias
-  PPB?: number; // Percentual de Conteúdo de Importação
-  TEMP?: string; // Campo temporário/auxiliar
+  ANOTACOES: string | null; // Product description/notes - used in description tab
+  META_TITLE: string; // SEO meta title
+  META_DESCRIPTION: string; // SEO meta description
+  DT_UPDATE: string; // Last update date
+  DATADOCADASTRO: string; // Creation date
 }
 
 /**
@@ -172,6 +174,18 @@ export interface ProductRelatedTaxonomy {
   SLUG: string | null;
   ORDEM: number;
   LEVEL: number | null;
+}
+
+/**
+ * Product supplier structure
+ * Returned in the third array of findProductById response
+ */
+export interface ProductSupplier {
+  ID_FORNECEDOR: number;
+  ID_PRODUTO: number;
+  FORNECEDOR: string;
+  CODIGODOPRODUTO: string;
+  DT_CADASTRO: string;
 }
 
 /**
@@ -218,11 +232,12 @@ export interface ProductListItem {
 
 /**
  * Request for finding product by ID (ENDPOINT 1)
+ * Based on API Reference: product-find-id.md
  */
 export interface FindProductByIdRequest extends BaseProductRequest {
   pe_type_business: number; // 1 = B2B, 2 = B2C
   pe_id_produto: number;
-  pe_slug_produto: string;
+  pe_slug_produto?: string; // Optional - for validation or URL-friendly systems
 }
 
 /**
@@ -433,15 +448,18 @@ export interface UpdateProductMetadataRequest extends BaseProductRequest {
 
 /**
  * Response for finding product by ID (ENDPOINT 1)
+ * Based on API Reference: product-find-id.md
  * data[0] = Product details array
  * data[1] = Related taxonomies/categories array
- * data[2] = Stored procedure response
- * data[3] = MySQL metadata
+ * data[2] = Suppliers array
+ * data[3] = Stored procedure response
+ * data[4] = MySQL metadata
  */
 export interface FindProductByIdResponse extends BaseProductResponse {
   data: [
     ProductDetail[],
     ProductRelatedTaxonomy[],
+    ProductSupplier[],
     [StoredProcedureResponse],
     MySQLMetadata,
   ];

@@ -42,6 +42,8 @@ import type {
   UpdateTaxonomyOrdemResponse,
   UpdateTaxonomyParentIdRequest,
   UpdateTaxonomyParentIdResponse,
+  UpdateTaxonomyPathImageRequest,
+  UpdateTaxonomyPathImageResponse,
   UpdateTaxonomyRequest,
   UpdateTaxonomyResponse,
 } from "./types/taxonomy-types";
@@ -60,6 +62,7 @@ import {
   UpdateTaxonomyNameSchema,
   UpdateTaxonomyOrdemSchema,
   UpdateTaxonomyParentIdSchema,
+  UpdateTaxonomyPathImageSchema,
   UpdateTaxonomySchema,
 } from "./validation/taxonomy-schemas";
 
@@ -240,15 +243,17 @@ export class TaxonomyServiceApi extends BaseApiService {
   }
 
   /**
-   * Endpoint 03 - Busca taxonomy por ID
-   * @param params - Parâmetros com ID da taxonomy
+   * Endpoint 03 - Busca taxonomy por ID ou slug
+   * @param params - Parâmetros com ID ou slug da taxonomy (pelo menos um obrigatório)
    * @returns Promise com dados da taxonomy
+   * @throws Error se nenhum critério de busca for fornecido ou se a taxonomy não for encontrada
    */
   static async findTaxonomyById(
-    params: Partial<FindTaxonomyByIdRequest> & { pe_id_taxonomy: number },
+    params: Partial<FindTaxonomyByIdRequest> &
+      ({ pe_id_taxonomy: number } | { pe_slug_taxonomy: string }),
   ): Promise<FindTaxonomyByIdResponse> {
     try {
-      // Validar parâmetros
+      // Validar parâmetros - schema verifica se pelo menos um está presente
       const validatedParams = FindTaxonomyByIdSchema.parse({
         pe_id_taxonomy: params.pe_id_taxonomy,
         pe_slug_taxonomy: params.pe_slug_taxonomy,
@@ -256,8 +261,8 @@ export class TaxonomyServiceApi extends BaseApiService {
 
       const instance = new TaxonomyServiceApi();
       const requestBody = TaxonomyServiceApi.buildBasePayload({
-        pe_slug_taxonomy: "", // Valor padrão - busca por ID
-        ...validatedParams,
+        pe_id_taxonomy: validatedParams.pe_id_taxonomy ?? 0, // 0 quando busca por slug
+        pe_slug_taxonomy: validatedParams.pe_slug_taxonomy ?? "", // "" quando busca por ID
       });
 
       const data: FindTaxonomyByIdResponse =
@@ -268,12 +273,19 @@ export class TaxonomyServiceApi extends BaseApiService {
 
       // Verifica se a busca foi bem-sucedida usando função utilitária
       if (isApiError(data.statusCode)) {
-        throw new Error(data.message || "Erro ao buscar taxonomy por ID");
+        throw new Error(
+          data.message || "Erro ao buscar taxonomy por ID ou slug",
+        );
+      }
+
+      // Verifica se a taxonomy foi encontrada
+      if (!data.data || !data.data[0] || data.data[0].length === 0) {
+        throw new Error("Taxonomy não encontrada com os critérios fornecidos");
       }
 
       return data;
     } catch (error) {
-      logger.error("Erro no serviço de taxonomy por ID", error);
+      logger.error("Erro no serviço de taxonomy por ID/slug", error);
       throw error;
     }
   }
@@ -749,6 +761,49 @@ export class TaxonomyServiceApi extends BaseApiService {
     } catch (error) {
       logger.error(
         "Erro no serviço de atualização de parent ID de taxonomy",
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Endpoint 15 - Atualiza caminho da imagem de taxonomy
+   * @param params - Parâmetros com ID da taxonomy e caminho da imagem
+   * @returns Promise com resposta da atualização
+   */
+  static async updateTaxonomyPathImage(
+    params: Partial<UpdateTaxonomyPathImageRequest> & {
+      pe_id_taxonomy: number;
+      pe_path_imagem: string;
+    },
+  ): Promise<UpdateTaxonomyPathImageResponse> {
+    try {
+      // Validar parâmetros
+      const validatedParams = UpdateTaxonomyPathImageSchema.parse({
+        pe_id_taxonomy: params.pe_id_taxonomy,
+        pe_path_imagem: params.pe_path_imagem,
+      });
+
+      const instance = new TaxonomyServiceApi();
+      const requestBody = TaxonomyServiceApi.buildBasePayload(validatedParams);
+
+      const data: UpdateTaxonomyPathImageResponse =
+        await instance.post<UpdateTaxonomyPathImageResponse>(
+          TAXONOMY_ENDPOINTS.UPDATE_PATH_IMAGE,
+          requestBody,
+        );
+
+      if (isApiError(data.statusCode)) {
+        throw new Error(
+          data.message || "Erro ao atualizar caminho da imagem da taxonomy",
+        );
+      }
+
+      return data;
+    } catch (error) {
+      logger.error(
+        "Erro no serviço de atualização de caminho de imagem de taxonomy",
         error,
       );
       throw error;

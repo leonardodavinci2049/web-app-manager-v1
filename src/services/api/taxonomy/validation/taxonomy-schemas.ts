@@ -27,12 +27,21 @@ export const FindTaxonomySchema = z.object({
 });
 
 /**
- * Schema para buscar taxonomy por ID
+ * Schema para buscar taxonomy por ID ou slug
+ * Pelo menos um dos campos deve ser fornecido
  */
-export const FindTaxonomyByIdSchema = z.object({
-  pe_id_taxonomy: z.number().int().positive(),
-  pe_slug_taxonomy: z.string().max(255).optional(),
-});
+export const FindTaxonomyByIdSchema = z
+  .object({
+    pe_id_taxonomy: z.number().int().positive().optional(),
+    pe_slug_taxonomy: z.string().min(1).max(255).optional(),
+  })
+  .refine(
+    (data) =>
+      data.pe_id_taxonomy !== undefined || data.pe_slug_taxonomy !== undefined,
+    {
+      message: "Either 'pe_id_taxonomy' or 'pe_slug_taxonomy' must be provided",
+    },
+  );
 
 /**
  * Schema para criar nova taxonomy
@@ -136,6 +145,14 @@ export const UpdateTaxonomyParentIdSchema = z.object({
 });
 
 /**
+ * Schema para atualizar caminho da imagem de taxonomy
+ */
+export const UpdateTaxonomyPathImageSchema = z.object({
+  pe_id_taxonomy: z.number().int().positive(),
+  pe_path_imagem: z.string().min(1).max(200),
+});
+
+/**
  * Tipos inferidos dos schemas
  */
 export type FindTaxonomyMenuInput = z.infer<typeof FindTaxonomyMenuSchema>;
@@ -161,4 +178,7 @@ export type UpdateTaxonomyOrdemInput = z.infer<
 >;
 export type UpdateTaxonomyParentIdInput = z.infer<
   typeof UpdateTaxonomyParentIdSchema
+>;
+export type UpdateTaxonomyPathImageInput = z.infer<
+  typeof UpdateTaxonomyPathImageSchema
 >;
