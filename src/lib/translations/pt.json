@@ -656,7 +656,8 @@
         "create": "Criar Categoria",
         "creating": "Criando...",
         "cancel": "Cancelar",
-        "detail": "Detalhe"
+        "detail": "Detalhe",
+        "saveAll": "Salvar Tudo"
       },
       "errors": {
         "nameRequired": "Nome da categoria é obrigatório",
@@ -679,8 +680,13 @@
       },
       "details": {
         "title": "Detalhes da Categoria",
-        "subtitle": "Visualize e edite informações detalhadas da categoria"
-      }
+        "subtitle": "Visualize e edite informações detalhadas da categoria",
+        "basicInfo": "Informações Básicas",
+        "media": "Mídia",
+        "seo": "SEO",
+        "notes": "Anotações"
+      },
+      "noParent": "Sem categoria pai"
     }
   },
   "common": {

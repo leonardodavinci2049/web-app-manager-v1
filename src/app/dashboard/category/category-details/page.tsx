@@ -14,7 +14,7 @@ import {
   getCategoryParentName,
 } from "@/app/actions/action-categories";
 import { PageTitleSection } from "@/components/common/page-title-section";
-import { CategoryDetailsForm } from "@/components/forms/category-details-form";
+import { CategoryDetailsInlineEdit } from "@/components/forms/category-details-inline-edit";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { CategoryDetailsHeaderClient } from "./category-details-header";
@@ -101,18 +101,50 @@ async function CategoryDetailsContent({ categoryId }: { categoryId: number }) {
 
       <Separator className="my-4" />
 
-      {/* Card com Formulário */}
-      <div className="w-full lg:w-2/3">
+      {/* Cards de Edição Inline */}
+      <div className="space-y-6">
+        {/* Card 1: Informações Básicas */}
         <Card className="p-6">
           <div className="mb-6">
-            <h2 className="text-xl font-semibold">Editar Categoria</h2>
+            <h2 className="text-xl font-semibold">Informações Básicas</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Modifique os dados abaixo e clique em Salvar para atualizar a
-              categoria.
+              Clique em qualquer campo para editá-lo diretamente.
             </p>
           </div>
+          <CategoryDetailsInlineEdit category={category} section="basic" />
+        </Card>
 
-          <CategoryDetailsForm category={category} />
+        {/* Card 2: Mídia */}
+        <Card className="p-6">
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold">Mídia</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Gerencie as imagens da categoria.
+            </p>
+          </div>
+          <CategoryDetailsInlineEdit category={category} section="media" />
+        </Card>
+
+        {/* Card 3: SEO */}
+        <Card className="p-6">
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold">SEO</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Otimização para motores de busca.
+            </p>
+          </div>
+          <CategoryDetailsInlineEdit category={category} section="seo" />
+        </Card>
+
+        {/* Card 4: Anotações */}
+        <Card className="p-6">
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold">Anotações</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Informações adicionais e notas internas.
+            </p>
+          </div>
+          <CategoryDetailsInlineEdit category={category} section="notes" />
         </Card>
       </div>
     </div>

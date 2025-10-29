@@ -468,7 +468,8 @@
         "save": "Save",
         "saving": "Saving...",
         "cancel": "Cancel",
-        "detail": "Detail"
+        "detail": "Detail",
+        "saveAll": "Save All"
       },
       "errors": {
         "nameRequired": "Category name is required",
@@ -477,7 +478,16 @@
       },
       "messages": {
         "updatedSuccess": "Category updated successfully!"
-      }
+      },
+      "details": {
+        "title": "Category Details",
+        "subtitle": "View and edit detailed category information",
+        "basicInfo": "Basic Information",
+        "media": "Media",
+        "seo": "SEO",
+        "notes": "Notes"
+      },
+      "noParent": "No parent category"
     }
   },
   "common": {
