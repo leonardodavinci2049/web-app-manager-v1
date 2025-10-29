@@ -77,6 +77,7 @@ export const PRODUCT_ENDPOINTS = {
   UPDATE_DESCRIPTION: "/product/v2/product-upd-description",
   UPDATE_VARIOUS: "/product/v2/product-upd-variou",
   UPDATE_IMAGE_PATH: "/product/v2/product-upd-path-image",
+  UPDATE_METADATA: "/product/v2/product-upd-metadata",
 } as const;
 
 // Endpoints de Carrinho
@@ -119,6 +120,11 @@ export const TAXONOMY_ENDPOINTS = {
   REL_CREATE: "/taxonomy/v2/taxonomy-rel-create",
   REL_PRODUTO: "/taxonomy/v2/taxonomy-rel-produto",
   REL_DELETE: "/taxonomy/v2/taxonomy-rel-delete",
+  UPDATE_INACTIVE: "/taxonomy/v2/taxonomy-upd-inactive",
+  UPDATE_METADATA: "/taxonomy/v2/taxonomy-upd-metadata",
+  UPDATE_NAME: "/taxonomy/v2/taxonomy-upd-name",
+  UPDATE_ORDEM: "/taxonomy/v2/taxonomy-upd-ordem",
+  UPDATE_PARENT_ID: "/taxonomy/v2/taxonomy-upd-parent-id",
 } as const;
 
 // Endpoints de Product Type

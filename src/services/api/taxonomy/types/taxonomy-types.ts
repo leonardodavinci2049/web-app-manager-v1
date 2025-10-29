@@ -146,6 +146,48 @@ export interface DeleteTaxonomyRelRequest extends BaseTaxonomyRequest {
 }
 
 /**
+ * Requisição para atualizar status de inativação de taxonomy
+ */
+export interface UpdateTaxonomyInactiveRequest extends BaseTaxonomyRequest {
+  pe_id_taxonomy: number;
+  pe_inactive: boolean;
+}
+
+/**
+ * Requisição para atualizar metadados (SEO) de taxonomy
+ */
+export interface UpdateTaxonomyMetadataRequest extends BaseTaxonomyRequest {
+  pe_id_taxonomy: number;
+  pe_meta_title: string;
+  pe_meta_description: string;
+}
+
+/**
+ * Requisição para atualizar nome de taxonomy
+ */
+export interface UpdateTaxonomyNameRequest extends BaseTaxonomyRequest {
+  pe_id_taxonomy: number;
+  pe_taxonomia: string;
+}
+
+/**
+ * Requisição para atualizar ordem de taxonomy
+ */
+export interface UpdateTaxonomyOrdemRequest extends BaseTaxonomyRequest {
+  pe_parent_id: number;
+  pe_id_taxonomy: number;
+  pe_ordem: number;
+}
+
+/**
+ * Requisição para atualizar ID da taxonomy pai
+ */
+export interface UpdateTaxonomyParentIdRequest extends BaseTaxonomyRequest {
+  pe_id_taxonomy: number;
+  pe_parent_id: number;
+}
+
+/**
  * Estrutura de dados da taxonomy
  */
 export interface TaxonomyData {
@@ -270,5 +312,40 @@ export interface FindTaxonomyRelProdutoResponse extends BaseTaxonomyResponse {
  * Resposta da exclusão de relacionamento
  */
 export interface DeleteTaxonomyRelResponse extends BaseTaxonomyResponse {
+  data: [[StoredProcedureResponse], MySQLMetadata];
+}
+
+/**
+ * Resposta da atualização de status de inativação
+ */
+export interface UpdateTaxonomyInactiveResponse extends BaseTaxonomyResponse {
+  data: [[StoredProcedureResponse], MySQLMetadata];
+}
+
+/**
+ * Resposta da atualização de metadados
+ */
+export interface UpdateTaxonomyMetadataResponse extends BaseTaxonomyResponse {
+  data: [[StoredProcedureResponse], MySQLMetadata];
+}
+
+/**
+ * Resposta da atualização de nome
+ */
+export interface UpdateTaxonomyNameResponse extends BaseTaxonomyResponse {
+  data: [[StoredProcedureResponse], MySQLMetadata];
+}
+
+/**
+ * Resposta da atualização de ordem
+ */
+export interface UpdateTaxonomyOrdemResponse extends BaseTaxonomyResponse {
+  data: [[StoredProcedureResponse], MySQLMetadata];
+}
+
+/**
+ * Resposta da atualização de ID pai
+ */
+export interface UpdateTaxonomyParentIdResponse extends BaseTaxonomyResponse {
   data: [[StoredProcedureResponse], MySQLMetadata];
 }

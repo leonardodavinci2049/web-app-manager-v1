@@ -32,6 +32,16 @@ import type {
   StoredProcedureResponse,
   TaxonomyData,
   TaxonomyProductData,
+  UpdateTaxonomyInactiveRequest,
+  UpdateTaxonomyInactiveResponse,
+  UpdateTaxonomyMetadataRequest,
+  UpdateTaxonomyMetadataResponse,
+  UpdateTaxonomyNameRequest,
+  UpdateTaxonomyNameResponse,
+  UpdateTaxonomyOrdemRequest,
+  UpdateTaxonomyOrdemResponse,
+  UpdateTaxonomyParentIdRequest,
+  UpdateTaxonomyParentIdResponse,
   UpdateTaxonomyRequest,
   UpdateTaxonomyResponse,
 } from "./types/taxonomy-types";
@@ -45,6 +55,11 @@ import {
   FindTaxonomyMenuSchema,
   FindTaxonomyRelProdutoSchema,
   FindTaxonomySchema,
+  UpdateTaxonomyInactiveSchema,
+  UpdateTaxonomyMetadataSchema,
+  UpdateTaxonomyNameSchema,
+  UpdateTaxonomyOrdemSchema,
+  UpdateTaxonomyParentIdSchema,
   UpdateTaxonomySchema,
 } from "./validation/taxonomy-schemas";
 
@@ -524,6 +539,216 @@ export class TaxonomyServiceApi extends BaseApiService {
     } catch (error) {
       logger.error(
         "Erro no serviço de exclusão de relacionamento taxonomy-produto",
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Endpoint 10 - Atualiza status de inativação (ativo/inativo) de taxonomy
+   * @param params - Parâmetros com ID da taxonomy e flag de inativação
+   * @returns Promise com resposta da atualização
+   */
+  static async updateTaxonomyInactive(
+    params: Partial<UpdateTaxonomyInactiveRequest> & {
+      pe_id_taxonomy: number;
+      pe_inactive: boolean;
+    },
+  ): Promise<UpdateTaxonomyInactiveResponse> {
+    try {
+      // Validar parâmetros
+      const validatedParams = UpdateTaxonomyInactiveSchema.parse({
+        pe_id_taxonomy: params.pe_id_taxonomy,
+        pe_inactive: params.pe_inactive,
+      });
+
+      const instance = new TaxonomyServiceApi();
+      const requestBody = TaxonomyServiceApi.buildBasePayload(validatedParams);
+
+      const data: UpdateTaxonomyInactiveResponse =
+        await instance.post<UpdateTaxonomyInactiveResponse>(
+          TAXONOMY_ENDPOINTS.UPDATE_INACTIVE,
+          requestBody,
+        );
+
+      if (isApiError(data.statusCode)) {
+        throw new Error(
+          data.message || "Erro ao atualizar status de inativação da taxonomy",
+        );
+      }
+
+      return data;
+    } catch (error) {
+      logger.error(
+        "Erro no serviço de atualização de status de taxonomy",
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Endpoint 11 - Atualiza metadados de SEO (meta title e meta description) de taxonomy
+   * @param params - Parâmetros com ID da taxonomy e metadados
+   * @returns Promise com resposta da atualização
+   */
+  static async updateTaxonomyMetadata(
+    params: Partial<UpdateTaxonomyMetadataRequest> & {
+      pe_id_taxonomy: number;
+      pe_meta_title: string;
+      pe_meta_description: string;
+    },
+  ): Promise<UpdateTaxonomyMetadataResponse> {
+    try {
+      // Validar parâmetros
+      const validatedParams = UpdateTaxonomyMetadataSchema.parse({
+        pe_id_taxonomy: params.pe_id_taxonomy,
+        pe_meta_title: params.pe_meta_title,
+        pe_meta_description: params.pe_meta_description,
+      });
+
+      const instance = new TaxonomyServiceApi();
+      const requestBody = TaxonomyServiceApi.buildBasePayload(validatedParams);
+
+      const data: UpdateTaxonomyMetadataResponse =
+        await instance.post<UpdateTaxonomyMetadataResponse>(
+          TAXONOMY_ENDPOINTS.UPDATE_METADATA,
+          requestBody,
+        );
+
+      if (isApiError(data.statusCode)) {
+        throw new Error(
+          data.message || "Erro ao atualizar metadados da taxonomy",
+        );
+      }
+
+      return data;
+    } catch (error) {
+      logger.error(
+        "Erro no serviço de atualização de metadados de taxonomy",
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Endpoint 12 - Atualiza nome de taxonomy
+   * @param params - Parâmetros com ID da taxonomy e novo nome
+   * @returns Promise com resposta da atualização
+   */
+  static async updateTaxonomyName(
+    params: Partial<UpdateTaxonomyNameRequest> & {
+      pe_id_taxonomy: number;
+      pe_taxonomia: string;
+    },
+  ): Promise<UpdateTaxonomyNameResponse> {
+    try {
+      // Validar parâmetros
+      const validatedParams = UpdateTaxonomyNameSchema.parse({
+        pe_id_taxonomy: params.pe_id_taxonomy,
+        pe_taxonomia: params.pe_taxonomia,
+      });
+
+      const instance = new TaxonomyServiceApi();
+      const requestBody = TaxonomyServiceApi.buildBasePayload(validatedParams);
+
+      const data: UpdateTaxonomyNameResponse =
+        await instance.post<UpdateTaxonomyNameResponse>(
+          TAXONOMY_ENDPOINTS.UPDATE_NAME,
+          requestBody,
+        );
+
+      if (isApiError(data.statusCode)) {
+        throw new Error(data.message || "Erro ao atualizar nome da taxonomy");
+      }
+
+      return data;
+    } catch (error) {
+      logger.error("Erro no serviço de atualização de nome de taxonomy", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Endpoint 13 - Atualiza ordem de exibição de taxonomy
+   * @param params - Parâmetros com ID da taxonomy, parent ID e nova ordem
+   * @returns Promise com resposta da atualização
+   */
+  static async updateTaxonomyOrdem(
+    params: Partial<UpdateTaxonomyOrdemRequest> & {
+      pe_parent_id: number;
+      pe_id_taxonomy: number;
+      pe_ordem: number;
+    },
+  ): Promise<UpdateTaxonomyOrdemResponse> {
+    try {
+      // Validar parâmetros
+      const validatedParams = UpdateTaxonomyOrdemSchema.parse({
+        pe_parent_id: params.pe_parent_id,
+        pe_id_taxonomy: params.pe_id_taxonomy,
+        pe_ordem: params.pe_ordem,
+      });
+
+      const instance = new TaxonomyServiceApi();
+      const requestBody = TaxonomyServiceApi.buildBasePayload(validatedParams);
+
+      const data: UpdateTaxonomyOrdemResponse =
+        await instance.post<UpdateTaxonomyOrdemResponse>(
+          TAXONOMY_ENDPOINTS.UPDATE_ORDEM,
+          requestBody,
+        );
+
+      if (isApiError(data.statusCode)) {
+        throw new Error(data.message || "Erro ao atualizar ordem da taxonomy");
+      }
+
+      return data;
+    } catch (error) {
+      logger.error(
+        "Erro no serviço de atualização de ordem de taxonomy",
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Endpoint 14 - Atualiza ID da taxonomy pai (move na hierarquia)
+   * @param params - Parâmetros com ID da taxonomy e novo parent ID
+   * @returns Promise com resposta da atualização
+   */
+  static async updateTaxonomyParentId(
+    params: Partial<UpdateTaxonomyParentIdRequest> & {
+      pe_id_taxonomy: number;
+      pe_parent_id: number;
+    },
+  ): Promise<UpdateTaxonomyParentIdResponse> {
+    try {
+      // Validar parâmetros
+      const validatedParams = UpdateTaxonomyParentIdSchema.parse({
+        pe_id_taxonomy: params.pe_id_taxonomy,
+        pe_parent_id: params.pe_parent_id,
+      });
+
+      const instance = new TaxonomyServiceApi();
+      const requestBody = TaxonomyServiceApi.buildBasePayload(validatedParams);
+
+      const data: UpdateTaxonomyParentIdResponse =
+        await instance.post<UpdateTaxonomyParentIdResponse>(
+          TAXONOMY_ENDPOINTS.UPDATE_PARENT_ID,
+          requestBody,
+        );
+
+      if (isApiError(data.statusCode)) {
+        throw new Error(data.message || "Erro ao atualizar ID pai da taxonomy");
+      }
+
+      return data;
+    } catch (error) {
+      logger.error(
+        "Erro no serviço de atualização de parent ID de taxonomy",
         error,
       );
       throw error;

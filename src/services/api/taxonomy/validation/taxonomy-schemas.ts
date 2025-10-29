@@ -94,6 +94,48 @@ export const DeleteTaxonomyRelSchema = z.object({
 });
 
 /**
+ * Schema para atualizar status de inativação de taxonomy
+ */
+export const UpdateTaxonomyInactiveSchema = z.object({
+  pe_id_taxonomy: z.number().int().positive(),
+  pe_inactive: z.boolean(),
+});
+
+/**
+ * Schema para atualizar metadados (SEO) de taxonomy
+ */
+export const UpdateTaxonomyMetadataSchema = z.object({
+  pe_id_taxonomy: z.number().int().positive(),
+  pe_meta_title: z.string().min(1).max(100),
+  pe_meta_description: z.string().min(1).max(255),
+});
+
+/**
+ * Schema para atualizar nome de taxonomy
+ */
+export const UpdateTaxonomyNameSchema = z.object({
+  pe_id_taxonomy: z.number().int().positive(),
+  pe_taxonomia: z.string().min(1).max(200),
+});
+
+/**
+ * Schema para atualizar ordem de taxonomy
+ */
+export const UpdateTaxonomyOrdemSchema = z.object({
+  pe_parent_id: z.number().int().min(0),
+  pe_id_taxonomy: z.number().int().positive(),
+  pe_ordem: z.number().int().positive(),
+});
+
+/**
+ * Schema para atualizar ID da taxonomy pai
+ */
+export const UpdateTaxonomyParentIdSchema = z.object({
+  pe_id_taxonomy: z.number().int().positive(),
+  pe_parent_id: z.number().int().min(0),
+});
+
+/**
  * Tipos inferidos dos schemas
  */
 export type FindTaxonomyMenuInput = z.infer<typeof FindTaxonomyMenuSchema>;
@@ -107,3 +149,16 @@ export type FindTaxonomyRelProdutoInput = z.infer<
   typeof FindTaxonomyRelProdutoSchema
 >;
 export type DeleteTaxonomyRelInput = z.infer<typeof DeleteTaxonomyRelSchema>;
+export type UpdateTaxonomyInactiveInput = z.infer<
+  typeof UpdateTaxonomyInactiveSchema
+>;
+export type UpdateTaxonomyMetadataInput = z.infer<
+  typeof UpdateTaxonomyMetadataSchema
+>;
+export type UpdateTaxonomyNameInput = z.infer<typeof UpdateTaxonomyNameSchema>;
+export type UpdateTaxonomyOrdemInput = z.infer<
+  typeof UpdateTaxonomyOrdemSchema
+>;
+export type UpdateTaxonomyParentIdInput = z.infer<
+  typeof UpdateTaxonomyParentIdSchema
+>;

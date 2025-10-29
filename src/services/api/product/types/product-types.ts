@@ -418,6 +418,15 @@ export interface UpdateProductImagePathRequest extends BaseProductRequest {
   pe_path_imagem: string;
 }
 
+/**
+ * Request for updating product metadata (ENDPOINT 20)
+ */
+export interface UpdateProductMetadataRequest extends BaseProductRequest {
+  pe_id_produto: number;
+  pe_meta_title: string;
+  pe_meta_description: string;
+}
+
 // ========================================
 // RESPONSE TYPES - QUERY ENDPOINTS
 // ========================================
