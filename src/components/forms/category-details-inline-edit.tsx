@@ -16,6 +16,7 @@
 import { Check, Edit2, X } from "lucide-react";
 import { useState } from "react";
 import { CategoryNameEditor } from "@/components/dashboard/category/category-details/CategoryNameEditor";
+import { ParentCategoryEditor } from "@/components/dashboard/category/category-details/ParentCategoryEditor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +35,8 @@ import type { TaxonomyData } from "@/services/api/taxonomy/types/taxonomy-types"
 interface CategoryDetailsInlineEditProps {
   category: TaxonomyData;
   section: "basic" | "media" | "seo" | "notes";
+  categories?: TaxonomyData[];
+  parentName?: string;
 }
 
 interface EditingState {
@@ -44,6 +47,8 @@ interface EditingState {
 export function CategoryDetailsInlineEdit({
   category,
   section,
+  categories = [],
+  parentName = "Raiz",
 }: CategoryDetailsInlineEditProps) {
   const { t } = useTranslation();
   const [editingState, setEditingState] = useState<EditingState>({
@@ -56,6 +61,7 @@ export function CategoryDetailsInlineEdit({
     name: category.TAXONOMIA || "",
     slug: category.SLUG || "",
     parentId: category.PARENT_ID || 0,
+    parentName: parentName,
     order: category.ORDEM || 1,
     imagePath: category.PATH_IMAGEM || "",
     metaTitle: category.META_TITLE || "",
@@ -115,66 +121,20 @@ export function CategoryDetailsInlineEdit({
         }
       />
 
-      {/* Parent ID Field */}
-      <div className="space-y-2">
-        <Label className="text-sm font-medium text-muted-foreground">
-          {t("dashboard.category.fields.parent")}
-        </Label>
-        {isEditing("parentId") ? (
-          <div className="flex gap-2">
-            <Input
-              type="number"
-              min="0"
-              value={editingState.value as number}
-              onChange={(e) =>
-                setEditingState((prev) => ({
-                  ...prev,
-                  value: Number.parseInt(e.target.value, 10) || 0,
-                }))
-              }
-              onKeyDown={(e) => handleKeyDown(e, "parentId")}
-              autoFocus
-              className="flex-1"
-            />
-            <Button
-              size="icon"
-              variant="ghost"
-              className="shrink-0"
-              onClick={() => saveField("parentId")}
-            >
-              <Check className="h-4 w-4 text-green-600" />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="shrink-0"
-              onClick={cancelEditing}
-            >
-              <X className="h-4 w-4 text-red-600" />
-            </Button>
-          </div>
-        ) : (
-          <div
-            role="button"
-            tabIndex={0}
-            className="group flex items-center gap-2 rounded-md border border-transparent bg-muted/50 px-3 py-2 transition-colors hover:border-border hover:bg-background cursor-pointer"
-            onClick={() => startEditing("parentId", formData.parentId)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                startEditing("parentId", formData.parentId);
-              }
-            }}
-          >
-            <p className="flex-1 text-sm text-muted-foreground">
-              {formData.parentId === 0
-                ? t("dashboard.category.noParent")
-                : formData.parentId}
-            </p>
-            <Edit2 className="h-3.5 w-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-          </div>
-        )}
-      </div>
+      {/* Parent Category Field */}
+      <ParentCategoryEditor
+        categoryId={category.ID_TAXONOMY}
+        currentParentId={formData.parentId}
+        currentParentName={formData.parentName}
+        categories={categories}
+        onUpdate={(newParentId, newParentName) =>
+          setFormData((prev) => ({
+            ...prev,
+            parentId: newParentId,
+            parentName: newParentName,
+          }))
+        }
+      />
 
       {/* Order Field */}
       <div className="space-y-2">

@@ -196,8 +196,8 @@ async function fetchCategoryHierarchy(): Promise<{
 
 async function tryBuildHierarchyFromMenu(): Promise<CategoryNode[]> {
   const response = await TaxonomyServiceApi.findTaxonomyMenu({
-    pe_parent_id: -1,
     pe_id_tipo: 2,
+    // pe_parent_id is optional, defaults to 0 (root level)
   });
 
   if (!TaxonomyServiceApi.isValidTaxonomyMenuResponse(response)) {

@@ -8,8 +8,8 @@ import { z } from "zod";
  * Schema para buscar taxonomias do menu
  */
 export const FindTaxonomyMenuSchema = z.object({
-  pe_id_tipo: z.number().int().positive().optional(),
-  pe_parent_id: z.number().int().min(-1).optional(), // -1 para carregar todos os níveis hierárquicos
+  pe_id_tipo: z.number().int().positive(),
+  pe_parent_id: z.number().int().min(0).optional(),
 });
 
 /**

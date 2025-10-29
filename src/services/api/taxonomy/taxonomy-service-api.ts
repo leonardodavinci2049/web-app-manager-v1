@@ -93,21 +93,35 @@ export class TaxonomyServiceApi extends BaseApiService {
 
   /**
    * Endpoint 01 - Busca taxonomias para menu
+   * Retorna a estrutura hierárquica completa de taxonomias (categorias) organizadas em formato de menu.
+   *
+   * Características:
+   * - Retorna estrutura aninhada com propriedade `children` em cada nó
+   * - Suporta múltiplos níveis de profundidade (tipicamente 3 níveis)
+   * - Filtro obrigatório por tipo de taxonomia (pe_id_tipo)
+   * - Filtro opcional por taxonomia pai (pe_parent_id)
+   * - Respeita ordenação definida no campo ORDEM
+   *
    * @param params - Parâmetros de busca para menu
-   * @returns Promise com lista de taxonomias hierárquica
+   * @param params.pe_id_tipo - ID do tipo de taxonomia (obrigatório)
+   * @param params.pe_parent_id - ID da taxonomia pai para filtrar hierarquicamente (opcional)
+   * @returns Promise com estrutura hierárquica de taxonomias
+   * @throws {TaxonomyError} Quando há erro na requisição ou validação
    */
   static async findTaxonomyMenu(
-    params: Partial<FindTaxonomyMenuRequest> = {},
+    params: Partial<FindTaxonomyMenuRequest> & { pe_id_tipo: number },
   ): Promise<FindTaxonomyMenuResponse> {
     try {
-      // Validar parâmetros
-      const validatedParams = FindTaxonomyMenuSchema.partial().parse(params);
+      // Validar parâmetros - pe_id_tipo é obrigatório
+      const validatedParams = FindTaxonomyMenuSchema.parse({
+        pe_id_tipo: params.pe_id_tipo,
+        pe_parent_id: params.pe_parent_id,
+      });
 
       const instance = new TaxonomyServiceApi();
       const requestBody = TaxonomyServiceApi.buildBasePayload({
-        pe_id_tipo: 1, // Valor padrão conforme referência
-        pe_parent_id: 0, // Valor padrão - busca da raiz
-        ...validatedParams,
+        pe_id_tipo: validatedParams.pe_id_tipo,
+        pe_parent_id: validatedParams.pe_parent_id ?? 0, // Default: busca da raiz
       });
 
       const data: FindTaxonomyMenuResponse =
