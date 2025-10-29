@@ -279,7 +279,7 @@ export class TaxonomyServiceApi extends BaseApiService {
       }
 
       // Verifica se a taxonomy foi encontrada
-      if (!data.data || !data.data[0] || data.data[0].length === 0) {
+      if (!data.data || !data.data[0] || !data.data[0][0]) {
         throw new Error("Taxonomy não encontrada com os critérios fornecidos");
       }
 
