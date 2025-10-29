@@ -125,6 +125,7 @@ export const TAXONOMY_ENDPOINTS = {
   UPDATE_NAME: "/taxonomy/v2/taxonomy-upd-name",
   UPDATE_ORDEM: "/taxonomy/v2/taxonomy-upd-ordem",
   UPDATE_PARENT_ID: "/taxonomy/v2/taxonomy-upd-parent-id",
+  UPDATE_PATH_IMAGE: "/taxonomy/v2/taxonomy-upd-path-image",
 } as const;
 
 // Endpoints de Product Type

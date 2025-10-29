@@ -88,12 +88,12 @@ export function ProductTechnicalDataCard({
                 <tbody>
                   <tr>
                     <td className="py-2 px-2 text-sm">{product.ID_MARCA}</td>
-                    <td className="py-2 px-2 text-sm">{product.MARCA_NOME}</td>
+                    <td className="py-2 px-2 text-sm">{product.MARCA}</td>
                     <td className="py-2 px-2">
                       <ChangeProductBrandDialog
                         productId={productId}
                         currentBrandId={product.ID_MARCA}
-                        currentBrandName={product.MARCA_NOME}
+                        currentBrandName={product.MARCA}
                         onSuccess={onDataChange}
                       />
                     </td>
