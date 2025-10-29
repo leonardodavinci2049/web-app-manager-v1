@@ -127,6 +127,8 @@ export function CategoryTreeItem({
               isSelected && "font-semibold text-primary",
             )}
           >
+            <span className="text-muted-foreground">{node.id}</span>
+            <span className="mx-1.5">-</span>
             {node.name}
           </button>
 

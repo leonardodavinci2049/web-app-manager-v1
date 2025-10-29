@@ -6,47 +6,103 @@ import type { TaxonomyData } from "@/services/api/taxonomy/types/taxonomy-types"
 import type { CategoryNode } from "../category-tree.types";
 
 /**
- * Converte dados planos da API em estrutura hierárquica aninhada
- * @param flatData - Array plano de taxonomias da API
+ * Converte dados da API em estrutura hierárquica
+ * Detecta automaticamente se os dados já vêm hierárquicos (com children) ou planos
+ * @param data - Array de taxonomias da API (pode ser plano ou hierárquico)
  * @returns Array hierárquico de CategoryNode com children aninhados
  */
 export function transformTaxonomyToHierarchy(
-  flatData: TaxonomyData[],
+  data: TaxonomyData[],
 ): CategoryNode[] {
-  // Converter dados da API para formato CategoryNode
+  // Check if data already has hierarchical structure (children property)
+  const hasHierarchicalStructure = data.some(
+    (item) => item.children && Array.isArray(item.children),
+  );
+
+  if (hasHierarchicalStructure) {
+    // Data is already hierarchical, just convert format recursively
+    return data.map(convertHierarchicalNode);
+  }
+
+  // Data is flat, need to build hierarchy
+  return buildHierarchyFromFlatData(data);
+}
+
+/**
+ * Converts hierarchical API data to CategoryNode format recursively
+ * @param apiItem - API item with potential children
+ * @returns CategoryNode with children converted
+ */
+function convertHierarchicalNode(apiItem: TaxonomyData): CategoryNode {
+  const node = apiItemToCategoryNode(apiItem);
+
+  // Recursively convert children if they exist
+  if (apiItem.children && Array.isArray(apiItem.children)) {
+    node.children = apiItem.children.map(convertHierarchicalNode);
+    // Sort children by order
+    node.children = sortNodesByOrder(node.children);
+  } else {
+    node.children = [];
+  }
+
+  return node;
+}
+
+/**
+ * Builds hierarchy from flat data
+ * @param flatData - Flat array of taxonomies
+ * @returns Hierarchical array of CategoryNode
+ */
+function buildHierarchyFromFlatData(flatData: TaxonomyData[]): CategoryNode[] {
+  // Convert API data to CategoryNode format
   const nodes: CategoryNode[] = flatData.map(apiItemToCategoryNode);
 
-  // Criar mapa de nós por ID para busca rápida
+  // Create map of nodes by ID for quick lookup
   const nodeMap = new Map<string | number, CategoryNode>();
   const rootNodes: CategoryNode[] = [];
 
-  // Primeira passagem: criar mapa de todos os nós
+  // First pass: create map of all nodes with children initialized
   for (const node of nodes) {
     nodeMap.set(node.id, { ...node, children: [] });
   }
 
-  // Segunda passagem: construir hierarquia
+  // Second pass: build hierarchy
   for (const node of nodes) {
     const currentNode = nodeMap.get(node.id);
     if (!currentNode) continue;
-    if (node.parentId === node.id) continue;
 
-    // Se é nó raiz (parentId é 0 ou null)
-    if (!node.parentId || node.parentId === 0) {
+    // Protection against self-reference (node that is parent of itself)
+    if (currentNode.parentId && currentNode.parentId === currentNode.id) {
+      console.warn(
+        `Auto-referência detectada: ID ${currentNode.id}, forçando como nó raiz`,
+      );
+      currentNode.parentId = null;
+    }
+
+    // If it's a root node (parentId is 0, null or undefined)
+    if (!currentNode.parentId || currentNode.parentId === 0) {
       rootNodes.push(currentNode);
     } else {
-      // Encontrar nó pai e adicionar como filho
-      const parentNode = nodeMap.get(node.parentId);
+      // Find parent node and add as child
+      const parentNode = nodeMap.get(currentNode.parentId);
       if (parentNode) {
+        // Ensure children is initialized
         if (!parentNode.children) {
           parentNode.children = [];
         }
         parentNode.children.push(currentNode);
+      } else {
+        // If parent doesn't exist, treat as root node
+        console.warn(
+          `Pai não encontrado para ID ${currentNode.id} (parentId: ${currentNode.parentId}), tratando como raiz`,
+        );
+        currentNode.parentId = null;
+        rootNodes.push(currentNode);
       }
     }
   }
 
-  // Ordenar nós em cada nível pela ordem especificada
+  // Sort nodes at each level by specified order
   return sortNodesByOrder([...rootNodes]);
 }
 

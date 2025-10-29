@@ -11,6 +11,7 @@ import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import {
   findCategoryById,
+  getCategoryOptions,
   getCategoryParentName,
 } from "@/app/actions/action-categories";
 import { PageTitleSection } from "@/components/common/page-title-section";
@@ -49,6 +50,9 @@ async function CategoryDetailsContent({ categoryId }: { categoryId: number }) {
 
   // Buscar nome da categoria pai se houver
   const parentName = await getCategoryParentName(category.PARENT_ID);
+
+  // Buscar lista de categorias para o seletor de categoria pai
+  const categories = await getCategoryOptions();
 
   return (
     <div className="space-y-6 py-6">
@@ -111,7 +115,12 @@ async function CategoryDetailsContent({ categoryId }: { categoryId: number }) {
               Clique em qualquer campo para editá-lo diretamente.
             </p>
           </div>
-          <CategoryDetailsInlineEdit category={category} section="basic" />
+          <CategoryDetailsInlineEdit
+            category={category}
+            section="basic"
+            categories={categories}
+            parentName={parentName}
+          />
         </Card>
 
         {/* Card 2: Mídia */}
