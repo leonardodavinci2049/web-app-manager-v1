@@ -32,6 +32,7 @@ import type {
   UpdateProductFlagsRequest,
   UpdateProductGeneralRequest,
   UpdateProductImagePathRequest,
+  UpdateProductMetadataRequest,
   UpdateProductNameRequest,
   UpdateProductPriceRequest,
   UpdateProductResponse,
@@ -52,6 +53,7 @@ import {
   UpdateProductFlagsSchema,
   UpdateProductGeneralSchema,
   UpdateProductImagePathSchema,
+  UpdateProductMetadataSchema,
   UpdateProductNameSchema,
   UpdateProductPriceSchema,
   UpdateProductShortDescriptionSchema,
@@ -824,6 +826,42 @@ export class ProductServiceApi extends BaseApiService {
       return data;
     } catch (error) {
       logger.error("Erro ao atualizar caminho da imagem do produto", error);
+      throw error;
+    }
+  }
+
+  /**
+   * ENDPOINT 20 - Update product metadata (meta title and meta description)
+   * @param params - Update parameters
+   * @returns Promise with update response
+   */
+  static async updateProductMetadata(
+    params: Partial<UpdateProductMetadataRequest> & {
+      pe_id_produto: number;
+      pe_meta_title: string;
+      pe_meta_description: string;
+    },
+  ): Promise<UpdateProductResponse> {
+    try {
+      const validatedParams = UpdateProductMetadataSchema.parse(params);
+      const instance = new ProductServiceApi();
+      const requestBody = ProductServiceApi.buildBasePayload(validatedParams);
+
+      const data: UpdateProductResponse =
+        await instance.post<UpdateProductResponse>(
+          PRODUCT_ENDPOINTS.UPDATE_METADATA,
+          requestBody,
+        );
+
+      if (isApiError(data.statusCode)) {
+        throw new Error(
+          data.message || "Erro ao atualizar metadados do produto",
+        );
+      }
+
+      return data;
+    } catch (error) {
+      logger.error("Erro ao atualizar metadados do produto", error);
       throw error;
     }
   }

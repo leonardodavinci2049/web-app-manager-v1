@@ -256,3 +256,16 @@ export type UpdateProductVariousInput = z.infer<
 export type UpdateProductImagePathInput = z.infer<
   typeof UpdateProductImagePathSchema
 >;
+
+/**
+ * Schema for updating product metadata (ENDPOINT 20)
+ */
+export const UpdateProductMetadataSchema = z.object({
+  pe_id_produto: z.number().int().min(1),
+  pe_meta_title: z.string().max(100),
+  pe_meta_description: z.string().max(200),
+});
+
+export type UpdateProductMetadataInput = z.infer<
+  typeof UpdateProductMetadataSchema
+>;
