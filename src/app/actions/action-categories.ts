@@ -126,9 +126,9 @@ export async function findCategories(
     // Verificar se há mais páginas
     // Se retornou a quantidade solicitada, provavelmente há mais
     const hasMore = categories.length === perPage;
-
+    /* 
     logger.info(`Categorias carregadas: ${categories.length}, página: ${page}`);
-
+ */
     return {
       success: true,
       data: categories,
@@ -398,9 +398,9 @@ export async function getCategoryOptions(): Promise<TaxonomyData[]> {
       }
     }
 
-    logger.info(
+    /*     logger.info(
       `Opções de categorias carregadas: ${flattenedOptions.length} (níveis 1 e 2)`,
-    );
+    ); */
 
     return flattenedOptions;
   } catch (error) {

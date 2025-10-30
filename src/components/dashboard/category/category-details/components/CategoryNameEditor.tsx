@@ -109,7 +109,7 @@ export function CategoryNameEditor({
               value={tempName}
               onChange={(e) => setTempName(e.target.value)}
               placeholder={t("dashboard.category.placeholders.name")}
-              className="text-base font-medium"
+              className="text-2xl font-semibold "
               disabled={isSaving}
               autoFocus
               maxLength={MAX_CHARACTERS + 10}
@@ -172,7 +172,7 @@ export function CategoryNameEditor({
             }
           }}
         >
-          <p className="flex-1 text-sm font-medium">{name}</p>
+          <p className="flex-1 text-2xl font-semibold">{name}</p>
           <Edit2 className="h-3.5 w-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
         </div>
       )}

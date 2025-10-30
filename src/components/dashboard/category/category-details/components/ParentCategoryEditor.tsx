@@ -223,9 +223,6 @@ export function ParentCategoryEditor({
             <p className="flex-1 text-sm text-muted-foreground">{parentName}</p>
             <Edit2 className="h-3.5 w-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
           </div>
-          <p className="text-xs text-muted-foreground">
-            ID: {parentId === 0 ? "-" : parentId}
-          </p>
         </div>
       )}
     </div>
