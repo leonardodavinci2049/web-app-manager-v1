@@ -69,7 +69,7 @@ export function CategoryListClient({
         // Estado local reseta automaticamente
       });
     },
-    [router],
+    [router]
   );
 
   /**
@@ -79,15 +79,14 @@ export function CategoryListClient({
     (column: string, order: string) => {
       if (currentSearch) {
         router.push(
-          `?sort=${column}-${order}&search=${encodeURIComponent(currentSearch)}`,
+          `?sort=${column}-${order}&search=${encodeURIComponent(currentSearch)}`
         );
       } else {
         router.push(`?sort=${column}-${order}`);
       }
     },
-    [currentSearch, router],
+    [currentSearch, router]
   );
-
   /**
    * Modo de visualização = muda URL
    * Não afeta os dados, apenas a apresentação
@@ -101,7 +100,7 @@ export function CategoryListClient({
       params.append("view", mode);
       router.push(`?${params.toString()}`);
     },
-    [currentSearch, currentSort, router],
+    [currentSearch, currentSort, router]
   );
 
   /**
@@ -121,10 +120,10 @@ export function CategoryListClient({
         searchType: "name",
         sortColumn: currentSort.includes("-")
           ? Number(currentSort.split("-")[0])
-          : 2,
+          : 2, // Fallback: coluna 2 (Mais Recente)
         sortOrder: currentSort.includes("-")
           ? Number(currentSort.split("-")[1])
-          : 1,
+          : 2, // Fallback: ordem decrescente (mais recente primeiro)
         filterStatus: 0,
         page: nextPage,
         perPage: 20,

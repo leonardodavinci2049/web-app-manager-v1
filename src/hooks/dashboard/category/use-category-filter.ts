@@ -33,8 +33,8 @@ export function useCategoryFilter() {
   const [filters, setFilters] = useState<CategoryFilterOptions>({
     searchTerm: "",
     searchType: "name",
-    sortColumn: 2, // Coluna nome
-    sortOrder: 1, // Ordem crescente (A-Z)
+    sortColumn: 2, // Coluna 2: Mais Recente
+    sortOrder: 2, // Ordem decrescente (mais recente primeiro)
   });
 
   // Estado dos dados
@@ -103,9 +103,8 @@ export function useCategoryFilter() {
         }
       });
     },
-    [currentPage],
+    [currentPage]
   );
-
   /**
    * Carrega mais categorias (paginação)
    */
@@ -124,9 +123,8 @@ export function useCategoryFilter() {
             resolve(filters);
             return filters;
           });
-        },
+        }
       );
-
       const params: FindCategoriesParams = {
         searchTerm: currentFilters.searchTerm,
         searchType: currentFilters.searchType,
@@ -161,9 +159,8 @@ export function useCategoryFilter() {
     (newFilters: Partial<CategoryFilterOptions>) => {
       setFilters((prev) => ({ ...prev, ...newFilters }));
     },
-    [],
+    []
   );
-
   /**
    * Reseta todos os filtros para valores padrão
    */
@@ -171,8 +168,8 @@ export function useCategoryFilter() {
     setFilters({
       searchTerm: "",
       searchType: "name",
-      sortColumn: 2,
-      sortOrder: 1,
+      sortColumn: 2, // Coluna 2: Mais Recente
+      sortOrder: 2, // Ordem decrescente (mais recente primeiro)
     });
   }, []);
 

@@ -38,10 +38,11 @@ interface CategoryFiltersClientProps {
  * Opções de ordenação
  */
 const sortOptions = [
-  { column: 2, order: 1, key: "sortNameAsc" }, // Nome A-Z
-  { column: 2, order: 2, key: "sortNameDesc" }, // Nome Z-A
-  { column: 1, order: 1, key: "sortIdAsc" }, // ID Crescente
-  { column: 1, order: 2, key: "sortIdDesc" }, // ID Decrescente
+  { column: 1, order: 1, key: "sortNameAsc" }, // Nome A-Z
+  { column: 1, order: 2, key: "sortNameDesc" }, // Nome Z-A
+  { column: 2, order: 2, key: "sortMostRecent" }, // Mais Recente (padrão) - ordem decrescente
+  { column: 3, order: 1, key: "sortQuantityAsc" }, // QT Crescente
+  { column: 3, order: 2, key: "sortQuantityDesc" }, // QT Decrescente
 ] as const;
 
 export function CategoryFiltersClient({
@@ -73,13 +74,12 @@ export function CategoryFiltersClient({
         handleSearchButtonClick();
       }
     },
-    [handleSearchButtonClick],
+    [handleSearchButtonClick]
   );
-
   // Contar filtros ativos
   const activeFiltersCount = [
     currentSearch && currentSearch.trim() !== "",
-    currentSort && currentSort !== "2-1", // Não é ordenação padrão
+    currentSort && currentSort !== "2-2", // Não é ordenação padrão (Mais Recente - decrescente)
   ].filter(Boolean).length;
 
   // Handler para mudança de ordenação
@@ -88,11 +88,10 @@ export function CategoryFiltersClient({
       const [column, order] = value.split("-");
       onSort(column, order);
     },
-    [onSort],
+    [onSort]
   );
-
   // Valor atual de ordenação para o Select
-  const currentSortValue = currentSort || "2-1";
+  const currentSortValue = currentSort || "2-2"; // Padrão: Mais Recente (coluna 2, ordem decrescente)
 
   return (
     <div className="space-y-6">

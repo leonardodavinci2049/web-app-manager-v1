@@ -48,7 +48,7 @@ export interface FindCategoriesResponse {
  * @returns Resultado da busca com dados das categorias
  */
 export async function findCategories(
-  params: FindCategoriesParams = {},
+  params: FindCategoriesParams = {}
 ): Promise<FindCategoriesResponse> {
   try {
     // Verificar autenticação
@@ -71,8 +71,8 @@ export async function findCategories(
     const {
       searchTerm = "",
       searchType = "name",
-      sortColumn = 2, // Ordenar por nome (coluna 2)
-      sortOrder = 1, // Ordem crescente
+      sortColumn = 2, // Padrão: Mais Recente (coluna 2)
+      sortOrder = 2, // Padrão: Ordem 2 (decrescente - mais recente primeiro)
       filterStatus = 0, // Apenas ativos
       page = 0, // Página inicial (MySQL começa em 0)
       perPage = 20,
@@ -157,7 +157,7 @@ export async function findCategories(
  * @returns Dados da categoria ou null
  */
 export async function findCategoryById(
-  id: number,
+  id: number
 ): Promise<TaxonomyData | null> {
   try {
     // Verificar autenticação
@@ -238,7 +238,7 @@ export interface UpdateCategoryResponse {
  * @returns Resultado da atualização
  */
 export async function updateCategory(
-  params: UpdateCategoryParams,
+  params: UpdateCategoryParams
 ): Promise<UpdateCategoryResponse> {
   try {
     // Verificar autenticação
@@ -324,7 +324,7 @@ export interface CreateCategoryParams {
   slug: string; // pe_slug - OBRIGATÓRIO
   parentId?: number; // pe_parent_id - OBRIGATÓRIO (default: 0)
   level?: number; // pe_level - OBRIGATÓRIO (default: 1)
-  type?: number; // pe_id_tipo - OBRIGATÓRIO (default: 2)
+  type?: number; // pe_id_tipo - OBRIGATÓRIO (default: 1)
 }
 
 /**
@@ -340,8 +340,10 @@ export interface CreateCategoryResponse {
 
 /**
  * Busca categorias para usar como opções de categoria pai
+ * Usa o endpoint de menu que retorna hierarquia organizada
+ * Retorna apenas níveis 1 e 2 (Família e Grupo)
  *
- * @returns Lista de categorias para seleção
+ * @returns Lista de categorias para seleção (níveis 1 e 2)
  */
 export async function getCategoryOptions(): Promise<TaxonomyData[]> {
   try {
@@ -355,77 +357,52 @@ export async function getCategoryOptions(): Promise<TaxonomyData[]> {
       return [];
     }
 
-    // Buscar todas as categorias ativas ordenadas por nome
-    const response = await TaxonomyServiceApi.findTaxonomies({
-      pe_id_parent: -1, // Todos os níveis
-      pe_flag_inativo: 0, // Apenas ativas
-      pe_qt_registros: 100, // Limite alto para pegar todas
-      pe_pagina_id: 0,
-      pe_coluna_id: 2, // Ordenar por nome
-      pe_ordem_id: 1, // Ordem crescente
-      pe_taxonomia: "", // Sem filtro de nome
-      pe_id_taxonomy: 0, // Sem filtro de ID
+    // Buscar hierarquia de categorias usando endpoint de menu
+    const response = await TaxonomyServiceApi.findTaxonomyMenu({
+      pe_id_tipo: 1, // Tipo de taxonomia (categorias)
+      // pe_parent_id omitido para buscar desde a raiz
     });
 
-    // Extrair lista completa de taxonomias
-    const categories = TaxonomyServiceApi.extractTaxonomyList(response);
-
-    // Separar categorias raiz e filhos diretos
-    const rootCategories = categories.filter(
-      (category) => category.PARENT_ID === 0,
-    );
-    const rootIds = new Set(
-      rootCategories.map((category) => category.ID_TAXONOMY),
-    );
-
-    // Agrupar filhos por categoria raiz para manter hierarquia controlada
-    const directChildrenByParent = new Map<number, TaxonomyData[]>();
-    for (const category of categories) {
-      if (category.PARENT_ID === 0) {
-        continue;
-      }
-
-      if (!rootIds.has(category.PARENT_ID)) {
-        continue;
-      }
-
-      const existingChildren =
-        directChildrenByParent.get(category.PARENT_ID) ?? [];
-      existingChildren.push(category);
-      directChildrenByParent.set(category.PARENT_ID, existingChildren);
+    // Verificar se resposta é válida
+    if (!TaxonomyServiceApi.isValidTaxonomyMenuResponse(response)) {
+      logger.error("Resposta inválida do endpoint de menu");
+      return [];
     }
 
-    // Ordenação consistente considerando locale pt-BR
-    const collator = new Intl.Collator("pt-BR", { sensitivity: "base" });
-    const orderedOptions: TaxonomyData[] = [];
+    // Extrair hierarquia de taxonomias
+    const hierarchicalCategories =
+      TaxonomyServiceApi.extractTaxonomyMenuList(response);
 
-    // Ordenar categorias raiz e agregar filhos diretos ordenados
-    [...rootCategories]
-      .sort((a, b) => collator.compare(a.TAXONOMIA, b.TAXONOMIA))
-      .forEach((rootCategory) => {
-        orderedOptions.push({
-          ...rootCategory,
-          LEVEL: rootCategory.LEVEL ?? 1,
-        });
+    // Flatten hierarchy to include only levels 1 and 2
+    // This prevents having level 4 categories (we only allow up to level 3)
+    // Parent can only be level 1 (Family) or level 2 (Group), never level 3 (Subgroup)
+    const flattenedOptions: TaxonomyData[] = [];
 
-        const children = directChildrenByParent.get(rootCategory.ID_TAXONOMY);
-        if (!children) {
-          return;
-        }
-
-        [...children]
-          .sort((a, b) => collator.compare(a.TAXONOMIA, b.TAXONOMIA))
-          .forEach((childCategory) => {
-            orderedOptions.push({
-              ...childCategory,
-              LEVEL: childCategory.LEVEL ?? 2,
-            });
-          });
+    for (const rootCategory of hierarchicalCategories) {
+      // Add root category (level 1 - Family)
+      flattenedOptions.push({
+        ...rootCategory,
+        LEVEL: rootCategory.LEVEL ?? 1,
       });
 
-    logger.info(`Opções de categorias carregadas: ${orderedOptions.length}`);
+      // Add direct children (level 2 - Group) if they exist
+      // Do NOT include level 3 (Subgroup) to prevent level 4 creation
+      if (rootCategory.children && rootCategory.children.length > 0) {
+        for (const childCategory of rootCategory.children) {
+          flattenedOptions.push({
+            ...childCategory,
+            LEVEL: childCategory.LEVEL ?? 2,
+            children: undefined, // Remove children property to flatten structure
+          });
+        }
+      }
+    }
 
-    return orderedOptions;
+    logger.info(
+      `Opções de categorias carregadas: ${flattenedOptions.length} (níveis 1 e 2)`
+    );
+
+    return flattenedOptions;
   } catch (error) {
     logger.error("Erro ao buscar opções de categorias", error);
     return [];
@@ -492,7 +469,7 @@ export async function createCategoryAction(formData: FormData) {
       pe_slug: slug,
       pe_parent_id: validated.parentId,
       pe_level: 1,
-      pe_id_tipo: 2, // Valor padrão conforme API reference
+      pe_id_tipo: 1, // Valor padrão conforme API reference
     });
 
     // 5. Validar resposta
@@ -532,7 +509,7 @@ export async function createCategoryAction(formData: FormData) {
 }
 
 export async function createCategory(
-  params: CreateCategoryParams,
+  params: CreateCategoryParams
 ): Promise<CreateCategoryResponse> {
   try {
     // Verificar autenticação

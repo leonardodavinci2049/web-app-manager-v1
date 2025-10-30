@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -42,6 +43,23 @@ export function ParentCategoryEditor({
   const availableCategories = categories.filter(
     (cat) => cat.ID_TAXONOMY !== categoryId,
   );
+
+  // Group categories by parent (level 1 = root, level 2 = children)
+  const level1Categories = availableCategories.filter(
+    (cat) => (cat.LEVEL ?? 1) === 1,
+  );
+  const level2Categories = availableCategories.filter(
+    (cat) => (cat.LEVEL ?? 1) === 2,
+  );
+
+  // Create map of children by parent ID for grouping
+  const childrenByParent = new Map<number, TaxonomyData[]>();
+  for (const child of level2Categories) {
+    const parentId = child.PARENT_ID;
+    const existing = childrenByParent.get(parentId) ?? [];
+    existing.push(child);
+    childrenByParent.set(parentId, existing);
+  }
 
   const handleEdit = () => {
     setTempParentId(parentId);
@@ -114,24 +132,57 @@ export function ParentCategoryEditor({
               <SelectValue placeholder="Selecione a categoria pai" />
             </SelectTrigger>
             <SelectContent>
+              {/* Root option */}
               <SelectItem value="0">
                 {t("dashboard.category.options.rootCategory")}
               </SelectItem>
-              {availableCategories.map((category) => (
-                <SelectItem
-                  key={category.ID_TAXONOMY}
-                  value={category.ID_TAXONOMY.toString()}
-                >
-                  {category.LEVEL &&
-                    category.LEVEL > 1 &&
-                    "— ".repeat(category.LEVEL - 1)}
-                  {category.TAXONOMIA}
-                </SelectItem>
-              ))}
+
+              {/* Level 1 categories (selectable) with their level 2 children grouped below */}
+              {level1Categories.map((rootCategory) => {
+                const children = childrenByParent.get(rootCategory.ID_TAXONOMY);
+                const hasChildren = children && children.length > 0;
+
+                if (hasChildren) {
+                  return (
+                    <SelectGroup key={rootCategory.ID_TAXONOMY}>
+                      {/* Level 1 category as selectable item */}
+                      <SelectItem
+                        value={rootCategory.ID_TAXONOMY.toString()}
+                        className="font-semibold"
+                      >
+                        📁 {rootCategory.TAXONOMIA}
+                      </SelectItem>
+                      {/* Level 2 children indented */}
+                      {children.map((childCategory) => (
+                        <SelectItem
+                          key={childCategory.ID_TAXONOMY}
+                          value={childCategory.ID_TAXONOMY.toString()}
+                          className="pl-8"
+                        >
+                          <span className="text-muted-foreground">└─</span>{" "}
+                          {childCategory.TAXONOMIA}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  );
+                }
+
+                // Root category without children
+                return (
+                  <SelectItem
+                    key={rootCategory.ID_TAXONOMY}
+                    value={rootCategory.ID_TAXONOMY.toString()}
+                    className="font-semibold"
+                  >
+                    📁 {rootCategory.TAXONOMIA}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
           <p className="text-xs text-muted-foreground">
-            Selecione a nova categoria pai ou "Raiz" para categoria principal
+            💡 Selecione a categoria pai (Nível 1 - Família ou Nível 2 - Grupo)
+            ou "Raiz" para categoria de nível 1
           </p>
           <div className="flex gap-2">
             <Button
