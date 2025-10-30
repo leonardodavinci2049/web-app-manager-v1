@@ -5,7 +5,7 @@
  * Wraps the ParentCategoryEditor in a card with proper styling and layout.
  */
 
-import { ParentCategoryEditor } from "@/components/dashboard/category/category-details/details-inline-edit/components/ParentCategoryEditor";
+import { ParentCategoryEditor } from "@/components/dashboard/category/category-details/components/ParentCategoryEditor";
 import { Card } from "@/components/ui/card";
 import type { TaxonomyData } from "@/services/api/taxonomy/types/taxonomy-types";
 

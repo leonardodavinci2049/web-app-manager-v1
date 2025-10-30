@@ -24,10 +24,10 @@ import {
   CategorySeoCard,
   CategoryStatusCard,
   ParentCategoryCard,
-} from "@/components/dashboard/category/category-details/details-inline-edit";
+} from "@/components/dashboard/category/category-details/";
+import { CategoryDetailsHeaderClient } from "@/components/dashboard/category/category-details/category-details-header";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { CategoryDetailsHeaderClient } from "./category-details-header";
 
 interface PageProps {
   searchParams: Promise<{
@@ -131,6 +131,13 @@ async function CategoryDetailsContent({ categoryId }: { categoryId: number }) {
           categories={categories}
         />
 
+        {/* Card 6: Anotações */}
+        <CategoryNotesCard category={category} />
+
+        {/* Card 5: SEO */}
+        <CategorySeoCard category={category} />
+
+
         {/* Card 3: Ordem de Exibição */}
         <CategoryOrderCard
           categoryId={category.ID_TAXONOMY}
@@ -141,11 +148,7 @@ async function CategoryDetailsContent({ categoryId }: { categoryId: number }) {
         {/* Card 4: Mídia */}
         <CategoryMediaCard category={category} />
 
-        {/* Card 5: SEO */}
-        <CategorySeoCard category={category} />
 
-        {/* Card 6: Anotações */}
-        <CategoryNotesCard category={category} />
 
         {/* Card 7: Status - Movido para o final */}
         <CategoryStatusCard

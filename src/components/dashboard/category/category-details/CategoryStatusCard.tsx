@@ -5,7 +5,7 @@
  * Wraps the CategoryStatusEditor in a card with proper styling and layout.
  */
 
-import { CategoryStatusEditor } from "@/components/dashboard/category/category-details/details-inline-edit/components/CategoryStatusEditor";
+import { CategoryStatusEditor } from "@/components/dashboard/category/category-details/components/CategoryStatusEditor";
 import { Card } from "@/components/ui/card";
 
 interface CategoryStatusCardProps {

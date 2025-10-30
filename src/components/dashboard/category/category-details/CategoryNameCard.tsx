@@ -5,7 +5,7 @@
  * Wraps the CategoryNameEditor in a card with proper styling and layout.
  */
 
-import { CategoryNameEditor } from "@/components/dashboard/category/category-details/details-inline-edit/components/CategoryNameEditor";
+import { CategoryNameEditor } from "@/components/dashboard/category/category-details/components/CategoryNameEditor";
 import { Card } from "@/components/ui/card";
 
 interface CategoryNameCardProps {

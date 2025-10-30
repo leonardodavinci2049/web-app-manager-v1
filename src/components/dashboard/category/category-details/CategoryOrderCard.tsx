@@ -5,7 +5,7 @@
  * Wraps the CategoryOrderEditor in a card with proper styling and layout.
  */
 
-import { CategoryOrderEditor } from "@/components/dashboard/category/category-details/details-inline-edit/components/CategoryOrderEditor";
+import { CategoryOrderEditor } from "@/components/dashboard/category/category-details/components/CategoryOrderEditor";
 import { Card } from "@/components/ui/card";
 
 interface CategoryOrderCardProps {
