@@ -77,7 +77,7 @@ export function CategoryFilters({
         onSearch();
       }, 300);
     },
-    [onFiltersChange, onSearch]
+    [onFiltersChange, onSearch],
   );
   // Contar filtros ativos
   const activeFiltersCount = [
@@ -93,7 +93,7 @@ export function CategoryFilters({
       // Busca automaticamente ao mudar ordenação (usando queueMicrotask para evitar loop)
       queueMicrotask(() => onSearch());
     },
-    [onFiltersChange, onSearch]
+    [onFiltersChange, onSearch],
   );
   // Valor atual de ordenação para o Select
   const currentSortValue = `${filters.sortColumn}-${filters.sortOrder}`;

@@ -74,7 +74,7 @@ export function CategoryFiltersClient({
         handleSearchButtonClick();
       }
     },
-    [handleSearchButtonClick]
+    [handleSearchButtonClick],
   );
   // Contar filtros ativos
   const activeFiltersCount = [
@@ -88,7 +88,7 @@ export function CategoryFiltersClient({
       const [column, order] = value.split("-");
       onSort(column, order);
     },
-    [onSort]
+    [onSort],
   );
   // Valor atual de ordenação para o Select
   const currentSortValue = currentSort || "2-2"; // Padrão: Mais Recente (coluna 2, ordem decrescente)

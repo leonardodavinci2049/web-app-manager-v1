@@ -48,7 +48,7 @@ export interface FindCategoriesResponse {
  * @returns Resultado da busca com dados das categorias
  */
 export async function findCategories(
-  params: FindCategoriesParams = {}
+  params: FindCategoriesParams = {},
 ): Promise<FindCategoriesResponse> {
   try {
     // Verificar autenticação
@@ -157,7 +157,7 @@ export async function findCategories(
  * @returns Dados da categoria ou null
  */
 export async function findCategoryById(
-  id: number
+  id: number,
 ): Promise<TaxonomyData | null> {
   try {
     // Verificar autenticação
@@ -238,7 +238,7 @@ export interface UpdateCategoryResponse {
  * @returns Resultado da atualização
  */
 export async function updateCategory(
-  params: UpdateCategoryParams
+  params: UpdateCategoryParams,
 ): Promise<UpdateCategoryResponse> {
   try {
     // Verificar autenticação
@@ -399,7 +399,7 @@ export async function getCategoryOptions(): Promise<TaxonomyData[]> {
     }
 
     logger.info(
-      `Opções de categorias carregadas: ${flattenedOptions.length} (níveis 1 e 2)`
+      `Opções de categorias carregadas: ${flattenedOptions.length} (níveis 1 e 2)`,
     );
 
     return flattenedOptions;
@@ -509,7 +509,7 @@ export async function createCategoryAction(formData: FormData) {
 }
 
 export async function createCategory(
-  params: CreateCategoryParams
+  params: CreateCategoryParams,
 ): Promise<CreateCategoryResponse> {
   try {
     // Verificar autenticação

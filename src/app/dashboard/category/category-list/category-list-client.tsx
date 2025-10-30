@@ -69,7 +69,7 @@ export function CategoryListClient({
         // Estado local reseta automaticamente
       });
     },
-    [router]
+    [router],
   );
 
   /**
@@ -79,13 +79,13 @@ export function CategoryListClient({
     (column: string, order: string) => {
       if (currentSearch) {
         router.push(
-          `?sort=${column}-${order}&search=${encodeURIComponent(currentSearch)}`
+          `?sort=${column}-${order}&search=${encodeURIComponent(currentSearch)}`,
         );
       } else {
         router.push(`?sort=${column}-${order}`);
       }
     },
-    [currentSearch, router]
+    [currentSearch, router],
   );
   /**
    * Modo de visualização = muda URL
@@ -100,7 +100,7 @@ export function CategoryListClient({
       params.append("view", mode);
       router.push(`?${params.toString()}`);
     },
-    [currentSearch, currentSort, router]
+    [currentSearch, currentSort, router],
   );
 
   /**

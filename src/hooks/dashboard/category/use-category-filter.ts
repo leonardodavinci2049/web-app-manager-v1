@@ -103,7 +103,7 @@ export function useCategoryFilter() {
         }
       });
     },
-    [currentPage]
+    [currentPage],
   );
   /**
    * Carrega mais categorias (paginação)
@@ -123,7 +123,7 @@ export function useCategoryFilter() {
             resolve(filters);
             return filters;
           });
-        }
+        },
       );
       const params: FindCategoriesParams = {
         searchTerm: currentFilters.searchTerm,
@@ -159,7 +159,7 @@ export function useCategoryFilter() {
     (newFilters: Partial<CategoryFilterOptions>) => {
       setFilters((prev) => ({ ...prev, ...newFilters }));
     },
-    []
+    [],
   );
   /**
    * Reseta todos os filtros para valores padrão
