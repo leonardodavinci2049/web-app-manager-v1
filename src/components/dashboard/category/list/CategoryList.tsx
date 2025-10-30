@@ -100,18 +100,18 @@ export function CategoryList({
           className="hover:bg-accent transition-colors duration-200"
         >
           {/* Layout responsivo: horizontal em desktop, vertical em mobile */}
-          <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4">
+          <div className="flex flex-col gap-3 px-4 py-1 sm:flex-row sm:items-center sm:gap-4">
             {/* Seção superior: Imagem + Info principal + Botão (mobile) */}
             <div className="flex items-center gap-3 sm:flex-1">
               {/* Image */}
-              <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-md border bg-muted">
+              <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border bg-muted">
                 {category.PATH_IMAGEM ? (
                   <Image
                     src={category.PATH_IMAGEM}
                     alt={category.TAXONOMIA}
                     fill
                     className="object-cover"
-                    sizes="48px"
+                    sizes="80px"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
@@ -122,21 +122,16 @@ export function CategoryList({
 
               {/* Main Info */}
               <div className="flex-1 min-w-0">
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
-                  <h3 className="font-semibold truncate">
-                    {category.TAXONOMIA}
-                  </h3>
-                  <Badge variant="outline" className="text-xs w-fit">
+                <h3 className="font-semibold truncate">{category.TAXONOMIA}</h3>
+                <div className="mt-1 flex flex-col gap-1 text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 sm:text-sm">
+                  <span className="truncate">
                     {t("dashboard.category.list.cardId")}:{" "}
                     {category.ID_TAXONOMY}
-                  </Badge>
-                </div>
-                <div className="mt-1 flex flex-col gap-1 text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 sm:text-sm">
-                  {category.SLUG && (
-                    <span className="truncate">
-                      {t("dashboard.category.list.cardSlug")}: {category.SLUG}
-                    </span>
-                  )}
+                  </span>
+                  <span className="truncate">
+                    {t("dashboard.category.list.cardProducts")}:{" "}
+                    {category.QT_RECORDS || 0}
+                  </span>
                   {category.PARENT_ID !== 0 && (
                     <span className="truncate">
                       {t("dashboard.category.list.cardParent")}:{" "}

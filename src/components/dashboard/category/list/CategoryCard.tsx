@@ -78,22 +78,23 @@ export function CategoryCard({ category }: CategoryCardProps) {
 
       {/* Conteúdo do Card */}
       <CardHeader className="space-y-2">
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="line-clamp-2 text-lg">
-            {category.TAXONOMIA}
-          </CardTitle>
-          <Badge variant="outline" className="shrink-0">
-            {t("dashboard.category.list.cardId")} {category.ID_TAXONOMY}
-          </Badge>
-        </div>
+        {/* Nome da Categoria */}
+        <CardTitle className="line-clamp-2 text-lg">
+          {category.TAXONOMIA}
+        </CardTitle>
 
-        {/* Slug */}
-        {category.SLUG && (
-          <CardDescription className="flex items-center gap-1">
+        {/* ID da Categoria e Quantidade de Produtos */}
+        <CardDescription className="flex items-center gap-3">
+          <span className="flex items-center gap-1">
             <Tag className="h-3 w-3" />
-            {category.SLUG}
-          </CardDescription>
-        )}
+            {t("dashboard.category.list.cardId")}: {category.ID_TAXONOMY}
+          </span>
+          <span className="flex items-center gap-1">
+            <Package className="h-3 w-3" />
+            {t("dashboard.category.list.cardProducts")}:{" "}
+            {category.QT_RECORDS || 0}
+          </span>
+        </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-3">

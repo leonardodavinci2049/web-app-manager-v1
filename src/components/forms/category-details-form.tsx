@@ -199,7 +199,7 @@ export function CategoryDetailsForm({ category }: CategoryDetailsFormProps) {
       {/* Meta Description - SEO */}
       <div className="space-y-2">
         <Label htmlFor="metaDescription">
-          {t("dashboard.category.fields.metaDescription")}
+          hhhhh {t("dashboard.category.fields.metaDescription")}
         </Label>
         <Textarea
           id="metaDescription"
