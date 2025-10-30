@@ -39,10 +39,11 @@ interface CategoryFiltersProps {
  * Opções de ordenação
  */
 const sortOptions = [
-  { column: 2, order: 1, key: "sortNameAsc" }, // Nome A-Z
-  { column: 2, order: 2, key: "sortNameDesc" }, // Nome Z-A
-  { column: 1, order: 1, key: "sortIdAsc" }, // ID Crescente
-  { column: 1, order: 2, key: "sortIdDesc" }, // ID Decrescente
+  { column: 1, order: 1, key: "sortNameAsc" }, // Nome A-Z
+  { column: 1, order: 2, key: "sortNameDesc" }, // Nome Z-A
+  { column: 2, order: 2, key: "sortMostRecent" }, // Mais Recente (padrão) - ordem decrescente
+  { column: 3, order: 1, key: "sortQuantityAsc" }, // QT Crescente
+  { column: 3, order: 2, key: "sortQuantityDesc" }, // QT Decrescente
 ] as const;
 
 export function CategoryFilters({
@@ -78,11 +79,10 @@ export function CategoryFilters({
     },
     [onFiltersChange, onSearch],
   );
-
   // Contar filtros ativos
   const activeFiltersCount = [
     filters.searchTerm && filters.searchTerm.trim() !== "",
-    filters.sortColumn !== 2 || filters.sortOrder !== 1, // Não é ordenação padrão
+    filters.sortColumn !== 2 || filters.sortOrder !== 2, // Não é ordenação padrão
   ].filter(Boolean).length;
 
   // Handler para mudança de ordenação
@@ -95,7 +95,6 @@ export function CategoryFilters({
     },
     [onFiltersChange, onSearch],
   );
-
   // Valor atual de ordenação para o Select
   const currentSortValue = `${filters.sortColumn}-${filters.sortOrder}`;
 

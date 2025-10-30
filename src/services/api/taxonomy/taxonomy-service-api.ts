@@ -318,7 +318,7 @@ export class TaxonomyServiceApi extends BaseApiService {
     try {
       // Validar parâmetros
       const validatedParams = CreateTaxonomySchema.parse({
-        pe_id_tipo: params.pe_id_tipo ?? 2,
+        pe_id_tipo: params.pe_id_tipo ?? 1,
         pe_parent_id: params.pe_parent_id ?? 0,
         pe_taxonomia: params.pe_taxonomia,
         pe_slug: params.pe_slug,

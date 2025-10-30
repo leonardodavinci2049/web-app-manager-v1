@@ -34,13 +34,13 @@ async function CategoryListContent({
 }) {
   // Extrair parâmetros
   const search = searchParams.search || "";
-  const sort = searchParams.sort || "2-1";
+  const sort = searchParams.sort || "2-2"; // Padrão: Mais Recente (column: 2, order: 2 - decrescente)
   const view = (searchParams.view || "list") as ViewMode;
 
   // Parse sort
   const [sortColumn, sortOrder] = sort.includes("-")
     ? sort.split("-").map(Number)
-    : [2, 1];
+    : [2, 2]; // Fallback: coluna 2, ordem decrescente
 
   // Buscar categorias no servidor
   const result = await findCategories({
