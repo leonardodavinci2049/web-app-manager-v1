@@ -9,7 +9,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -21,8 +20,49 @@ import type { TaxonomyData } from "@/services/api/taxonomy/types/taxonomy-types"
 
 interface AddCategoryDialogProps {
   productId: number;
-  existingCategoryIds: number[];
+  existingCategoryIds?: number[]; // Optional now, not used for filtering
   onSuccess?: () => void;
+}
+
+/**
+ * Flattens hierarchical taxonomy structure into a flat list
+ * preserving the hierarchy information (level)
+ * @param categories - Hierarchical taxonomy array
+ * @returns Flat array with all taxonomies
+ */
+function flattenTaxonomyHierarchy(categories: TaxonomyData[]): TaxonomyData[] {
+  const result: TaxonomyData[] = [];
+
+  function flatten(items: TaxonomyData[]) {
+    for (const item of items) {
+      // Add the current item (without children for clean structure)
+      const { children, ...itemWithoutChildren } = item;
+      result.push(itemWithoutChildren as TaxonomyData);
+
+      // Recursively flatten children
+      if (children && children.length > 0) {
+        flatten(children);
+      }
+    }
+  }
+
+  flatten(categories);
+  return result;
+}
+
+/**
+ * Get prefix dashes based on level
+ * Level 1: no dashes
+ * Level 2: one dash (-)
+ * Level 3: two dashes (--)
+ * @param level - Hierarchy level
+ * @returns Prefix string with dashes
+ */
+function getLevelPrefix(level: number): string {
+  if (level === 1) return "";
+  if (level === 2) return "- ";
+  if (level === 3) return "-- ";
+  return "--- "; // Fallback for deeper levels
 }
 
 /**
@@ -33,7 +73,6 @@ interface AddCategoryDialogProps {
  */
 export function AddCategoryDialog({
   productId,
-  existingCategoryIds,
   onSuccess,
 }: AddCategoryDialogProps) {
   const { t } = useTranslation();
@@ -56,9 +95,13 @@ export function AddCategoryDialog({
       }
 
       const data = await response.json();
-      setCategories(data.categories || []);
-    } catch (error) {
-      console.error("Error loading categories:", error);
+
+      // Flatten the hierarchical structure into a flat list
+      const hierarchicalCategories = data.categories || [];
+      const flatCategories = flattenTaxonomyHierarchy(hierarchicalCategories);
+
+      setCategories(flatCategories);
+    } catch (_error) {
       toast.error("Erro ao carregar categorias");
     } finally {
       setIsLoading(false);
@@ -83,22 +126,26 @@ export function AddCategoryDialog({
         setSearchTerm("");
         onSuccess?.();
       } else {
-        toast.error(result.message);
+        // Check if it's a duplicate category message (not an error, just information)
+        if (result.message.includes("Categoria já existe")) {
+          toast.info(result.message);
+        } else {
+          toast.error(result.message);
+        }
       }
-    } catch {
+    } catch (_error) {
       toast.error("Erro inesperado ao adicionar categoria");
     } finally {
       setIsAdding(false);
     }
   }
 
-  // Filter categories based on search and exclude existing ones
+  // Filter categories based on search only (show all categories, including existing ones)
   const filteredCategories = categories.filter((category) => {
     const matchesSearch = category.TAXONOMIA.toLowerCase().includes(
       searchTerm.toLowerCase(),
     );
-    const notAlreadyAdded = !existingCategoryIds.includes(category.ID_TAXONOMY);
-    return matchesSearch && notAlreadyAdded;
+    return matchesSearch;
   });
 
   return (
@@ -157,10 +204,10 @@ export function AddCategoryDialog({
                     disabled={isAdding}
                     className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-50"
                   >
-                    <span className="flex items-center gap-2">
-                      {category.LEVEL &&
-                        category.LEVEL > 1 &&
-                        "— ".repeat(category.LEVEL - 1)}
+                    <span className="flex items-center gap-1">
+                      <span className="text-muted-foreground">
+                        {getLevelPrefix(category.LEVEL || 1)}
+                      </span>
                       <span>{category.TAXONOMIA}</span>
                     </span>
                     <span className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -179,7 +226,7 @@ export function AddCategoryDialog({
           )}
         </div>
 
-        <DialogFooter>
+        <div className="flex justify-end">
           <Button
             variant="outline"
             onClick={() => {
@@ -190,7 +237,7 @@ export function AddCategoryDialog({
           >
             {t("dashboard.common.cancel")}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

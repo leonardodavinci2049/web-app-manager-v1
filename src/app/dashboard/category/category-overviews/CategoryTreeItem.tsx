@@ -20,7 +20,7 @@ export function CategoryTreeItem({
   const isExpanded = expandedIds.has(node.id);
   const isSelected = selectedId === node.id;
 
-  // Calcula indentação baseada no nível
+  // Calcula indentação baseada no nível (para o container principal)
   const indentationMap: Record<number, string> = {
     1: "pl-0",
     2: "pl-6",
@@ -89,6 +89,7 @@ export function CategoryTreeItem({
           "flex items-center gap-2 py-2 px-3 rounded-md transition-colors duration-150",
           "hover:bg-muted group w-full",
           isSelected && "bg-primary/10 border-l-2 border-primary",
+          indentation, // Aplica indentação ao container principal
         )}
       >
         {/* Ícone expansor */}
@@ -111,7 +112,7 @@ export function CategoryTreeItem({
         )}
 
         {/* Conteúdo do item com ícone hierárquico */}
-        <div className={cn("flex-1 flex items-center gap-2", indentation)}>
+        <div className="flex-1 flex items-center gap-2">
           {/* Ícone do nível hierárquico */}
           <div className="flex items-center justify-center flex-shrink-0">
             {getLevelIcon()}
