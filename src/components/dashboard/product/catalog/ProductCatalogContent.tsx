@@ -28,7 +28,7 @@ export function ProductCatalogContent({
   // State management
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [total, setTotal] = useState(initialTotal);
-  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [filters, setFilters] = useState<FilterOptions>({
     searchTerm: "",
     selectedCategory: "all",

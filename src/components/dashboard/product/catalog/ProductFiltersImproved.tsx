@@ -556,22 +556,22 @@ export function ProductFiltersImproved({
 
                 <div className="flex items-center rounded-md border">
                   <Button
-                    variant={viewMode === "list" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => onViewModeChange("list")}
-                    className="rounded-r-none"
-                    disabled={isLoading}
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                  <Button
                     variant={viewMode === "grid" ? "default" : "ghost"}
                     size="sm"
                     onClick={() => onViewModeChange("grid")}
-                    className="rounded-l-none"
+                    className="rounded-r-none"
                     disabled={isLoading}
                   >
                     <Grid3X3 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => onViewModeChange("list")}
+                    className="rounded-l-none"
+                    disabled={isLoading}
+                  >
+                    <List className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
