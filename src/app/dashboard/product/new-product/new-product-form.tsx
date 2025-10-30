@@ -13,7 +13,10 @@ import { toast } from "sonner";
 import { createProductFromForm } from "@/app/actions/action-products";
 import {
   FormButton,
+  FormCurrencyInput,
   FormInput,
+  FormIntegerInput,
+  FormPositiveIntegerInput,
   FormTextarea,
 } from "@/components/forms/form-inputs";
 import { SubmitButton } from "@/components/forms/submit-button";
@@ -54,6 +57,9 @@ export function NewProductForm() {
     } else if (wholesalePrice === 0) {
       errors.wholesalePrice =
         "O preço de atacado não pode ser zero. Por favor, defina um valor adequado para vendas no atacado.";
+    } else if (wholesalePrice > 2000000) {
+      errors.wholesalePrice =
+        "O preço de atacado não pode ser maior que R$ 2.000.000,00.";
     }
 
     // Validar Preço Varejo
@@ -64,6 +70,9 @@ export function NewProductForm() {
     } else if (retailPrice === 0) {
       errors.retailPrice =
         "O preço de varejo não pode ser zero. Por favor, defina um valor adequado para vendas no varejo.";
+    } else if (retailPrice > 2000000) {
+      errors.retailPrice =
+        "O preço de varejo não pode ser maior que R$ 2.000.000,00.";
     }
 
     // Validar Preço Corporativo
@@ -74,6 +83,9 @@ export function NewProductForm() {
     } else if (corporatePrice === 0) {
       errors.corporatePrice =
         "O preço corporativo não pode ser zero. Por favor, defina um valor adequado para vendas corporativas.";
+    } else if (corporatePrice > 2000000) {
+      errors.corporatePrice =
+        "O preço corporativo não pode ser maior que R$ 2.000.000,00.";
     }
 
     // Validar Estoque (opcional)
@@ -81,20 +93,22 @@ export function NewProductForm() {
     if (!Number.isNaN(stock) && stock < 0) {
       errors.stock =
         "O estoque deve ser um número inteiro válido (maior ou igual a zero).";
+    } else if (!Number.isNaN(stock) && stock > 1000000) {
+      errors.stock = "O estoque não pode ser maior que 1.000.000 unidades.";
     }
 
     // Validar ID da Marca (opcional)
     const brandId = parseInt(formData.get("brandId") as string, 10);
-    if (!Number.isNaN(brandId) && brandId < 0) {
+    if (Number.isNaN(brandId) || brandId <= 0) {
       errors.brandId =
-        "O ID da marca deve ser um número inteiro válido (maior ou igual a zero).";
+        "O ID da marca deve ser um número inteiro positivo maior que zero.";
     }
 
     // Validar ID do Tipo (opcional)
     const typeId = parseInt(formData.get("typeId") as string, 10);
-    if (!Number.isNaN(typeId) && typeId < 0) {
+    if (Number.isNaN(typeId) || typeId <= 0) {
       errors.typeId =
-        "O ID do tipo deve ser um número inteiro válido (maior ou igual a zero).";
+        "O ID do tipo deve ser um número inteiro positivo maior que zero.";
     }
 
     // Validações de consistência entre preços
@@ -213,14 +227,13 @@ export function NewProductForm() {
           {/* Preço Atacado */}
           <div className="space-y-2">
             <Label htmlFor="wholesalePrice">Preço Atacado</Label>
-            <FormInput
+            <FormCurrencyInput
               id="wholesalePrice"
               name="wholesalePrice"
-              type="number"
-              min="0"
-              step="0.01"
+              maxDecimals={4}
+              maxValue={2000000}
               defaultValue="0"
-              placeholder="0.00"
+              placeholder="0,0000"
               className={
                 validationErrors.wholesalePrice
                   ? "border-red-500 focus:border-red-500"
@@ -237,14 +250,13 @@ export function NewProductForm() {
           {/* Preço Varejo */}
           <div className="space-y-2">
             <Label htmlFor="retailPrice">Preço Varejo</Label>
-            <FormInput
+            <FormCurrencyInput
               id="retailPrice"
               name="retailPrice"
-              type="number"
-              min="0"
-              step="0.01"
+              maxDecimals={4}
+              maxValue={2000000}
               defaultValue="0"
-              placeholder="0.00"
+              placeholder="0,0000"
               className={
                 validationErrors.retailPrice
                   ? "border-red-500 focus:border-red-500"
@@ -261,14 +273,13 @@ export function NewProductForm() {
           {/* Preço Corporativo */}
           <div className="space-y-2">
             <Label htmlFor="corporatePrice">Preço Corporativo</Label>
-            <FormInput
+            <FormCurrencyInput
               id="corporatePrice"
               name="corporatePrice"
-              type="number"
-              min="0"
-              step="0.01"
+              maxDecimals={4}
+              maxValue={2000000}
               defaultValue="0"
-              placeholder="0.00"
+              placeholder="0,0000"
               className={
                 validationErrors.corporatePrice
                   ? "border-red-500 focus:border-red-500"
@@ -295,11 +306,10 @@ export function NewProductForm() {
             <Label htmlFor="stock">
               {t("dashboard.products.new.fields.stock")}
             </Label>
-            <FormInput
+            <FormIntegerInput
               id="stock"
               name="stock"
-              type="number"
-              min="0"
+              maxValue={1000000}
               defaultValue="0"
               placeholder={t("dashboard.products.new.placeholders.stock")}
               className={
@@ -326,13 +336,12 @@ export function NewProductForm() {
           {/* ID da Marca */}
           <div className="space-y-2">
             <Label htmlFor="brandId">ID da Marca</Label>
-            <FormInput
+            <FormPositiveIntegerInput
               id="brandId"
               name="brandId"
-              type="number"
-              min="0"
-              defaultValue="0"
-              placeholder="0"
+              maxValue={1000000}
+              defaultValue="1"
+              placeholder="1"
               className={
                 validationErrors.brandId
                   ? "border-red-500 focus:border-red-500"
@@ -349,13 +358,12 @@ export function NewProductForm() {
           {/* ID do Tipo */}
           <div className="space-y-2">
             <Label htmlFor="typeId">ID do Tipo</Label>
-            <FormInput
+            <FormPositiveIntegerInput
               id="typeId"
               name="typeId"
-              type="number"
-              min="0"
-              defaultValue="0"
-              placeholder="0"
+              maxValue={1000000}
+              defaultValue="1"
+              placeholder="1"
               className={
                 validationErrors.typeId
                   ? "border-red-500 focus:border-red-500"
