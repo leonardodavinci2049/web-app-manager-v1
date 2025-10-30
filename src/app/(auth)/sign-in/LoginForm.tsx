@@ -7,8 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
-import GoogleButton from "../components/GoogleButton";
-
 import SubmitButton from "../components/SubmitButton";
 import { loginAction } from "./login-action";
 
@@ -98,21 +96,21 @@ export function LoginForm({
           <SubmitButton />
         </Form>
 
-        <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+        {/*         <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
           <span className="bg-background text-muted-foreground relative z-10 px-2">
             {t("auth.login.orContinueWith")}
           </span>
         </div>
 
-        <GoogleButton />
+        <GoogleButton /> */}
       </div>
 
-      <div className="text-center text-sm">
+      {/*       <div className="text-center text-sm">
         {t("auth.login.noAccount")}{" "}
         <a href="/sign-up" className="underline underline-offset-4">
           {t("auth.login.signUp")}
         </a>
-      </div>
+      </div> */}
     </div>
   );
 }

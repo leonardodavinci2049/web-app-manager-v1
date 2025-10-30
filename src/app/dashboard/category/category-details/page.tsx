@@ -137,7 +137,6 @@ async function CategoryDetailsContent({ categoryId }: { categoryId: number }) {
         {/* Card 5: SEO */}
         <CategorySeoCard category={category} />
 
-
         {/* Card 3: Ordem de Exibição */}
         <CategoryOrderCard
           categoryId={category.ID_TAXONOMY}
@@ -147,8 +146,6 @@ async function CategoryDetailsContent({ categoryId }: { categoryId: number }) {
 
         {/* Card 4: Mídia */}
         <CategoryMediaCard category={category} />
-
-
 
         {/* Card 7: Status - Movido para o final */}
         <CategoryStatusCard
