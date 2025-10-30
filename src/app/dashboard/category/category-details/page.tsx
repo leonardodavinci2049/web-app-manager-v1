@@ -7,6 +7,8 @@
  * Rota: /dashboard/category/category-details?id=XXX
  */
 
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import {
@@ -14,9 +16,16 @@ import {
   getCategoryOptions,
   getCategoryParentName,
 } from "@/app/actions/action-categories";
-import { PageTitleSection } from "@/components/common/page-title-section";
-import { CategoryDetailsInlineEdit } from "@/components/forms/category-details-inline-edit";
-import { Card } from "@/components/ui/card";
+import {
+  CategoryMediaCard,
+  CategoryNameCard,
+  CategoryNotesCard,
+  CategoryOrderCard,
+  CategorySeoCard,
+  CategoryStatusCard,
+  ParentCategoryCard,
+} from "@/components/dashboard/category/category-details/details-inline-edit";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { CategoryDetailsHeaderClient } from "./category-details-header";
 
@@ -56,12 +65,13 @@ async function CategoryDetailsContent({ categoryId }: { categoryId: number }) {
 
   return (
     <div className="space-y-6 py-6">
-      {/* Título da Página */}
-      <PageTitleSection
-        titleKey="dashboard.category.details.title"
-        subtitleKey="dashboard.category.details.subtitle"
-        className="space-y-2"
-      />
+      {/* Botão Voltar */}
+      <Link href="/dashboard/category/category-list">
+        <Button variant="outline" size="sm" className="mb-4 gap-2">
+          <ArrowLeft className="h-4 w-4" />
+          Voltar para lista de categorias
+        </Button>
+      </Link>
 
       {/* Informações do Header */}
       <div className="flex flex-col gap-4">
@@ -96,7 +106,7 @@ async function CategoryDetailsContent({ categoryId }: { categoryId: number }) {
           </div>
           <div className="space-y-1">
             <p className="text-xs font-medium text-muted-foreground uppercase">
-              Itens
+              QT Produtos
             </p>
             <p className="text-sm font-semibold">{category.QT_RECORDS || 0}</p>
           </div>
@@ -107,54 +117,41 @@ async function CategoryDetailsContent({ categoryId }: { categoryId: number }) {
 
       {/* Cards de Edição Inline */}
       <div className="space-y-6">
-        {/* Card 1: Informações Básicas */}
-        <Card className="p-6">
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold">Informações Básicas</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Clique em qualquer campo para editá-lo diretamente.
-            </p>
-          </div>
-          <CategoryDetailsInlineEdit
-            category={category}
-            section="basic"
-            categories={categories}
-            parentName={parentName}
-          />
-        </Card>
+        {/* Card 1: Nome da Categoria */}
+        <CategoryNameCard
+          categoryId={category.ID_TAXONOMY}
+          initialName={category.TAXONOMIA}
+        />
 
-        {/* Card 2: Mídia */}
-        <Card className="p-6">
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold">Mídia</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Gerencie as imagens da categoria.
-            </p>
-          </div>
-          <CategoryDetailsInlineEdit category={category} section="media" />
-        </Card>
+        {/* Card 2: Categoria Pai */}
+        <ParentCategoryCard
+          categoryId={category.ID_TAXONOMY}
+          currentParentId={category.PARENT_ID}
+          currentParentName={parentName}
+          categories={categories}
+        />
 
-        {/* Card 3: SEO */}
-        <Card className="p-6">
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold">SEO</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Otimização para motores de busca.
-            </p>
-          </div>
-          <CategoryDetailsInlineEdit category={category} section="seo" />
-        </Card>
+        {/* Card 3: Ordem de Exibição */}
+        <CategoryOrderCard
+          categoryId={category.ID_TAXONOMY}
+          parentId={category.PARENT_ID}
+          initialOrder={category.ORDEM}
+        />
 
-        {/* Card 4: Anotações */}
-        <Card className="p-6">
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold">Anotações</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Informações adicionais e notas internas.
-            </p>
-          </div>
-          <CategoryDetailsInlineEdit category={category} section="notes" />
-        </Card>
+        {/* Card 4: Mídia */}
+        <CategoryMediaCard category={category} />
+
+        {/* Card 5: SEO */}
+        <CategorySeoCard category={category} />
+
+        {/* Card 6: Anotações */}
+        <CategoryNotesCard category={category} />
+
+        {/* Card 7: Status - Movido para o final */}
+        <CategoryStatusCard
+          categoryId={category.ID_TAXONOMY}
+          initialStatus={category.INATIVO}
+        />
       </div>
     </div>
   );
