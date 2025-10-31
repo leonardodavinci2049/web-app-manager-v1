@@ -152,6 +152,8 @@ export class ProductServiceApi extends BaseApiService {
       const requestBody =
         ProductServiceApi.buildProductSearchPayload(validatedParams);
 
+      console.log("Request Body findProductById:", requestBody);
+
       const response =
         await ProductServiceApi.executeProductSearch(requestBody);
 

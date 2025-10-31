@@ -339,6 +339,57 @@ export interface CreateCategoryResponse {
 }
 
 /**
+ * Server Action to load categories menu for client components
+ * Uses pe_id_tipo = 2 for product categories as per API documentation
+ * @returns Promise with categories data or error
+ */
+export async function loadCategoriesMenuAction() {
+  try {
+    // Verificar autenticação
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      logger.error("Usuário não autenticado para carregar menu de categorias");
+      return {
+        success: false,
+        data: [],
+        message: "Usuário não autenticado",
+      };
+    }
+
+    // Use pe_id_tipo = 2 for product categories (based on API documentation)
+    const response = await TaxonomyServiceApi.findTaxonomyMenu({
+      pe_id_tipo: 2, // Product categories type
+    });
+
+    if (TaxonomyServiceApi.isValidTaxonomyMenuResponse(response)) {
+      const taxonomies = TaxonomyServiceApi.extractTaxonomyMenuList(response);
+
+      return {
+        success: true,
+        data: taxonomies,
+        message: "Categorias carregadas com sucesso",
+      };
+    } else {
+      throw new Error("Resposta inválida da API de taxonomias");
+    }
+  } catch (error) {
+    logger.error("Error loading categories menu in server action", error);
+
+    const errorMessage =
+      error instanceof Error ? error.message : "Erro ao carregar categorias";
+
+    return {
+      success: false,
+      data: [],
+      message: errorMessage,
+    };
+  }
+}
+
+/**
  * Busca categorias para usar como opções de categoria pai
  * Usa o endpoint de menu que retorna hierarquia organizada
  * Retorna apenas níveis 1 e 2 (Família e Grupo)

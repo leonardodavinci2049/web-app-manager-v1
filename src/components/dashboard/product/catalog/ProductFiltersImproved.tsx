@@ -20,12 +20,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useBrands } from "@/hooks/use-brands";
+import { useCategories } from "@/hooks/use-categories";
+import { usePtypes } from "@/hooks/use-ptypes";
 import type {
   Category,
   FilterOptions,
   SortOption,
-  Subcategory,
-  Subgroup,
   ViewMode,
 } from "@/types/types";
 
@@ -59,69 +60,30 @@ export function ProductFiltersImproved({
   displayedProducts,
   isLoading = false,
 }: ProductFiltersImprovedProps) {
+  // Hook para carregar categorias
+  const {
+    categories,
+    isLoading: categoriesLoading,
+    error: categoriesError,
+  } = useCategories();
+
+  // Hook para carregar marcas
+  const { brands, isLoading: brandsLoading, error: brandsError } = useBrands();
+
+  // Hook para carregar tipos de produto
+  const { ptypes, isLoading: ptypesLoading, error: ptypesError } = usePtypes();
+
   // Estado local para o input de busca
   const [searchInputValue, setSearchInputValue] = useState(filters.searchTerm);
 
-  // Estado para subcategorias disponíveis
-  const [availableSubcategories, setAvailableSubcategories] = useState<
-    Subcategory[]
-  >([]);
-
-  // Estado para subgrupos disponíveis
-  const [availableSubgroups, setAvailableSubgroups] = useState<Subgroup[]>([]);
+  // Estados removidos - subcategorias e subgrupos não são mais necessários
 
   // Sincronizar o input local quando os filtros mudam externamente
   useEffect(() => {
     setSearchInputValue(filters.searchTerm);
   }, [filters.searchTerm]);
 
-  // Atualizar subcategorias quando a categoria muda
-  useEffect(() => {
-    // Por enquanto, sem dados de hierarquia de categorias
-    setAvailableSubcategories([]);
-    setAvailableSubgroups([]);
-
-    // Limpar subcategoria e subgrupo quando categoria muda
-    if (filters.selectedSubcategory || filters.selectedSubgroup) {
-      onFiltersChange({
-        ...filters,
-        selectedSubcategory: undefined,
-        selectedSubgroup: undefined,
-      });
-    }
-  }, [
-    filters.selectedCategory,
-    filters.selectedSubcategory,
-    filters.selectedSubgroup,
-    filters,
-    onFiltersChange,
-  ]);
-
-  // Atualizar subgrupos quando a subcategoria muda
-  useEffect(() => {
-    if (filters.selectedSubcategory && filters.selectedSubcategory !== "all") {
-      const subcategory = availableSubcategories.find(
-        (sub) => sub.id === filters.selectedSubcategory,
-      );
-      if (subcategory?.subgroups) {
-        setAvailableSubgroups(subcategory.subgroups);
-      } else {
-        setAvailableSubgroups([]);
-      }
-    } else {
-      setAvailableSubgroups([]);
-      // Limpar subgrupo quando subcategoria muda
-      if (filters.selectedSubgroup) {
-        onFiltersChange({ ...filters, selectedSubgroup: undefined });
-      }
-    }
-  }, [
-    filters.selectedSubcategory,
-    filters.selectedSubgroup,
-    availableSubcategories,
-    filters,
-    onFiltersChange,
-  ]);
+  // Effects removidos - não precisamos mais de lógica de hierarquia de categorias
 
   const updateFilter = <K extends keyof FilterOptions>(
     key: K,
@@ -159,43 +121,58 @@ export function ProductFiltersImproved({
     onResetFilters(); // Depois chama a função do pai
   };
 
-  // Função para alterar categoria (limpa subcategoria automaticamente)
+  // Função para alterar categoria
   const handleCategoryChange = (categoryId: string) => {
     onFiltersChange({
       ...filters,
       selectedCategory: categoryId,
-      selectedSubcategory: undefined, // Limpa subcategoria
+    });
+  };
+
+  // Função para alterar marca
+  const handleBrandChange = (brandId: string) => {
+    onFiltersChange({
+      ...filters,
+      selectedBrand: brandId === "all" ? undefined : brandId,
+    });
+  };
+
+  // Função para alterar tipo
+  const handlePtypeChange = (ptypeId: string) => {
+    onFiltersChange({
+      ...filters,
+      selectedPtype: ptypeId === "all" ? undefined : ptypeId,
     });
   };
 
   // Função para remover filtro específico
   const removeFilter = (
-    filterType: "category" | "subcategory" | "subgroup" | "search" | "stock",
+    filterType: "category" | "search" | "stock" | "brand" | "ptype",
   ) => {
     switch (filterType) {
       case "category":
         onFiltersChange({
           ...filters,
           selectedCategory: "all",
-          selectedSubcategory: undefined,
-          selectedSubgroup: undefined,
         });
-        break;
-      case "subcategory":
-        onFiltersChange({
-          ...filters,
-          selectedSubcategory: undefined,
-          selectedSubgroup: undefined,
-        });
-        break;
-      case "subgroup":
-        updateFilter("selectedSubgroup", undefined);
         break;
       case "search":
         handleClearSearch();
         break;
       case "stock":
         updateFilter("onlyInStock", false);
+        break;
+      case "brand":
+        onFiltersChange({
+          ...filters,
+          selectedBrand: undefined,
+        });
+        break;
+      case "ptype":
+        onFiltersChange({
+          ...filters,
+          selectedPtype: undefined,
+        });
         break;
     }
   };
@@ -213,38 +190,39 @@ export function ProductFiltersImproved({
     }
 
     if (filters.selectedCategory && filters.selectedCategory !== "all") {
-      // Usar o valor da categoria como label por enquanto
+      // Encontrar o nome da categoria selecionada
+      const selectedCategory = categories.find(
+        (cat) => cat.id.toString() === filters.selectedCategory,
+      );
       activeFilters.push({
         type: "category" as const,
-        label: filters.selectedCategory,
+        label: `Categoria: ${selectedCategory?.name || filters.selectedCategory}`,
         value: filters.selectedCategory,
       });
     }
 
-    if (filters.selectedSubcategory) {
-      const subcategory = availableSubcategories.find(
-        (sub) => sub.id === filters.selectedSubcategory,
+    if (filters.selectedBrand) {
+      // Encontrar o nome da marca selecionada
+      const selectedBrand = brands.find(
+        (brand) => brand.id.toString() === filters.selectedBrand,
       );
-      if (subcategory) {
-        activeFilters.push({
-          type: "subcategory" as const,
-          label: subcategory.name,
-          value: filters.selectedSubcategory,
-        });
-      }
+      activeFilters.push({
+        type: "brand" as const,
+        label: `Marca: ${selectedBrand?.name || filters.selectedBrand}`,
+        value: filters.selectedBrand,
+      });
     }
 
-    if (filters.selectedSubgroup) {
-      const subgroup = availableSubgroups.find(
-        (sub) => sub.id === filters.selectedSubgroup,
+    if (filters.selectedPtype) {
+      // Encontrar o nome do tipo selecionado
+      const selectedPtype = ptypes.find(
+        (ptype) => ptype.id.toString() === filters.selectedPtype,
       );
-      if (subgroup) {
-        activeFilters.push({
-          type: "subgroup" as const,
-          label: subgroup.name,
-          value: filters.selectedSubgroup,
-        });
-      }
+      activeFilters.push({
+        type: "ptype" as const,
+        label: `Tipo: ${selectedPtype?.name || filters.selectedPtype}`,
+        value: filters.selectedPtype,
+      });
     }
 
     if (filters.onlyInStock) {
@@ -329,106 +307,130 @@ export function ProductFiltersImproved({
           <AccordionContent className="pt-4">
             <Card>
               <CardContent className="space-y-4 pt-6">
-                {/* Linha de Dropdowns: Família, Grupo, Subgrupo + Botão Limpar */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-                  {/* Dropdown Família (Categoria) */}
+                {/* Linha de Dropdown: Categoria + Marca + Tipo + Botão Limpar */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+                  {/* Dropdown Categoria */}
                   <div className="space-y-2">
                     <div className="text-sm font-medium text-muted-foreground">
-                      Família
+                      Categoria
+                      {categoriesError && (
+                        <span className="text-red-500 text-xs ml-2">
+                          (Erro ao carregar)
+                        </span>
+                      )}
                     </div>
                     <Select
                       value={filters.selectedCategory}
                       onValueChange={handleCategoryChange}
-                      disabled={isLoading}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecione uma família" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Todas as Famílias</SelectItem>
-                        {/* Categorias serão carregadas da API em futuras iterações */}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Dropdown Grupo (Subcategoria) */}
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium text-muted-foreground">
-                      Grupo
-                    </div>
-                    <Select
-                      value={filters.selectedSubcategory || "all"}
-                      onValueChange={(value) =>
-                        updateFilter(
-                          "selectedSubcategory",
-                          value === "all" ? undefined : value,
-                        )
-                      }
-                      disabled={
-                        isLoading || availableSubcategories.length === 0
-                      }
+                      disabled={isLoading || categoriesLoading}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue
                           placeholder={
-                            availableSubcategories.length === 0
-                              ? "Selecione uma família primeiro"
-                              : "Selecione um grupo"
+                            categoriesLoading
+                              ? "Carregando categorias..."
+                              : "Selecione uma categoria"
                           }
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">Todos os Grupos</SelectItem>
-                        {availableSubcategories.map((subcategory) => (
+                        <SelectItem value="all">Todas as Categorias</SelectItem>
+                        {categories.map((category) => (
                           <SelectItem
-                            key={subcategory.id}
-                            value={subcategory.id}
+                            key={category.id}
+                            value={category.id.toString()}
                           >
-                            {subcategory.name}
+                            {category.displayName}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
 
-                  {/* Dropdown Subgrupo */}
+                  {/* Dropdown Marca */}
                   <div className="space-y-2">
                     <div className="text-sm font-medium text-muted-foreground">
-                      Subgrupo
+                      Marca
+                      {brandsError && (
+                        <span className="text-red-500 text-xs ml-2">
+                          (Erro ao carregar)
+                        </span>
+                      )}
                     </div>
                     <Select
-                      value={filters.selectedSubgroup || "all"}
-                      onValueChange={(value) =>
-                        updateFilter(
-                          "selectedSubgroup",
-                          value === "all" ? undefined : value,
-                        )
-                      }
-                      disabled={isLoading || availableSubgroups.length === 0}
+                      value={filters.selectedBrand || "all"}
+                      onValueChange={handleBrandChange}
+                      disabled={isLoading || brandsLoading}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue
                           placeholder={
-                            availableSubgroups.length === 0
-                              ? "Selecione um grupo primeiro"
-                              : "Selecione um subgrupo"
+                            brandsLoading
+                              ? "Carregando marcas..."
+                              : "Selecione uma marca"
                           }
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">Todos os Subgrupos</SelectItem>
-                        {availableSubgroups.map((subgroup) => (
-                          <SelectItem key={subgroup.id} value={subgroup.id}>
-                            {subgroup.name}
+                        <SelectItem value="all">Todas as Marcas</SelectItem>
+                        {brands.map((brand) => (
+                          <SelectItem
+                            key={brand.id}
+                            value={brand.id.toString()}
+                          >
+                            {brand.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
 
-                  {/* Botão Limpar Filtros - só aparece quando há categoria selecionada */}
+                  {/* Dropdown Tipo */}
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium text-muted-foreground">
+                      Tipo
+                      {ptypesError && (
+                        <span className="text-red-500 text-xs ml-2">
+                          (Erro ao carregar)
+                        </span>
+                      )}
+                    </div>
+                    <Select
+                      value={filters.selectedPtype || "all"}
+                      onValueChange={handlePtypeChange}
+                      disabled={isLoading || ptypesLoading}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue
+                          placeholder={
+                            ptypesLoading
+                              ? "Carregando tipos..."
+                              : "Selecione um tipo"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os Tipos</SelectItem>
+                        {ptypes.map((ptype) => (
+                          <SelectItem
+                            key={ptype.id}
+                            value={ptype.id.toString()}
+                          >
+                            {ptype.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Espaço vazio para manter layout */}
+                  <div></div>
+
+                  {/* Botão Limpar Filtros - aparece quando há categoria, marca ou tipo selecionado */}
                   <div className="flex justify-end">
-                    {filters.selectedCategory !== "all" && (
+                    {(filters.selectedCategory !== "all" ||
+                      filters.selectedBrand ||
+                      filters.selectedPtype) && (
                       <Button
                         variant="outline"
                         size="default"

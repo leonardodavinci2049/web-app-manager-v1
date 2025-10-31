@@ -34,6 +34,8 @@ export function ProductCatalogContent({
     selectedCategory: "all",
     selectedSubcategory: undefined,
     selectedSubgroup: undefined,
+    selectedBrand: undefined,
+    selectedPtype: undefined,
     onlyInStock: false,
     sortBy: "newest", // Default to newest products first
   });
@@ -57,11 +59,14 @@ export function ProductCatalogContent({
         setLoadedQuantity(20); // Reset loaded quantity
         setReachedEnd(false); // Reset end state
 
-        logger.info("Updating filters:", newFilters);
+        logger.info("Updating filters:", {
+          ...newFilters,
+          categoryFilterActive: newFilters.selectedCategory !== "all",
+        });
 
         const result = await fetchProductsWithFilters(
           newFilters.searchTerm,
-          newFilters.selectedCategory,
+          newFilters.selectedCategory, // This will be the category ID or "all"
           newFilters.onlyInStock,
           newFilters.sortBy,
           1, // First page
@@ -96,6 +101,8 @@ export function ProductCatalogContent({
       selectedCategory: "all",
       selectedSubcategory: undefined,
       selectedSubgroup: undefined,
+      selectedBrand: undefined,
+      selectedPtype: undefined,
       onlyInStock: false,
       sortBy: "newest", // Default to newest products first
     };
