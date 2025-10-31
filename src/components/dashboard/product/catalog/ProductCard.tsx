@@ -1,9 +1,14 @@
-import { Eye, Package, Plane, Shield, Star } from "lucide-react";
+"use client";
+
+import { Eye, Plane, Shield, Star } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Product } from "../../../../types/types";
 import { formatCurrency } from "../../../../utils/common-utils";
+import { InlinePriceEditor } from "./InlinePriceEditor";
+import { InlineStockEditor } from "./InlineStockEditor";
 import { ProductCardClient } from "./ProductCardClient";
 
 interface ProductCardProps {
@@ -19,9 +24,34 @@ export function ProductCard({
   onViewDetails,
   onImageUploadSuccess,
 }: ProductCardProps) {
+  const [currentStock, setCurrentStock] = useState(product.stock);
+  const [currentRetailPrice, setCurrentRetailPrice] = useState(
+    product.normalPrice,
+  );
+  const [currentWholesalePrice, setCurrentWholesalePrice] = useState(
+    product.wholesalePrice,
+  );
+  const [currentCorporatePrice, setCurrentCorporatePrice] = useState(
+    product.corporatePrice,
+  );
+
   const hasPromotion = Boolean(
     product.promotionalPrice && product.promotionalPrice < product.normalPrice,
   );
+
+  const handleStockUpdated = (newStock: number) => {
+    setCurrentStock(newStock);
+  };
+
+  const handlePricesUpdated = (
+    retailPrice: number,
+    wholesalePrice: number,
+    corporatePrice: number,
+  ) => {
+    setCurrentRetailPrice(retailPrice);
+    setCurrentWholesalePrice(wholesalePrice);
+    setCurrentCorporatePrice(corporatePrice);
+  };
 
   const categoryLabels: Record<string, string> = {
     electronics: "Eletrônicos",
@@ -90,47 +120,34 @@ export function ProductCard({
                 )}
               </div>
 
-              {/* Preços - Grid responsivo */}
-              <div className="grid grid-cols-3 gap-2 md:flex md:flex-wrap md:gap-4">
+              {/* Preços - Editor Inline */}
+              <div className="md:max-w-xs">
                 {hasPromotion && (
-                  <div className="col-span-3 md:w-auto">
+                  <div className="mb-2">
                     <p className="text-muted-foreground text-xs md:text-sm line-through">
-                      {formatCurrency(product.normalPrice)}
+                      Preço original: {formatCurrency(product.normalPrice)}
                     </p>
                   </div>
                 )}
-                <div className="text-center md:text-left">
-                  <p className="text-xs text-muted-foreground">Atac.</p>
-                  <p className="text-sm md:text-base font-bold text-green-600 dark:text-green-400">
-                    {formatCurrency(product.wholesalePrice)}
-                  </p>
-                </div>
-                <div className="text-center md:text-left">
-                  <p className="text-xs text-muted-foreground">Vare.</p>
-                  <p className="text-sm md:text-base font-bold text-orange-600 dark:text-orange-400">
-                    {formatCurrency(product.normalPrice)}
-                  </p>
-                </div>
-                <div className="text-center md:text-left">
-                  <p className="text-xs text-muted-foreground">Corp.</p>
-                  <p className="text-sm md:text-base font-bold text-blue-600 dark:text-blue-400">
-                    {formatCurrency(product.corporatePrice)}
-                  </p>
-                </div>
+                <InlinePriceEditor
+                  productId={Number(product.id) || 0}
+                  productName={product.name}
+                  retailPrice={currentRetailPrice}
+                  wholesalePrice={currentWholesalePrice}
+                  corporatePrice={currentCorporatePrice}
+                  onPricesUpdated={handlePricesUpdated}
+                />
               </div>
 
               {/* Estoque e Garantia - Layout responsivo */}
               <div className="flex flex-wrap gap-4 text-sm">
-                <div
-                  className={`flex items-center gap-1 font-medium ${
-                    product.stock === 0
-                      ? "text-red-600 dark:text-red-400"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  <Package className="h-4 w-4 flex-shrink-0" />
-                  <span>Estoque: {product.stock}</span>
-                </div>
+                <InlineStockEditor
+                  productId={Number(product.id) || 0}
+                  productName={product.name}
+                  currentStock={currentStock}
+                  onStockUpdated={handleStockUpdated}
+                  className="font-medium"
+                />
                 {product.warrantyDays > 0 && (
                   <div className="text-muted-foreground flex items-center gap-1 text-xs md:text-sm">
                     <Shield className="h-4 w-4 flex-shrink-0" />
@@ -200,32 +217,25 @@ export function ProductCard({
                 Preço original: {formatCurrency(product.normalPrice)}
               </span>
             )}
-            {/* Preços diferenciados - linhas diferentes no modo grid */}
-            <div className="space-y-1">
-              <div className="text-sm font-medium text-green-600 dark:text-green-400">
-                Atac. {formatCurrency(product.wholesalePrice)}
-              </div>
-              <div className="text-sm font-medium text-orange-600 dark:text-orange-400">
-                Vare. {formatCurrency(product.normalPrice)}
-              </div>
-              <div className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                Corp. {formatCurrency(product.corporatePrice)}
-              </div>
-            </div>
+            <InlinePriceEditor
+              productId={Number(product.id) || 0}
+              productName={product.name}
+              retailPrice={currentRetailPrice}
+              wholesalePrice={currentWholesalePrice}
+              corporatePrice={currentCorporatePrice}
+              onPricesUpdated={handlePricesUpdated}
+            />
           </div>
 
           {/* Estoque e Garantia */}
           <div className="space-y-1">
-            <div
-              className={`flex items-center gap-1 text-sm font-medium ${
-                product.stock === 0
-                  ? "text-red-600 dark:text-red-400"
-                  : "text-muted-foreground"
-              }`}
-            >
-              <Package className="h-3 w-3" />
-              <span>Estoque: {product.stock}</span>
-            </div>
+            <InlineStockEditor
+              productId={Number(product.id) || 0}
+              productName={product.name}
+              currentStock={currentStock}
+              onStockUpdated={handleStockUpdated}
+              className="text-sm font-medium"
+            />
             {product.warrantyDays > 0 && (
               <div className="text-muted-foreground flex items-center gap-1 text-xs">
                 <Shield className="h-3 w-3" />
