@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/hooks/use-translation";
 import type { TaxonomyData } from "@/services/api/taxonomy/types/taxonomy-types";
+import { DeleteCategoryDialog } from "./DeleteCategoryDialog";
 
 /**
  * Props for CategoryList Component
@@ -16,6 +17,7 @@ import type { TaxonomyData } from "@/services/api/taxonomy/types/taxonomy-types"
 interface CategoryListProps {
   categories: TaxonomyData[];
   isLoading?: boolean;
+  onDelete?: (categoryId: number) => void;
 }
 
 /**
@@ -27,6 +29,7 @@ interface CategoryListProps {
 export function CategoryList({
   categories,
   isLoading = false,
+  onDelete,
 }: CategoryListProps) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -173,8 +176,8 @@ export function CategoryList({
                   )}
               </div>
 
-              {/* Botão de Detalhe - visível apenas em desktop */}
-              <div className="hidden sm:flex sm:flex-shrink-0">
+              {/* Botões de Ação - visível apenas em desktop */}
+              <div className="hidden sm:flex sm:flex-shrink-0 sm:gap-2">
                 <Button
                   size="sm"
                   variant="outline"
@@ -184,6 +187,14 @@ export function CategoryList({
                   <ChevronRight className="h-4 w-4" />
                   {t("dashboard.category.list.buttonDetail")}
                 </Button>
+                <DeleteCategoryDialog
+                  categoryId={category.ID_TAXONOMY}
+                  categoryName={category.TAXONOMIA}
+                  onSuccess={() => onDelete?.(category.ID_TAXONOMY)}
+                  variant="outline"
+                  size="sm"
+                  showLabel={false}
+                />
               </div>
             </div>
           </div>

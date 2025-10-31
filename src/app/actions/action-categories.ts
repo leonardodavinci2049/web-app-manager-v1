@@ -483,11 +483,11 @@ export async function createCategoryAction(formData: FormData) {
       throw new Error("Falha ao criar categoria");
     }
 
-    logger.info("Categoria criada com sucesso", {
+/*     logger.info("Categoria criada com sucesso", {
       name: validated.name,
       slug,
       level: 1,
-    });
+    }); */
 
     // 7. Redirect automático em caso de sucesso (Next.js 15 pattern)
     const { redirect } = await import("next/navigation");
@@ -567,7 +567,7 @@ export async function createCategory(
     // Buscar dados da categoria criada
     const createdCategory = await findCategoryById(recordId);
 
-    logger.info(`Categoria criada com sucesso: ID ${recordId}, Nome: ${name}`);
+    // logger.info(`Categoria criada com sucesso: ID ${recordId}, Nome: ${name}`);
 
     return {
       success: true,
@@ -584,6 +584,89 @@ export async function createCategory(
         error instanceof Error
           ? error.message
           : "Erro desconhecido ao criar categoria",
+    };
+  }
+}
+
+/**
+ * Interface para resposta de exclusão de categoria
+ */
+export interface DeleteCategoryResponse {
+  success: boolean;
+  message: string;
+  error?: string;
+}
+
+/**
+ * Deleta uma categoria (soft delete)
+ *
+ * @param categoryId - ID da categoria a ser deletada
+ * @returns Resultado da operação de exclusão
+ */
+export async function deleteCategory(
+  categoryId: number,
+): Promise<DeleteCategoryResponse> {
+  try {
+    // Verificar autenticação
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session?.user) {
+      return {
+        success: false,
+        message: "Não autorizado",
+        error: "Usuário não autenticado",
+      };
+    }
+
+    // logger.info(`Deletando categoria: ID ${categoryId}`);
+
+    // Chamar serviço de API para deletar
+    const response = await TaxonomyServiceApi.deleteTaxonomy({
+      pe_id_taxonomy: categoryId,
+    });
+
+    // Validar resposta
+    if (!TaxonomyServiceApi.isValidOperationResponse(response)) {
+      throw new Error("Resposta inválida da API");
+    }
+
+    // Verificar se a operação foi bem-sucedida
+    if (!TaxonomyServiceApi.isOperationSuccessful(response)) {
+      const errorMsg =
+        TaxonomyServiceApi.extractStoredProcedureResponse(response)
+          ?.sp_message || "Falha ao deletar categoria";
+      return {
+        success: false,
+        message: errorMsg,
+        error: errorMsg,
+      };
+    }
+
+    // Extrair mensagem de sucesso da stored procedure
+    const spResponse =
+      TaxonomyServiceApi.extractStoredProcedureResponse(response);
+    const successMessage =
+      spResponse?.sp_message ||
+      response.message ||
+      "Categoria deletada com sucesso";
+
+    // logger.info(`Categoria deletada com sucesso: ID ${categoryId}`);
+
+    return {
+      success: true,
+      message: successMessage,
+    };
+  } catch (error) {
+    logger.error("Erro ao deletar categoria", error);
+    return {
+      success: false,
+      message: "Erro ao deletar categoria",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Erro desconhecido ao deletar categoria",
     };
   }
 }

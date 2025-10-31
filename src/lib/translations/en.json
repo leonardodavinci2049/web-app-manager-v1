@@ -403,6 +403,7 @@
         "buttonClear": "Clear",
         "buttonLoadMore": "Load More",
         "buttonDetail": "Detail",
+        "buttonDelete": "Delete",
         "sortBy": "Sort by",
         "sortNameAsc": "Name (A-Z)",
         "sortNameDesc": "Name (Z-A)",
@@ -429,7 +430,16 @@
         "rootCategory": "Root",
         "showing": "Showing {{displayed}} of {{total}} categories",
         "allLoaded": "All categories have been loaded",
-        "activeFilters": "{{count}} filter{{plural}} active{{plural}}"
+        "activeFilters": "{{count}} filter{{plural}} active{{plural}}",
+        "delete": {
+          "title": "Confirm deletion",
+          "description": "Are you sure you want to delete the category \"{{name}}\"? This action cannot be undone.",
+          "confirmButton": "Delete",
+          "cancelButton": "Cancel",
+          "deleting": "Deleting...",
+          "success": "Category deleted successfully!",
+          "error": "Error deleting category"
+        }
       },
       "fields": {
         "name": "Category Name",
