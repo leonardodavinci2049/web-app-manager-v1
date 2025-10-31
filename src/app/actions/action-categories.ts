@@ -483,7 +483,7 @@ export async function createCategoryAction(formData: FormData) {
       throw new Error("Falha ao criar categoria");
     }
 
-/*     logger.info("Categoria criada com sucesso", {
+    /*     logger.info("Categoria criada com sucesso", {
       name: validated.name,
       slug,
       level: 1,
