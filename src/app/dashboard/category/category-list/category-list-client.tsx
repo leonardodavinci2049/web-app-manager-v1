@@ -13,7 +13,7 @@
  */
 
 import { useRouter } from "next/navigation";
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import type { FindCategoriesParams } from "@/app/actions/action-categories";
 import { findCategories } from "@/app/actions/action-categories";
@@ -48,7 +48,23 @@ export function CategoryListClient({
   const [hasMore, setHasMore] = useState(initialCategories.length === 20);
 
   // Estado local para modo de visualização - usar "list" como padrão para evitar flash
-  const [viewMode, setViewMode] = useState<ViewMode>(currentView || "list");
+  const [viewMode, setViewMode] = useState<ViewMode>(
+    () => currentView || "list",
+  );
+
+  useEffect(() => {
+    if (!currentView) {
+      return;
+    }
+
+    setViewMode((previous) => {
+      if (previous === currentView) {
+        return previous;
+      }
+
+      return currentView;
+    });
+  }, [currentView]);
 
   // Loading states
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -60,16 +76,29 @@ export function CategoryListClient({
   const handleSearch = useCallback(
     (term: string) => {
       startTransition(() => {
+        const searchParams = new URLSearchParams(
+          typeof window !== "undefined" ? window.location.search : "",
+        );
+
         if (term.trim()) {
-          router.push(`?search=${encodeURIComponent(term)}`);
+          searchParams.set("search", term.trim());
         } else {
-          router.push("?");
+          searchParams.delete("search");
         }
+
+        if (viewMode === "list") {
+          searchParams.delete("view");
+        } else {
+          searchParams.set("view", viewMode);
+        }
+
+        const queryString = searchParams.toString();
+        router.push(queryString ? `?${queryString}` : "?");
         // Server Component recarrega com novo search
         // Estado local reseta automaticamente
       });
     },
-    [router],
+    [router, viewMode],
   );
 
   /**
@@ -77,31 +106,48 @@ export function CategoryListClient({
    */
   const handleSort = useCallback(
     (column: string, order: string) => {
-      if (currentSearch) {
-        router.push(
-          `?sort=${column}-${order}&search=${encodeURIComponent(currentSearch)}`,
-        );
+      const searchParams = new URLSearchParams(
+        typeof window !== "undefined" ? window.location.search : "",
+      );
+
+      searchParams.set("sort", `${column}-${order}`);
+
+      if (viewMode === "list") {
+        searchParams.delete("view");
       } else {
-        router.push(`?sort=${column}-${order}`);
+        searchParams.set("view", viewMode);
       }
+
+      const queryString = searchParams.toString();
+      router.push(queryString ? `?${queryString}` : "?");
     },
-    [currentSearch, router],
+    [router, viewMode],
   );
   /**
    * Modo de visualização = muda URL
    * Não afeta os dados, apenas a apresentação
    */
-  const handleViewChange = useCallback(
-    (mode: ViewMode) => {
-      setViewMode(mode);
-      const params = new URLSearchParams();
-      if (currentSearch) params.append("search", currentSearch);
-      if (currentSort) params.append("sort", currentSort);
-      params.append("view", mode);
-      router.push(`?${params.toString()}`);
-    },
-    [currentSearch, currentSort, router],
-  );
+  const handleViewChange = useCallback((mode: ViewMode) => {
+    setViewMode(mode);
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+
+    if (mode === "list") {
+      params.delete("view");
+    } else {
+      params.set("view", mode);
+    }
+
+    const queryString = params.toString();
+    const newUrl = queryString
+      ? `${window.location.pathname}?${queryString}`
+      : window.location.pathname;
+
+    window.history.replaceState(null, "", newUrl);
+  }, []);
 
   /**
    * Load More = incrementa página LOCAL e busca mais dados
@@ -150,8 +196,22 @@ export function CategoryListClient({
    * Limpar busca = muda URL com campo vazio
    */
   const handleClear = useCallback(() => {
-    router.push("?");
-  }, [router]);
+    const searchParams = new URLSearchParams(
+      typeof window !== "undefined" ? window.location.search : "",
+    );
+
+    searchParams.delete("search");
+    searchParams.delete("sort");
+
+    if (viewMode === "list") {
+      searchParams.delete("view");
+    } else {
+      searchParams.set("view", viewMode);
+    }
+
+    const queryString = searchParams.toString();
+    router.push(queryString ? `?${queryString}` : "?");
+  }, [router, viewMode]);
 
   /**
    * Handle delete = Remove item da lista localmente e depois atualiza do servidor
