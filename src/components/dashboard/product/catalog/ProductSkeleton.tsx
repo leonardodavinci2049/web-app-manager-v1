@@ -37,7 +37,7 @@ export function ProductSkeleton({ viewMode }: ProductSkeletonProps) {
   }
 
   return (
-    <Card>
+    <Card className="mx-auto w-full max-w-[360px] sm:max-w-none">
       <CardContent className="space-y-4 p-4">
         <Skeleton className="aspect-square w-full rounded-md" />
         <Skeleton className="h-6 w-20" />
@@ -68,13 +68,7 @@ export function ProductGridSkeleton({
   );
 
   return (
-    <div
-      className={
-        viewMode === "grid"
-          ? "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-          : "space-y-4"
-      }
-    >
+    <div className={viewMode === "grid" ? "product-grid-fluid" : "space-y-4"}>
       {items.map((key) => (
         <ProductSkeleton key={key} viewMode={viewMode} />
       ))}

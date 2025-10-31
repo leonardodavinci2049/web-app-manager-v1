@@ -26,7 +26,7 @@ interface CategoryListProps {
  * Displays categories in a list layout (row format)
  * Each row shows: ID, Image, Name, Slug, Parent, Level, Products
  */
-export function CategoryList({
+export function CategoryCardList({
   categories,
   isLoading = false,
   onDelete,
@@ -130,10 +130,6 @@ export function CategoryList({
                   <span className="truncate">
                     {t("dashboard.category.list.cardId")}:{" "}
                     {category.ID_TAXONOMY}
-                  </span>
-                  <span className="truncate">
-                    {t("dashboard.category.list.cardProducts")}:{" "}
-                    {category.QT_RECORDS || 0}
                   </span>
                   {category.PARENT_ID !== 0 && (
                     <span className="truncate">

@@ -27,7 +27,7 @@ interface CategoryCardProps {
   onDelete?: () => void;
 }
 
-export function CategoryCard({ category, onDelete }: CategoryCardProps) {
+export function CategoryCardGrid({ category, onDelete }: CategoryCardProps) {
   const router = useRouter();
   const { t } = useTranslation();
 
@@ -83,11 +83,6 @@ export function CategoryCard({ category, onDelete }: CategoryCardProps) {
           <span className="flex items-center gap-1">
             <Tag className="h-3 w-3" />
             {t("dashboard.category.list.cardId")}: {category.ID_TAXONOMY}
-          </span>
-          <span className="flex items-center gap-1">
-            <Package className="h-3 w-3" />
-            {t("dashboard.category.list.cardProducts")}:{" "}
-            {category.QT_RECORDS || 0}
           </span>
         </CardDescription>
       </CardHeader>
