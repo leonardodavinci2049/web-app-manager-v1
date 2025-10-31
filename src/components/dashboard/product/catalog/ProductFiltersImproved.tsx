@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useCategories } from "@/hooks/use-categories";
 import type {
   Category,
   FilterOptions,
@@ -57,6 +58,13 @@ export function ProductFiltersImproved({
   displayedProducts,
   isLoading = false,
 }: ProductFiltersImprovedProps) {
+  // Hook para carregar categorias
+  const {
+    categories,
+    isLoading: categoriesLoading,
+    error: categoriesError,
+  } = useCategories();
+
   // Estado local para o input de busca
   const [searchInputValue, setSearchInputValue] = useState(filters.searchTerm);
 
@@ -240,18 +248,36 @@ export function ProductFiltersImproved({
                   <div className="space-y-2">
                     <div className="text-sm font-medium text-muted-foreground">
                       Categoria
+                      {categoriesError && (
+                        <span className="text-red-500 text-xs ml-2">
+                          (Erro ao carregar)
+                        </span>
+                      )}
                     </div>
                     <Select
                       value={filters.selectedCategory}
                       onValueChange={handleCategoryChange}
-                      disabled={isLoading}
+                      disabled={isLoading || categoriesLoading}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Selecione uma categoria" />
+                        <SelectValue
+                          placeholder={
+                            categoriesLoading
+                              ? "Carregando categorias..."
+                              : "Selecione uma categoria"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">Todas as Categorias</SelectItem>
-                        {/* Categorias serão carregadas da API em futuras iterações */}
+                        {categories.map((category) => (
+                          <SelectItem
+                            key={category.id}
+                            value={category.id.toString()}
+                          >
+                            {category.displayName}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
