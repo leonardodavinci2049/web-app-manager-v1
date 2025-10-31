@@ -547,6 +547,7 @@
         "buttonClear": "Limpar",
         "buttonLoadMore": "Carregar Mais",
         "buttonDetail": "Detalhe",
+        "buttonDelete": "Excluir",
         "sortBy": "Ordenar por",
         "sortNameAsc": "Nome (A-Z)",
         "sortNameDesc": "Nome (Z-A)",
@@ -573,7 +574,16 @@
         "rootCategory": "Raiz",
         "showing": "Mostrando {{displayed}} de {{total}} categorias",
         "allLoaded": "Todas as categorias foram carregadas",
-        "activeFilters": "{{count}} filtro{{plural}} ativo{{plural}}"
+        "activeFilters": "{{count}} filtro{{plural}} ativo{{plural}}",
+        "delete": {
+          "title": "Confirmar exclusão",
+          "description": "Tem certeza que deseja excluir a categoria \"{{name}}\"? Esta ação não pode ser desfeita.",
+          "confirmButton": "Excluir",
+          "cancelButton": "Cancelar",
+          "deleting": "Excluindo...",
+          "success": "Categoria excluída com sucesso!",
+          "error": "Erro ao excluir categoria"
+        }
       },
       "new": {
         "title": "Nova Categoria",

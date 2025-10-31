@@ -153,6 +153,24 @@ export function CategoryListClient({
     router.push("?");
   }, [router]);
 
+  /**
+   * Handle delete = Remove item da lista localmente e depois atualiza do servidor
+   */
+  const handleDelete = useCallback(
+    (categoryId: number) => {
+      // Remove imediatamente da lista local para feedback rápido
+      setCategories((prev) =>
+        prev.filter((cat) => cat.ID_TAXONOMY !== categoryId),
+      );
+
+      // Depois atualiza do servidor em background
+      startTransition(() => {
+        router.refresh();
+      });
+    },
+    [router],
+  );
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-6">
@@ -180,6 +198,7 @@ export function CategoryListClient({
                 hasMore={hasMore}
                 onLoadMore={handleLoadMore}
                 viewMode={viewMode}
+                onDelete={handleDelete}
               />
             </div>
           </div>

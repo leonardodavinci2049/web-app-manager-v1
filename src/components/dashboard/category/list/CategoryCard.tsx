@@ -6,14 +6,7 @@
  * Exibe informações da categoria em formato de card
  */
 
-import {
-  ChevronRight,
-  FolderOpen,
-  Layers,
-  Package,
-  Tag,
-  Trash2,
-} from "lucide-react";
+import { ChevronRight, FolderOpen, Layers, Package, Tag } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
@@ -27,12 +20,14 @@ import {
 } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/use-translation";
 import type { TaxonomyData } from "@/services/api/taxonomy/types/taxonomy-types";
+import { DeleteCategoryDialog } from "./DeleteCategoryDialog";
 
 interface CategoryCardProps {
   category: TaxonomyData;
+  onDelete?: () => void;
 }
 
-export function CategoryCard({ category }: CategoryCardProps) {
+export function CategoryCard({ category, onDelete }: CategoryCardProps) {
   const router = useRouter();
   const { t } = useTranslation();
 
@@ -141,9 +136,14 @@ export function CategoryCard({ category }: CategoryCardProps) {
             <ChevronRight className="h-4 w-4" />
             {t("dashboard.category.list.buttonDetail")}
           </Button>
-          <Button size="sm" variant="outline" className="gap-2" disabled>
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <DeleteCategoryDialog
+            categoryId={category.ID_TAXONOMY}
+            categoryName={category.TAXONOMIA}
+            onSuccess={onDelete}
+            variant="outline"
+            size="sm"
+            showLabel={false}
+          />
         </div>
       </CardContent>
     </Card>

@@ -24,6 +24,7 @@ interface CategoryGridProps {
   hasMore?: boolean;
   onLoadMore?: () => void;
   viewMode?: ViewMode;
+  onDelete?: (categoryId: number) => void;
 }
 
 /**
@@ -50,6 +51,7 @@ export function CategoryGrid({
   hasMore = false,
   onLoadMore,
   viewMode = "list",
+  onDelete,
 }: CategoryGridProps) {
   const { t } = useTranslation();
 
@@ -58,7 +60,7 @@ export function CategoryGrid({
     return viewMode === "grid" ? (
       <CategoryGridSkeleton />
     ) : (
-      <CategoryList categories={[]} isLoading={true} />
+      <CategoryList categories={[]} isLoading={true} onDelete={onDelete} />
     );
   }
 
@@ -83,11 +85,19 @@ export function CategoryGrid({
       {viewMode === "grid" ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {categories.map((category) => (
-            <CategoryCard key={category.ID_TAXONOMY} category={category} />
+            <CategoryCard
+              key={category.ID_TAXONOMY}
+              category={category}
+              onDelete={() => onDelete?.(category.ID_TAXONOMY)}
+            />
           ))}
         </div>
       ) : (
-        <CategoryList categories={categories} isLoading={false} />
+        <CategoryList
+          categories={categories}
+          isLoading={false}
+          onDelete={onDelete}
+        />
       )}
 
       {/* Loading State para paginação */}
