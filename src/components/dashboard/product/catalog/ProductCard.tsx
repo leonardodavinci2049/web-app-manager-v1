@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Product } from "../../../../types/types";
 import { formatCurrency } from "../../../../utils/common-utils";
+import { InlineNameEditor } from "./InlineNameEditor";
 import { InlinePriceEditor } from "./InlinePriceEditor";
 import { InlineStockEditor } from "./InlineStockEditor";
 import { ProductCardClient } from "./ProductCardClient";
@@ -34,6 +35,7 @@ export function ProductCard({
   const [currentCorporatePrice, setCurrentCorporatePrice] = useState(
     product.corporatePrice,
   );
+  const [currentName, setCurrentName] = useState(product.name);
 
   const hasPromotion = Boolean(
     product.promotionalPrice && product.promotionalPrice < product.normalPrice,
@@ -51,6 +53,10 @@ export function ProductCard({
     setCurrentRetailPrice(retailPrice);
     setCurrentWholesalePrice(wholesalePrice);
     setCurrentCorporatePrice(corporatePrice);
+  };
+
+  const handleNameUpdated = (newName: string) => {
+    setCurrentName(newName);
   };
 
   const categoryLabels: Record<string, string> = {
@@ -80,10 +86,12 @@ export function ProductCard({
               {/* Header: Nome, SKU, Categoria */}
               <div className="space-y-2">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="line-clamp-2 text-base font-semibold">
-                      {product.name}
-                    </h3>
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <InlineNameEditor
+                      productId={Number(product.id) || 0}
+                      productName={currentName}
+                      onNameUpdated={handleNameUpdated}
+                    />
                     <p className="text-muted-foreground text-sm">
                       SKU: {product.sku}
                     </p>
@@ -176,7 +184,7 @@ export function ProductCard({
 
   // Grid View
   return (
-    <Card className="group transition-all duration-200 hover:-translate-y-1 hover:shadow-lg max-w-[500px]">
+    <Card className="group mx-auto w-full max-w-[360px] transition-all duration-200 hover:-translate-y-1 hover:shadow-lg sm:max-w-none">
       <CardContent className="flex h-full flex-col p-4">
         {/* Imagem */}
         <ProductCardClient
@@ -195,9 +203,12 @@ export function ProductCard({
 
           {/* Nome e SKU */}
           <div className="space-y-1">
-            <h3 className="line-clamp-2 text-sm leading-tight font-semibold">
-              {product.name}
-            </h3>
+            <InlineNameEditor
+              productId={Number(product.id) || 0}
+              productName={currentName}
+              onNameUpdated={handleNameUpdated}
+              className="text-sm"
+            />
             <div className="space-y-1">
               <p className="text-muted-foreground text-xs">
                 SKU: {product.sku}
