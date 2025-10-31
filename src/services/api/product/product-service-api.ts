@@ -120,6 +120,8 @@ export class ProductServiceApi extends BaseApiService {
         ...validatedParams,
       });
 
+  
+
       const data: FindProductByIdResponse =
         await instance.post<FindProductByIdResponse>(
           PRODUCT_ENDPOINTS.FIND_BY_ID,
@@ -151,6 +153,8 @@ export class ProductServiceApi extends BaseApiService {
       const validatedParams = ProductServiceApi.validateSearchParams(params);
       const requestBody =
         ProductServiceApi.buildProductSearchPayload(validatedParams);
+
+    console.log("Request Body findProductById:", requestBody);
 
       const response =
         await ProductServiceApi.executeProductSearch(requestBody);
