@@ -20,7 +20,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useBrands } from "@/hooks/use-brands";
 import { useCategories } from "@/hooks/use-categories";
+import { usePtypes } from "@/hooks/use-ptypes";
 import type {
   Category,
   FilterOptions,
@@ -64,6 +66,12 @@ export function ProductFiltersImproved({
     isLoading: categoriesLoading,
     error: categoriesError,
   } = useCategories();
+
+  // Hook para carregar marcas
+  const { brands, isLoading: brandsLoading, error: brandsError } = useBrands();
+
+  // Hook para carregar tipos de produto
+  const { ptypes, isLoading: ptypesLoading, error: ptypesError } = usePtypes();
 
   // Estado local para o input de busca
   const [searchInputValue, setSearchInputValue] = useState(filters.searchTerm);
@@ -121,8 +129,26 @@ export function ProductFiltersImproved({
     });
   };
 
+  // Função para alterar marca
+  const handleBrandChange = (brandId: string) => {
+    onFiltersChange({
+      ...filters,
+      selectedBrand: brandId === "all" ? undefined : brandId,
+    });
+  };
+
+  // Função para alterar tipo
+  const handlePtypeChange = (ptypeId: string) => {
+    onFiltersChange({
+      ...filters,
+      selectedPtype: ptypeId === "all" ? undefined : ptypeId,
+    });
+  };
+
   // Função para remover filtro específico
-  const removeFilter = (filterType: "category" | "search" | "stock") => {
+  const removeFilter = (
+    filterType: "category" | "search" | "stock" | "brand" | "ptype",
+  ) => {
     switch (filterType) {
       case "category":
         onFiltersChange({
@@ -135,6 +161,18 @@ export function ProductFiltersImproved({
         break;
       case "stock":
         updateFilter("onlyInStock", false);
+        break;
+      case "brand":
+        onFiltersChange({
+          ...filters,
+          selectedBrand: undefined,
+        });
+        break;
+      case "ptype":
+        onFiltersChange({
+          ...filters,
+          selectedPtype: undefined,
+        });
         break;
     }
   };
@@ -152,11 +190,38 @@ export function ProductFiltersImproved({
     }
 
     if (filters.selectedCategory && filters.selectedCategory !== "all") {
-      // Usar o valor da categoria como label por enquanto
+      // Encontrar o nome da categoria selecionada
+      const selectedCategory = categories.find(
+        (cat) => cat.id.toString() === filters.selectedCategory,
+      );
       activeFilters.push({
         type: "category" as const,
-        label: `Categoria: ${filters.selectedCategory}`,
+        label: `Categoria: ${selectedCategory?.name || filters.selectedCategory}`,
         value: filters.selectedCategory,
+      });
+    }
+
+    if (filters.selectedBrand) {
+      // Encontrar o nome da marca selecionada
+      const selectedBrand = brands.find(
+        (brand) => brand.id.toString() === filters.selectedBrand,
+      );
+      activeFilters.push({
+        type: "brand" as const,
+        label: `Marca: ${selectedBrand?.name || filters.selectedBrand}`,
+        value: filters.selectedBrand,
+      });
+    }
+
+    if (filters.selectedPtype) {
+      // Encontrar o nome do tipo selecionado
+      const selectedPtype = ptypes.find(
+        (ptype) => ptype.id.toString() === filters.selectedPtype,
+      );
+      activeFilters.push({
+        type: "ptype" as const,
+        label: `Tipo: ${selectedPtype?.name || filters.selectedPtype}`,
+        value: filters.selectedPtype,
       });
     }
 
@@ -242,8 +307,8 @@ export function ProductFiltersImproved({
           <AccordionContent className="pt-4">
             <Card>
               <CardContent className="space-y-4 pt-6">
-                {/* Linha de Dropdown: Categoria + Botão Limpar */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
+                {/* Linha de Dropdown: Categoria + Marca + Tipo + Botão Limpar */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
                   {/* Dropdown Categoria */}
                   <div className="space-y-2">
                     <div className="text-sm font-medium text-muted-foreground">
@@ -282,12 +347,90 @@ export function ProductFiltersImproved({
                     </Select>
                   </div>
 
+                  {/* Dropdown Marca */}
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium text-muted-foreground">
+                      Marca
+                      {brandsError && (
+                        <span className="text-red-500 text-xs ml-2">
+                          (Erro ao carregar)
+                        </span>
+                      )}
+                    </div>
+                    <Select
+                      value={filters.selectedBrand || "all"}
+                      onValueChange={handleBrandChange}
+                      disabled={isLoading || brandsLoading}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue
+                          placeholder={
+                            brandsLoading
+                              ? "Carregando marcas..."
+                              : "Selecione uma marca"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todas as Marcas</SelectItem>
+                        {brands.map((brand) => (
+                          <SelectItem
+                            key={brand.id}
+                            value={brand.id.toString()}
+                          >
+                            {brand.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Dropdown Tipo */}
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium text-muted-foreground">
+                      Tipo
+                      {ptypesError && (
+                        <span className="text-red-500 text-xs ml-2">
+                          (Erro ao carregar)
+                        </span>
+                      )}
+                    </div>
+                    <Select
+                      value={filters.selectedPtype || "all"}
+                      onValueChange={handlePtypeChange}
+                      disabled={isLoading || ptypesLoading}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue
+                          placeholder={
+                            ptypesLoading
+                              ? "Carregando tipos..."
+                              : "Selecione um tipo"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os Tipos</SelectItem>
+                        {ptypes.map((ptype) => (
+                          <SelectItem
+                            key={ptype.id}
+                            value={ptype.id.toString()}
+                          >
+                            {ptype.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   {/* Espaço vazio para manter layout */}
                   <div></div>
 
-                  {/* Botão Limpar Filtros - só aparece quando há categoria selecionada */}
+                  {/* Botão Limpar Filtros - aparece quando há categoria, marca ou tipo selecionado */}
                   <div className="flex justify-end">
-                    {filters.selectedCategory !== "all" && (
+                    {(filters.selectedCategory !== "all" ||
+                      filters.selectedBrand ||
+                      filters.selectedPtype) && (
                       <Button
                         variant="outline"
                         size="default"

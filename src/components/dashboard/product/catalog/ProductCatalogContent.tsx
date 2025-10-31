@@ -34,6 +34,8 @@ export function ProductCatalogContent({
     selectedCategory: "all",
     selectedSubcategory: undefined,
     selectedSubgroup: undefined,
+    selectedBrand: undefined,
+    selectedPtype: undefined,
     onlyInStock: false,
     sortBy: "newest", // Default to newest products first
   });
@@ -99,6 +101,8 @@ export function ProductCatalogContent({
       selectedCategory: "all",
       selectedSubcategory: undefined,
       selectedSubgroup: undefined,
+      selectedBrand: undefined,
+      selectedPtype: undefined,
       onlyInStock: false,
       sortBy: "newest", // Default to newest products first
     };

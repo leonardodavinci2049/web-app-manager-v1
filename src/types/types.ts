@@ -63,6 +63,8 @@ export interface FilterOptions {
   selectedCategory: string;
   selectedSubcategory?: string;
   selectedSubgroup?: string;
+  selectedBrand?: string;
+  selectedPtype?: string;
   onlyInStock: boolean;
   sortBy: SortOption;
 }
