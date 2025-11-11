@@ -15,17 +15,19 @@ export function SidebarLogo() {
       <SidebarMenuItem>
         <SidebarMenuButton size="lg" asChild>
           <Link href="/dashboard">
-            <div className="bg-sky-50 text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg">
+            <div className=" text-sidebar-primary-foreground flex aspect-square size-10 items-center justify-center overflow-hidden rounded-lg">
               <Image
                 src="/images/logo/logo-icon.png"
                 alt="Logo da Empresa"
-                width={24}
-                height={24}
-                className="size-6 object-contain"
+                width={32}
+                height={32}
+                className="size-8 object-contain"
               />
             </div>
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold">CAIXA FECHADA</span>
+              <span className="truncate font-semibold">
+                {process.env.NEXT_PUBLIC_COMPANY_NAME || "Comsuporte"}
+              </span>
               <span className="text-sidebar-foreground/70 truncate text-xs">
                 Painel Administrativo
               </span>

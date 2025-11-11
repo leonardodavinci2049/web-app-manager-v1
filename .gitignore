@@ -48,3 +48,4 @@ ecosystem.config.js
 .github/
 
 /generated/prisma
+
