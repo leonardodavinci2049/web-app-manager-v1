@@ -12,7 +12,7 @@ export default function AuthLayout({
       <div
         className="hidden max-sm:hidden lg:block fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('/images/auh/background-auth.webp')",
+          backgroundImage: "url('/images/auth/background-auth.webp')",
         }}
       />
 
