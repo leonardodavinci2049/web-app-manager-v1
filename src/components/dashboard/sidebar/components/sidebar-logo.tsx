@@ -17,7 +17,7 @@ export function SidebarLogo() {
           <Link href="/dashboard">
             <div className=" text-sidebar-primary-foreground flex aspect-square size-10 items-center justify-center overflow-hidden rounded-lg">
               <Image
-                src="/images/logo/logo-icon.png"
+                src="/images/logo/logo-header.png"
                 alt="Logo da Empresa"
                 width={32}
                 height={32}
