@@ -39,31 +39,91 @@ function ChartContainer({
   className,
   children,
   config,
+  width = "100%",
+  height = "100%",
+  minWidth = 0,
+  minHeight = 0,
+  aspect,
+  debounce,
   ...props
 }: React.ComponentProps<"div"> & {
   config: ChartConfig;
   children: React.ComponentProps<
     typeof RechartsPrimitive.ResponsiveContainer
   >["children"];
+  width?: React.ComponentProps<
+    typeof RechartsPrimitive.ResponsiveContainer
+  >["width"];
+  height?: React.ComponentProps<
+    typeof RechartsPrimitive.ResponsiveContainer
+  >["height"];
+  minWidth?: number;
+  minHeight?: number;
+  aspect?: number;
+  debounce?: number;
 }) {
   const uniqueId = React.useId();
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const [hasContainerSize, setHasContainerSize] = React.useState(false);
+
+  React.useEffect(() => {
+    const element = containerRef.current;
+
+    if (!element || typeof ResizeObserver === "undefined") {
+      // Fallback when ResizeObserver is not available (older browsers)
+      setHasContainerSize(true);
+      return;
+    }
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+
+      if (!entry) {
+        return;
+      }
+
+      const { width: entryWidth, height: entryHeight } = entry.contentRect;
+      setHasContainerSize((previous) => {
+        const hasSize = entryWidth > 0 && entryHeight > 0;
+        return previous === hasSize ? previous : hasSize;
+      });
+    });
+
+    observer.observe(element);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   return (
     <ChartContext.Provider value={{ config }}>
       <div
+        ref={containerRef}
         data-slot="chart"
         data-chart={chartId}
         className={cn(
-          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border flex aspect-video justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
+          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border flex h-full w-full min-w-0 justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
           className,
         )}
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
-        <RechartsPrimitive.ResponsiveContainer>
-          {children}
-        </RechartsPrimitive.ResponsiveContainer>
+        {hasContainerSize ? (
+          <RechartsPrimitive.ResponsiveContainer
+            width={width}
+            height={height}
+            minWidth={minWidth}
+            minHeight={minHeight}
+            aspect={aspect}
+            debounce={debounce}
+          >
+            {children}
+          </RechartsPrimitive.ResponsiveContainer>
+        ) : (
+          <div className="h-full w-full" />
+        )}
       </div>
     </ChartContext.Provider>
   );
