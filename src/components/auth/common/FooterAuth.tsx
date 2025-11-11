@@ -17,7 +17,7 @@ export default function CompanyFooter() {
           <div className="flex flex-col items-start space-y-4">
             <div className="flex items-center space-x-3">
               <Image
-                src="/images/logo/logo-icon.png"
+                src="/images/logo/logo-footer.png"
                 alt="Logo"
                 width={40}
                 height={40}

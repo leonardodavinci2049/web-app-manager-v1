@@ -4,7 +4,7 @@ export default function Logo() {
   return (
     <div className="flex items-center space-x-3">
       <Image
-        src="/images/logo/logo-icon.png"
+        src="/images/logo/logo-header.png"
         alt={`${process.env.NEXT_PUBLIC_COMPANY_NAME || "Logo"} Logo`}
         width={48}
         height={48}

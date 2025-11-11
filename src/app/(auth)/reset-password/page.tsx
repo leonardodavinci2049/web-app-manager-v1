@@ -52,10 +52,17 @@ function ResetPasswordUI({ token }: ResetPasswordUIProps) {
         <div className="p-6 md:p-10">
           <div className="relative h-full w-full overflow-hidden rounded-lg">
             <Image
-              src="/images/logo/logo-auth.png"
+              src="/images/auth/logo-auth-white.png"
               alt="Dashboard Background"
               fill
-              className="object-cover"
+              className="object-contain object-left dark:hidden"
+              priority
+            />
+            <Image
+              src="/images/auth/logo-auth-dark.png"
+              alt="Dashboard Background"
+              fill
+              className="hidden object-contain object-left dark:block"
               priority
             />
           </div>
