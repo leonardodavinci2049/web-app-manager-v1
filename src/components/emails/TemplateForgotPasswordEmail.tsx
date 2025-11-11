@@ -93,13 +93,13 @@ const TemplateForgotPasswordEmail = (props: VerifyEmailProps) => {
             {/* Footer */}
             <Section className="border-t border-gray-200 pt-[24px]">
               <Text className="mb-[8px] text-[12px] leading-[16px] text-gray-500">
-                Este e-mail foi enviado por Caixa fechada.
+                Este e-mail foi enviado por {process.env.NEXT_PUBLIC_COMPANY_NAME || "Comsuporte"}.
               </Text>
               <Text className="m-0 mb-[8px] text-[12px] leading-[16px] text-gray-500">
                 Rua dos Negócios, 123, Sala 100, Cidade, Estado, CEP 12345-678
               </Text>
               <Text className="m-0 text-[12px] leading-[16px] text-gray-500">
-                © {new Date().getFullYear()} CaixaFechada. Todos os direitos
+                © {new Date().getFullYear()} {process.env.NEXT_PUBLIC_COMPANY_NAME || "Comsuporte"}. Todos os direitos
                 reservados. |
                 <span className="ml-[4px] text-blue-600 no-underline">
                   Cancelar inscrição

@@ -42,9 +42,12 @@ next-env.d.ts
 
 # others
 /docs
+/public
 tasks-project-next.md
 ecosystem.config.js
 /generated/prisma
 .github/
 
 /generated/prisma
+favicon.ico
+
