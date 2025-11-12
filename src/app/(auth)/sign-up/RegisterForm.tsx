@@ -4,6 +4,7 @@ import { AlertTriangle, Loader2, X } from "lucide-react";
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +12,6 @@ import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { registerWithConfirmSchema } from "../_common-validations/validation";
 import registerAction from "./register-action";
-import { Button } from "@/components/ui/button";
 
 // Tipos para o estado do formulário
 interface FormData {
@@ -37,7 +37,7 @@ const initialFormData: FormData = {
 const RegisterForm = () => {
   const { t } = useTranslation();
   const [state, formAction] = useActionState(registerAction, initialState);
- const [isPending, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
   // Estados do formulário
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [clientErrors, setClientErrors] = useState<ClientErrors>({});
