@@ -105,12 +105,12 @@ export function LoginForm({
         <GoogleButton /> */}
       </div>
 
-      {/*       <div className="text-center text-sm">
+      <div className="text-center text-sm">
         {t("auth.login.noAccount")}{" "}
         <a href="/sign-up" className="underline underline-offset-4">
           {t("auth.login.signUp")}
         </a>
-      </div> */}
+      </div>
     </div>
   );
 }
