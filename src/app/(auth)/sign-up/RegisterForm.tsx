@@ -1,9 +1,10 @@
 "use client";
 
-import { AlertTriangle, X } from "lucide-react";
-import { useActionState, useEffect, useState } from "react";
+import { AlertTriangle, Loader2, X } from "lucide-react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,7 +37,7 @@ const initialFormData: FormData = {
 const RegisterForm = () => {
   const { t } = useTranslation();
   const [state, formAction] = useActionState(registerAction, initialState);
-
+  const [isPending, startTransition] = useTransition();
   // Estados do formulário
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [clientErrors, setClientErrors] = useState<ClientErrors>({});
@@ -168,7 +169,9 @@ const RegisterForm = () => {
     formDataToSubmit.append("confirmPassword", formData.confirmPassword);
 
     // Executar ação do servidor
-    formAction(formDataToSubmit);
+    startTransition(() => {
+      formAction(formDataToSubmit);
+    });
   };
 
   // Função para obter erro do campo (server ou client)
@@ -316,7 +319,7 @@ const RegisterForm = () => {
           )}
         </div>
 
-        {/*         <div className="pt-2">
+        <div className="pt-2">
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? (
               <>
@@ -327,7 +330,7 @@ const RegisterForm = () => {
               t("auth.signup.createAccount")
             )}
           </Button>
-        </div> */}
+        </div>
       </div>
     </form>
   );
