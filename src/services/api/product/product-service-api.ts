@@ -750,6 +750,8 @@ export class ProductServiceApi extends BaseApiService {
           requestBody,
         );
 
+      // console.log("updateProductDescription - Response:", data);
+
       if (isApiError(data.statusCode)) {
         throw new Error(
           data.message || "Erro ao atualizar descrição completa do produto",

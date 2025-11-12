@@ -196,7 +196,7 @@ export const UpdateProductTaxValuesSchema = z.object({
  */
 export const UpdateProductShortDescriptionSchema = z.object({
   pe_id_produto: z.number().int().positive(),
-  pe_descricao_venda: z.string().max(255),
+  pe_descricao_venda: z.string().max(1000),
 });
 
 /**
@@ -204,7 +204,7 @@ export const UpdateProductShortDescriptionSchema = z.object({
  */
 export const UpdateProductDescriptionSchema = z.object({
   pe_id_produto: z.number().int().positive(),
-  pe_produto_descricao: z.string().max(255),
+  pe_produto_descricao: z.string().max(10000),
 });
 
 /**
