@@ -41,11 +41,10 @@ yarn-error.log*
 next-env.d.ts
 
 # others
+.github/
 /docs
+/public
 tasks-project-next.md
 ecosystem.config.js
-/generated/prisma
-.github/
 
 /generated/prisma
-
