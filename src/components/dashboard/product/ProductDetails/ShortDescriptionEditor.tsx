@@ -21,7 +21,7 @@ export function ShortDescriptionEditor({
   onUpdate,
 }: ShortDescriptionEditorProps) {
   const { t } = useTranslation();
-  const MAX_CHARACTERS = 500;
+  const MAX_CHARACTERS = 1000;
   const [isEditing, setIsEditing] = useState(false);
   const [description, setDescription] = useState(initialDescription || "");
   const [tempDescription, setTempDescription] = useState(description);

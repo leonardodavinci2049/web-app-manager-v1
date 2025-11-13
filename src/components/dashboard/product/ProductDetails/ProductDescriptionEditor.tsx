@@ -17,12 +17,22 @@ export function ProductDescriptionEditor({
   productId,
   initialDescription,
 }: ProductDescriptionEditorProps) {
+  const MAX_CHARACTERS = 10000;
   const [isEditing, setIsEditing] = useState(false);
   const [description, setDescription] = useState(initialDescription || "");
   const [isPending, startTransition] = useTransition();
 
+  const remainingCharacters = MAX_CHARACTERS - description.length;
+  const isOverLimit = description.length > MAX_CHARACTERS;
+
   // Handle save action
   const handleSave = () => {
+    // Validation: check if description exceeds max length
+    if (isOverLimit) {
+      toast.error(`A descrição não pode exceder ${MAX_CHARACTERS} caracteres`);
+      return;
+    }
+
     startTransition(async () => {
       try {
         const result = await updateProductDescription(productId, description);
@@ -81,15 +91,40 @@ export function ProductDescriptionEditor({
       <CardContent className="space-y-4">
         {isEditing ? (
           <div className="space-y-4">
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Digite a descrição do produto..."
-              className="min-h-[200px] resize-y"
-              disabled={isPending}
-            />
+            <div className="space-y-2">
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Digite a descrição do produto..."
+                className="min-h-[200px] resize-y"
+                disabled={isPending}
+                maxLength={MAX_CHARACTERS + 50}
+              />
+              <div className="flex items-center justify-between text-xs">
+                <span
+                  className={`${
+                    isOverLimit
+                      ? "text-destructive font-medium"
+                      : remainingCharacters < 500
+                        ? "text-yellow-600 dark:text-yellow-500"
+                        : "text-muted-foreground"
+                  }`}
+                >
+                  {isOverLimit
+                    ? `${Math.abs(remainingCharacters)} caracteres a mais`
+                    : `${remainingCharacters} caracteres restantes`}
+                </span>
+                <span className="text-muted-foreground">
+                  {description.length} / {MAX_CHARACTERS}
+                </span>
+              </div>
+            </div>
             <div className="flex items-center gap-2">
-              <Button onClick={handleSave} disabled={isPending} size="sm">
+              <Button
+                onClick={handleSave}
+                disabled={isPending || isOverLimit}
+                size="sm"
+              >
                 <Save className="h-4 w-4 mr-2" />
                 {isPending ? "Salvando..." : "Salvar"}
               </Button>
