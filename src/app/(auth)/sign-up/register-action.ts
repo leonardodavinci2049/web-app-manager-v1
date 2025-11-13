@@ -2,7 +2,7 @@
 
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+//import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import {
   errorMessages,
@@ -51,7 +51,7 @@ async function registerAction(
       };
     }
 
-    const { name, email, password } = validationResult.data;
+    const { email } = validationResult.data;
 
     // Verificar se o email já existe no banco de dados
     const existingUser = await prisma.user.findFirst({
@@ -68,13 +68,13 @@ async function registerAction(
     }
 
     // Criar usuário usando Better-Auth
-    await auth.api.signUpEmail({
+    /*     await auth.api.signUpEmail({
       body: {
         name,
         email,
         password,
       },
-    });
+    }); */
 
     // Se chegou até aqui, o registro foi bem-sucedido
     // Redirecionar para a página de sucesso ao invés do dashboard

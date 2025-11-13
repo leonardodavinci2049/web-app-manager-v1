@@ -319,7 +319,7 @@ const RegisterForm = () => {
           )}
         </div>
 
-{/*         <div className="pt-2">
+        <div className="pt-2">
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? (
               <>
@@ -330,7 +330,7 @@ const RegisterForm = () => {
               t("auth.signup.createAccount")
             )}
           </Button>
-        </div> */}
+        </div>
       </div>
     </form>
   );
