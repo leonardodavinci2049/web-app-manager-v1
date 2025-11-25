@@ -71,11 +71,12 @@ export async function ProductImageGalleryServer({
     });
 
     // Transform to gallery image structure with IDs
-    // Using 'medium' resolution (400x400) for gallery display
+    // Prefer 'preview' resolution (800x600) for better desktop quality,
+    // fallback to 'medium' (400x400) and then 'original' if needed
     const galleryImages = sortedImages
       .map((img) => ({
         id: img.id,
-        url: img.urls.medium,
+        url: img.urls.preview ?? img.urls.medium ?? img.urls.original,
         isPrimary: img.isPrimary,
       }))
       .filter(

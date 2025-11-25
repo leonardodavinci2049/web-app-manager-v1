@@ -367,7 +367,7 @@ export function ProductImageGallery({
                   fill
                   className="object-cover transition-transform duration-300"
                   priority
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
                   onError={() => handleImageError(selectedImageIndex)}
                   unoptimized={
                     getImageUrl(selectedImageIndex).startsWith("http://") ||
