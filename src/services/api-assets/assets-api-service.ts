@@ -57,7 +57,7 @@ export class AssetsApiService {
     try {
       const data = await response.json();
 
-     // logger.debug("API Response:", JSON.stringify(data, null, 2));
+      // logger.debug("API Response:", JSON.stringify(data, null, 2));
 
       if (!response.ok) {
         return {
