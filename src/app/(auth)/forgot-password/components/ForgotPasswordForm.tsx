@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/hooks/use-translation";
-import { authClient } from "@/lib/auth/auth-client";
+//import { authClient } from "@/lib/auth/auth-client";
 import { cn } from "@/lib/utils";
 import {
   type ForgotPasswordFormData,
@@ -71,7 +71,8 @@ export function ForgotPasswordForm({
     }
 
     try {
-      const { error } = await authClient.forgetPassword({
+      const error = null;
+      /*       const { error } = await authClient.requestPasswordReset({
         email: validation.data.email,
         redirectTo: "/reset-password",
       });
@@ -99,7 +100,7 @@ export function ForgotPasswordForm({
 
       // Limpar o formulário sempre
       (event.target as HTMLFormElement).reset();
-    } catch (error) {
+    } catch (error) { */
       console.error("Forgot password error:", error);
       toast.error("Erro interno do sistema. Tente novamente mais tarde.");
     } finally {
