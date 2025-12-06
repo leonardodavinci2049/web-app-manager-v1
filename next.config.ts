@@ -1,56 +1,26 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Permite origens de desenvolvimento com IPs privados (localhost)
+  allowedDevOrigins: [
+    "http://localhost:5573",
+    "http://127.0.0.1:5573",
+    "http://[::1]:5573",
+  ],
   images: {
+    // Permite carregar imagens de IPs privados em desenvolvimento
+    dangerouslyAllowSVG: true,
+    // Desabilita a verificação de IP privado para imagens remotas
+    unoptimized: process.env.NODE_ENV === "development",
     remotePatterns: [
       {
         protocol: "https",
         hostname: "images.unsplash.com",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "picsum.photos",
-        port: "",
-        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "mundialmegastore.com.br",
         port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "http",
-        hostname: "mundialmegastore.com.br",
-        port: "",
-        pathname: "/**",
-      },
-      // Common product image domains
-      {
-        protocol: "https",
-        hostname: "via.placeholder.com",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "placehold.co",
-        port: "",
-        pathname: "/**",
-      },
-      // Add more common domains as needed
-      {
-        protocol: "https",
-        hostname: "*.s3.amazonaws.com",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "http",
-        hostname: "localhost",
-        port: "5573",
         pathname: "/**",
       },
       // Production assets domain
@@ -58,6 +28,12 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "assents01.comsuporte.com.br",
         port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "5573",
         pathname: "/**",
       },
     ],
