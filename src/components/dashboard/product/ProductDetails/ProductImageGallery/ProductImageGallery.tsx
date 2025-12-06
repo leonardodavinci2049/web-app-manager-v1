@@ -37,9 +37,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-interface GalleryImageWithId {
+export interface GalleryImageWithId {
   id: string;
   url: string;
+  originalUrl?: string;
+  mediumUrl?: string;
+  previewUrl?: string;
   isPrimary?: boolean;
 }
 
@@ -74,7 +77,10 @@ export function ProductImageGallery({
 
   // Get the image URL with fallback logic
   const getImageUrl = useCallback(
-    (index: number): string => {
+    (
+      index: number,
+      size: "original" | "medium" | "preview" = "preview",
+    ): string => {
       const currentImage = images[index];
 
       // If no image at this index, use fallback or default
@@ -101,8 +107,18 @@ export function ProductImageGallery({
         return "/images/product/no-image.jpeg";
       }
 
-      // Use original gallery image URL
-      return currentImage.url;
+      // Return requested size or fallback to default url
+      if (size === "original") {
+        return currentImage.originalUrl || currentImage.url;
+      }
+      if (size === "medium") {
+        return (
+          currentImage.mediumUrl || currentImage.previewUrl || currentImage.url
+        );
+      }
+
+      // Default to preview
+      return currentImage.previewUrl || currentImage.url;
     },
     [images, imageErrors, fallbackImage, fallbackAttempted],
   );
@@ -357,12 +373,22 @@ export function ProductImageGallery({
       {/* Main Image Display */}
       <Card className="overflow-hidden">
         <CardContent className="p-0">
-          <div className="relative aspect-square bg-muted group">
+          <div
+            className="relative aspect-square bg-muted group cursor-zoom-in"
+            onClick={() => openZoomModal(selectedImageIndex)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                openZoomModal(selectedImageIndex);
+              }
+            }}
+          >
             {!imageErrors.has(selectedImageIndex) ||
             (fallbackImage && !fallbackAttempted.has(selectedImageIndex)) ? (
               <>
                 <Image
-                  src={getImageUrl(selectedImageIndex)}
+                  src={getImageUrl(selectedImageIndex, "preview")}
                   alt={`${productName} - Imagem principal`}
                   fill
                   className="object-cover transition-transform duration-300"
@@ -370,8 +396,12 @@ export function ProductImageGallery({
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
                   onError={() => handleImageError(selectedImageIndex)}
                   unoptimized={
-                    getImageUrl(selectedImageIndex).startsWith("http://") ||
-                    getImageUrl(selectedImageIndex).startsWith("https://")
+                    getImageUrl(selectedImageIndex, "preview").startsWith(
+                      "http://",
+                    ) ||
+                    getImageUrl(selectedImageIndex, "preview").startsWith(
+                      "https://",
+                    )
                   }
                 />
 
@@ -425,15 +455,15 @@ export function ProductImageGallery({
                 (fallbackImage && !fallbackAttempted.has(index)) ? (
                   <>
                     <Image
-                      src={getImageUrl(index)}
+                      src={getImageUrl(index, "medium")}
                       alt={`${productName} - ${index + 1}`}
                       fill
                       className="object-cover"
                       sizes="100px"
                       onError={() => handleImageError(index)}
                       unoptimized={
-                        getImageUrl(index).startsWith("http://") ||
-                        getImageUrl(index).startsWith("https://")
+                        getImageUrl(index, "medium").startsWith("http://") ||
+                        getImageUrl(index, "medium").startsWith("https://")
                       }
                     />
 
@@ -559,7 +589,7 @@ export function ProductImageGallery({
             {!imageErrors.has(zoomedImageIndex) ||
             (fallbackImage && !fallbackAttempted.has(zoomedImageIndex)) ? (
               <Image
-                src={getImageUrl(zoomedImageIndex)}
+                src={getImageUrl(zoomedImageIndex, "original")}
                 alt={`${productName} - Ampliada`}
                 fill
                 className="object-contain"
@@ -567,8 +597,12 @@ export function ProductImageGallery({
                 sizes="(max-width: 1200px) 100vw, 80vw"
                 onError={() => handleImageError(zoomedImageIndex)}
                 unoptimized={
-                  getImageUrl(zoomedImageIndex).startsWith("http://") ||
-                  getImageUrl(zoomedImageIndex).startsWith("https://")
+                  getImageUrl(zoomedImageIndex, "original").startsWith(
+                    "http://",
+                  ) ||
+                  getImageUrl(zoomedImageIndex, "original").startsWith(
+                    "https://",
+                  )
                 }
               />
             ) : (
