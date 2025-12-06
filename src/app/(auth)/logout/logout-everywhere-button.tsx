@@ -15,14 +15,31 @@ export function LogoutEverywhereButton() {
 
   async function handleLogoutEverywhere() {
     setLoading(true);
-    const { error } = await authClient.revokeSessions();
-    setLoading(false);
 
-    if (error) {
-      toast.error(error.message || "Failed to log out everywhere");
-    } else {
-      toast.success("Logged out from all devices");
+    try {
+      // Sign out and clear session
+      const { error } = await authClient.signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            // Clear any client-side cached data
+            router.refresh();
+          },
+        },
+      });
+
+      if (error) {
+        toast.error(error.message || "Failed to log out");
+        setLoading(false);
+        return;
+      }
+
+      toast.success("Logged out successfully");
+      // Redirect to sign-in page
       router.push("/sign-in");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("An error occurred during logout");
+      setLoading(false);
     }
   }
 
