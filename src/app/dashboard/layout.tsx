@@ -22,7 +22,7 @@ export default async function DashboardLayout({
       headers: await headers(),
     });
 
-    // Se não há sessão válida, redireciona para login
+    // Strict validation - no session means no access
     if (!session?.user) {
       redirect("/sign-in");
     }
@@ -34,8 +34,12 @@ export default async function DashboardLayout({
       throw error;
     }
 
-    // Em caso de erro real na validação, redireciona para login
-    console.error("Dashboard session validation error:", error);
+    // Log error for debugging but don't expose details to user
+    console.error("Dashboard session validation error:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+    });
     redirect("/sign-in");
   }
 
