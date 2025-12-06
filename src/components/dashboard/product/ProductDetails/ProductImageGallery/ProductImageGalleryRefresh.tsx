@@ -1,13 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ProductImageGallery } from "./ProductImageGallery";
-
-interface GalleryImageWithId {
-  id: string;
-  url: string;
-  isPrimary?: boolean;
-}
+import {
+  type GalleryImageWithId,
+  ProductImageGallery,
+} from "./ProductImageGallery";
 
 interface ProductImageGalleryRefreshProps {
   productId: number;
@@ -62,7 +59,16 @@ export function ProductImageGalleryRefresh({
         setImages(
           data.images.length > 0
             ? data.images
-            : [{ id: "fallback", url: fallbackImage, isPrimary: true }],
+            : [
+                {
+                  id: "fallback",
+                  url: fallbackImage,
+                  originalUrl: fallbackImage,
+                  mediumUrl: fallbackImage,
+                  previewUrl: fallbackImage,
+                  isPrimary: true,
+                },
+              ],
         );
       } else {
         // Keep existing images if refresh fails

@@ -86,12 +86,23 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const images = sortedImages
       .map((img) => ({
         id: img.id,
-        url: img.urls.medium,
+        url: img.urls.medium ?? img.urls.preview ?? img.urls.original,
+        originalUrl: img.urls.original,
+        mediumUrl: img.urls.medium,
+        previewUrl: img.urls.preview,
         isPrimary: img.isPrimary,
       }))
       .filter(
-        (img): img is { id: string; url: string; isPrimary: boolean } =>
-          img.url !== undefined,
+        (
+          img,
+        ): img is {
+          id: string;
+          url: string;
+          originalUrl: string;
+          mediumUrl: string | undefined;
+          previewUrl: string | undefined;
+          isPrimary: boolean;
+        } => img.url !== undefined,
       );
 
     // Debug info removed for cleaner console output

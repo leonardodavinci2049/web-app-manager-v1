@@ -47,7 +47,14 @@ export async function ProductImageGalleryServer({
           productName={productName}
           fallbackImage={fallbackImage}
           initialImages={[
-            { id: "fallback", url: fallbackImage, isPrimary: true },
+            {
+              id: "fallback",
+              url: fallbackImage,
+              originalUrl: fallbackImage,
+              mediumUrl: fallbackImage,
+              previewUrl: fallbackImage,
+              isPrimary: true,
+            },
           ]}
         />
       );
@@ -77,11 +84,22 @@ export async function ProductImageGalleryServer({
       .map((img) => ({
         id: img.id,
         url: img.urls.preview ?? img.urls.medium ?? img.urls.original,
+        originalUrl: img.urls.original ?? img.urls.preview,
+        mediumUrl: img.urls.medium ?? img.urls.preview ?? img.urls.original,
+        previewUrl: img.urls.preview ?? img.urls.medium ?? img.urls.original,
         isPrimary: img.isPrimary,
       }))
       .filter(
-        (img): img is { id: string; url: string; isPrimary: boolean } =>
-          img.url !== undefined,
+        (
+          img,
+        ): img is {
+          id: string;
+          url: string;
+          originalUrl: string;
+          mediumUrl: string;
+          previewUrl: string;
+          isPrimary: boolean;
+        } => img.url !== undefined,
       );
 
     // Apply fallback if gallery is empty
@@ -93,7 +111,14 @@ export async function ProductImageGalleryServer({
           productName={productName}
           fallbackImage={fallbackImage}
           initialImages={[
-            { id: "fallback", url: fallbackImage, isPrimary: true },
+            {
+              id: "fallback",
+              url: fallbackImage,
+              originalUrl: fallbackImage,
+              mediumUrl: fallbackImage,
+              previewUrl: fallbackImage,
+              isPrimary: true,
+            },
           ]}
         />
       );
@@ -120,7 +145,14 @@ export async function ProductImageGalleryServer({
         productName={productName}
         fallbackImage={fallbackImage}
         initialImages={[
-          { id: "fallback", url: fallbackImage, isPrimary: true },
+          {
+            id: "fallback",
+            url: fallbackImage,
+            originalUrl: fallbackImage,
+            mediumUrl: fallbackImage,
+            previewUrl: fallbackImage,
+            isPrimary: true,
+          },
         ]}
       />
     );
