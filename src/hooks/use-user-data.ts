@@ -25,7 +25,7 @@ export function useUserData(): {
     if (!isPending && !session) {
       refetch();
     }
-  }, []);
+  }, [isPending, session, refetch]);
 
   useEffect(() => {
     if (session?.user) {
