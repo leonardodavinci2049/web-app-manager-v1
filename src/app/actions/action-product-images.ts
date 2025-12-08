@@ -161,11 +161,11 @@ export async function uploadProductImageAction(
     const result = await uploadFileAction(uploadFormData);
 
     // If upload was successful, try to update product PATH_IMAGEM if it's empty
-    if (result.success && result.data?.urls?.medium) {
+    if (result.success && result.data?.urls?.preview) {
       try {
         await updateProductImagePathIfEmpty(
           Number(productId),
-          result.data.urls.medium,
+          result.data.urls.preview,
         );
       } catch (pathUpdateError) {
         // Log error but don't fail the upload - image was successfully uploaded
