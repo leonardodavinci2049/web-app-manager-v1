@@ -1,8 +1,7 @@
 "use client";
 
-import { Eye, Plane, Shield, Star } from "lucide-react";
+import { Eye, Shield } from "lucide-react";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Product } from "../../../../types/types";
@@ -60,14 +59,6 @@ export function ProductCard({
     setCurrentName(newName);
   };
 
-  const categoryLabels: Record<string, string> = {
-    electronics: "Eletrônicos",
-    clothing: "Roupas & Acessórios",
-    "home-garden": "Casa & Jardim",
-    sports: "Esportes & Lazer",
-    "books-media": "Livros & Mídia",
-  };
-
   if (viewMode === "list") {
     return (
       <Card className="transition-all duration-200 hover:shadow-md">
@@ -93,40 +84,18 @@ export function ProductCard({
                       productName={currentName}
                       onNameUpdated={handleNameUpdated}
                     />
-                    <p className="text-muted-foreground text-sm">
-                      SKU: XXX{product.sku}
-                    </p>
-                    {product.brand && (
-                      <p className="text-muted-foreground text-xs">
-                        Marca: {product.brand}
+                    <div className="flex flex-wrap items-center gap-4 text-sm">
+                      <p className="text-muted-foreground">
+                        SKU: {product.sku}
                       </p>
-                    )}
+                      {product.brand && (
+                        <p className="text-muted-foreground">
+                          Marca: {product.brand}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <Badge variant="outline" className="flex-shrink-0 w-fit">
-                    {categoryLabels[product.category] || product.category}
-                  </Badge>
                 </div>
-
-                {/* Status badges - Em linha no mobile */}
-                {(product.isNew || product.isImported) && (
-                  <div className="flex flex-wrap gap-2">
-                    {product.isNew && (
-                      <Badge
-                        variant="secondary"
-                        className="text-xs bg-blue-100 text-blue-800 hover:bg-blue-200"
-                      >
-                        <Star className="h-3 w-3 mr-1" />
-                        Lançamento
-                      </Badge>
-                    )}
-                    {product.isImported && (
-                      <Badge variant="outline" className="text-xs">
-                        <Plane className="h-3 w-3 mr-1" />
-                        Importado
-                      </Badge>
-                    )}
-                  </div>
-                )}
               </div>
 
               {/* Preços - Editor Inline */}
@@ -200,27 +169,19 @@ export function ProductCard({
 
         {/* Conteúdo flexível */}
         <div className="mt-4 flex flex-1 flex-col gap-3">
-          {/* Categoria */}
-          <Badge variant="outline" className="w-fit text-xs">
-            {categoryLabels[product.category] || product.category}
-          </Badge>
-
-          {/* Nome e SKU */}
-          <div className="space-y-1">
+          {/* Nome SKU E MARCA */}
+          <div className="space-y-2">
             <InlineNameEditor
               productId={Number(product.id) || 0}
               productName={currentName}
               onNameUpdated={handleNameUpdated}
               className="text-sm"
             />
-            <div className="space-y-1">
-              <p className="text-muted-foreground text-xs">
-                SKU: {product.sku}
-              </p>
+            {/* SKU e MARCA na mesma linha */}
+            <div className="flex flex-wrap items-center gap-3 text-xs">
+              <p className="text-muted-foreground">SKU: {product.sku}</p>
               {product.brand && (
-                <p className="text-muted-foreground text-xs">
-                  Marca: {product.brand}
-                </p>
+                <p className="text-muted-foreground">Marca: {product.brand}</p>
               )}
             </div>
           </div>
