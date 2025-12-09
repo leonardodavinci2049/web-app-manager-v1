@@ -339,25 +339,30 @@ export function InlinePriceEditor({
           <Edit2 className="h-3 w-3 opacity-0 group-hover/price-editor:opacity-100 transition-opacity text-muted-foreground" />
         </div>
 
-        {/* Price Display */}
+        {/* Price Display - Table Layout */}
         <div className="space-y-1 text-xs">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Vare:</span>
-            <span className="font-medium text-orange-600 dark:text-orange-400">
-              {formatCurrency(retailPrice)}
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Atac:</span>
-            <span className="font-medium text-green-600 dark:text-green-400">
-              {formatCurrency(wholesalePrice)}
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Corp:</span>
-            <span className="font-medium text-blue-600 dark:text-blue-400">
-              {formatCurrency(corporatePrice)}
-            </span>
+          <div className="grid grid-cols-3 gap-2">
+            {/* Varejo */}
+            <div>
+              <div className="text-muted-foreground text-xs">Vare</div>
+              <div className="font-medium text-orange-600 dark:text-orange-400">
+                {formatCurrency(retailPrice)}
+              </div>
+            </div>
+            {/* Atacado */}
+            <div>
+              <div className="text-muted-foreground text-xs">Atac</div>
+              <div className="font-medium text-green-600 dark:text-green-400">
+                {formatCurrency(wholesalePrice)}
+              </div>
+            </div>
+            {/* Corporativo */}
+            <div>
+              <div className="text-muted-foreground text-xs">Corp</div>
+              <div className="font-medium text-blue-600 dark:text-blue-400">
+                {formatCurrency(corporatePrice)}
+              </div>
+            </div>
           </div>
         </div>
       </div>
