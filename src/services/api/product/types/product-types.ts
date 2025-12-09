@@ -223,6 +223,7 @@ export interface ProductListItem {
   ID_IMAGEM: number;
   PATH_IMAGEM: string;
   SLUG: string;
+  CATEGORIAS: string | null; // Array de categorias em formato JSON string
   DATADOCADASTRO: string;
 }
 
