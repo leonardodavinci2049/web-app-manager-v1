@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Product } from "../../../../types/types";
 import { formatCurrency } from "../../../../utils/common-utils";
+import { CategoryTags } from "./CategoryTags";
 import { InlineNameEditor } from "./InlineNameEditor";
 import { InlinePriceEditor } from "./InlinePriceEditor";
 import { InlineStockEditor } from "./InlineStockEditor";
@@ -93,7 +94,7 @@ export function ProductCard({
                       onNameUpdated={handleNameUpdated}
                     />
                     <p className="text-muted-foreground text-sm">
-                      SKU: {product.sku}
+                      SKU: XXX{product.sku}
                     </p>
                     {product.brand && (
                       <p className="text-muted-foreground text-xs">
@@ -163,6 +164,9 @@ export function ProductCard({
                   </div>
                 )}
               </div>
+
+              {/* Categorias */}
+              <CategoryTags categories={product.categories} />
 
               {/* Botão - Em linha no desktop, full width no mobile */}
               <div className="flex">
@@ -254,6 +258,9 @@ export function ProductCard({
               </div>
             )}
           </div>
+
+          {/* Categorias */}
+          <CategoryTags categories={product.categories} />
 
           {/* Espaçador flexível para empurrar o botão para baixo */}
           <div className="flex-1"></div>
