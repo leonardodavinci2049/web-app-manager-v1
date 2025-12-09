@@ -95,6 +95,23 @@ function transformApiProductToProduct(
       isPromotion,
     );
 
+    // Categories - Parse JSON string from CATEGORIAS field
+    let categories: { ID_TAXONOMY: number; TAXONOMIA: string }[] | undefined;
+    try {
+      if (apiProduct.CATEGORIAS && typeof apiProduct.CATEGORIAS === "string") {
+        const parsed = JSON.parse(apiProduct.CATEGORIAS);
+        if (Array.isArray(parsed)) {
+          categories = parsed;
+        }
+      }
+    } catch (error) {
+      // Silently fail - categories will be undefined
+      logger.warn("Failed to parse CATEGORIAS JSON:", {
+        productId: apiProduct.ID_PRODUTO,
+        error,
+      });
+    }
+
     // Created date - Parse from API or use current date as fallback
     let createdAt: Date;
     try {
@@ -121,6 +138,7 @@ function transformApiProductToProduct(
       isPromotion,
       isImported,
       isNew,
+      categories,
       createdAt,
     };
   } catch (error) {

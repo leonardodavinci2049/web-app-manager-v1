@@ -1,3 +1,8 @@
+export interface ProductCategory {
+  ID_TAXONOMY: number;
+  TAXONOMIA: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -14,6 +19,7 @@ export interface Product {
   isPromotion: boolean; // NEW: PROMOCAO flag
   isImported: boolean; // NEW: IMPORTADO flag
   isNew: boolean; // NEW: LANCAMENTO flag
+  categories?: ProductCategory[]; // NEW: Array of categories from CATEGORIAS field
   createdAt: Date;
 }
 
