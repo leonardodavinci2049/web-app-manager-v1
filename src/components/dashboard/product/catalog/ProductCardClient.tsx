@@ -2,6 +2,7 @@
 
 import { Plane, Star } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import type { Product } from "../../../../types/types";
@@ -59,7 +60,7 @@ function ProductImageSection({
 
   // Show image for products with image
   if (viewMode === "list") {
-    return (
+    const imageContent = (
       <div className="relative h-24 w-24 flex-shrink-0">
         <Image
           src={imageUrl}
@@ -83,10 +84,16 @@ function ProductImageSection({
         )}
       </div>
     );
+
+    return product.id ? (
+      <Link href={`/dashboard/product/${product.id}`}>{imageContent}</Link>
+    ) : (
+      imageContent
+    );
   }
 
   // Grid view image
-  return (
+  const gridImageContent = (
     <div className="relative aspect-square overflow-hidden rounded-md">
       <Image
         src={imageUrl}
@@ -129,6 +136,12 @@ function ProductImageSection({
         </div>
       )}
     </div>
+  );
+
+  return product.id ? (
+    <Link href={`/dashboard/product/${product.id}`}>{gridImageContent}</Link>
+  ) : (
+    gridImageContent
   );
 }
 
