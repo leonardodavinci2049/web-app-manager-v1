@@ -1,6 +1,10 @@
 export interface ProductCategory {
-  ID_TAXONOMY: number;
-  TAXONOMIA: string;
+  ID_TAXONOMY?: number;
+  PARENT_ID?: number;
+  TAXONOMIA?: string;
+  SLUG?: string | null;
+  ORDEM?: number;
+  LEVEL?: number;
 }
 
 export interface Product {

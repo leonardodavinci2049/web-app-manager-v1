@@ -113,3 +113,45 @@ export async function deleteTaxonomyRelationship(
     };
   }
 }
+
+/**
+ * Server Action - Fetch product categories (taxonomies)
+ * Retorna a hierarquia completa de categorias associadas ao produto (até 3 níveis)
+ * @param productId - Product ID
+ * @returns List of hierarchical product categories or error
+ */
+export async function fetchProductCategories(productId: number) {
+  try {
+    // Call service to fetch product categories
+    const response = await TaxonomyServiceApi.findTaxonomyRelProduto({
+      pe_id_record: productId,
+    });
+
+    // Validate response
+    if (!TaxonomyServiceApi.isValidTaxonomyProductResponse(response)) {
+      throw new Error(
+        response.message || "Erro ao buscar categorias do produto",
+      );
+    }
+
+    // Extract categories list
+    const categories = TaxonomyServiceApi.extractTaxonomyProductList(response);
+
+    return {
+      success: true,
+      data: categories,
+      message: "Categorias carregadas com sucesso",
+    };
+  } catch (error) {
+    logger.error("Error fetching product categories:", error);
+
+    return {
+      success: false,
+      data: [],
+      message:
+        error instanceof Error
+          ? error.message
+          : "Erro ao carregar categorias do produto",
+    };
+  }
+}
