@@ -37,6 +37,9 @@ export function ProductCard({
     product.corporatePrice,
   );
   const [currentName, setCurrentName] = useState(product.name);
+  const [currentCategories, setCurrentCategories] = useState(
+    product.categories || [],
+  );
 
   const hasPromotion = Boolean(
     product.promotionalPrice && product.promotionalPrice < product.normalPrice,
@@ -58,6 +61,10 @@ export function ProductCard({
 
   const handleNameUpdated = (newName: string) => {
     setCurrentName(newName);
+  };
+
+  const handleCategoriesUpdated = (categories: typeof currentCategories) => {
+    setCurrentCategories(categories);
   };
 
   if (viewMode === "list") {
@@ -136,8 +143,13 @@ export function ProductCard({
               </div>
 
               {/* Categorias */}
-              <InlineCategoryEditor productId={Number(product.id) || 0} />
-              <CategoryTags categories={product.categories} />
+              <InlineCategoryEditor
+                productId={Number(product.id) || 0}
+                productSku={product.sku}
+                productName={currentName}
+                onCategoriesUpdated={handleCategoriesUpdated}
+              />
+              <CategoryTags categories={currentCategories} />
 
               {/* Botão - Em linha no desktop, full width no mobile */}
               <div className="flex">
@@ -223,8 +235,13 @@ export function ProductCard({
           </div>
 
           {/* Categorias */}
-          <InlineCategoryEditor productId={Number(product.id) || 0} />
-          <CategoryTags categories={product.categories} />
+          <InlineCategoryEditor
+            productId={Number(product.id) || 0}
+            productSku={product.sku}
+            productName={currentName}
+            onCategoriesUpdated={handleCategoriesUpdated}
+          />
+          <CategoryTags categories={currentCategories} />
 
           {/* Espaçador flexível para empurrar o botão para baixo */}
           <div className="flex-1"></div>

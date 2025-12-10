@@ -1,8 +1,22 @@
 "use client";
 
-import { Edit2, Plus, Tag, Trash2 } from "lucide-react";
+import { Edit2, Loader2, Plus, Tag, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { fetchProductCategories } from "@/app/actions/action-taxonomy";
+import { toast } from "sonner";
+import {
+  deleteTaxonomyRelationship,
+  fetchProductCategories,
+} from "@/app/actions/action-taxonomy";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -25,15 +39,26 @@ import { AddCategoryInlineDialog } from "./AddCategoryInlineDialog";
 
 interface InlineCategoryEditorProps {
   productId: number;
+  productSku?: string;
+  productName?: string;
+  onCategoriesUpdated?: (categories: ProductCategory[]) => void;
 }
 
-export function InlineCategoryEditor({ productId }: InlineCategoryEditorProps) {
+export function InlineCategoryEditor({
+  productId,
+  productSku,
+  productName,
+  onCategoriesUpdated,
+}: InlineCategoryEditorProps) {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] =
+    useState<ProductCategory | null>(null);
 
   // Load categories only when Sheet is opened
   const loadCategories = async () => {
@@ -46,6 +71,8 @@ export function InlineCategoryEditor({ productId }: InlineCategoryEditorProps) {
       if (result.success) {
         setCategories(result.data);
         setHasLoadedOnce(true);
+        // Notify parent about updated categories
+        onCategoriesUpdated?.(result.data);
       } else {
         setError(result.message);
         setCategories([]);
@@ -78,8 +105,41 @@ export function InlineCategoryEditor({ productId }: InlineCategoryEditorProps) {
     loadCategories();
   };
 
-  const handleDeleteCategory = (categoryId: number) => {
-    console.log("Delete category", categoryId, "from product", productId);
+  // Open confirmation dialog for delete
+  const handleDeleteClick = (category: ProductCategory) => {
+    setCategoryToDelete(category);
+  };
+
+  // Close confirmation dialog
+  const handleCancelDelete = () => {
+    setCategoryToDelete(null);
+  };
+
+  // Confirm and execute delete
+  const handleConfirmDelete = async () => {
+    if (!categoryToDelete?.ID_TAXONOMY) return;
+
+    setIsDeleting(true);
+
+    try {
+      const result = await deleteTaxonomyRelationship(
+        categoryToDelete.ID_TAXONOMY,
+        productId,
+      );
+
+      if (result.success) {
+        toast.success(result.message);
+        // Reload categories to reflect the change
+        loadCategories();
+      } else {
+        toast.error(result.message);
+      }
+    } catch (_error) {
+      toast.error("Erro inesperado ao remover categoria");
+    } finally {
+      setIsDeleting(false);
+      setCategoryToDelete(null);
+    }
   };
 
   return (
@@ -96,7 +156,16 @@ export function InlineCategoryEditor({ productId }: InlineCategoryEditorProps) {
       </SheetTrigger>
       <SheetContent className="w-[400px] sm:w-[540px]">
         <SheetHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b">
-          <SheetTitle>Categorias Relacionadas</SheetTitle>
+          <div className="space-y-1">
+            {(productSku || productName) && (
+              <p className="text-sm text-muted-foreground">
+                {productSku && <span>SKU: {productSku}</span>}
+                {productSku && productName && <span> • </span>}
+                {productName && <span>{productName}</span>}
+              </p>
+            )}
+            <SheetTitle>Categorias Relacionadas</SheetTitle>
+          </div>
         </SheetHeader>
 
         <div className="py-6 space-y-6">
@@ -191,10 +260,8 @@ export function InlineCategoryEditor({ productId }: InlineCategoryEditorProps) {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 text-destructive hover:text-destructive/90"
-                          onClick={() =>
-                            category.ID_TAXONOMY &&
-                            handleDeleteCategory(category.ID_TAXONOMY)
-                          }
+                          onClick={() => handleDeleteClick(category)}
+                          disabled={isDeleting}
                         >
                           <Trash2 className="h-4 w-4" />
                           <span className="sr-only">Excluir</span>
@@ -215,6 +282,44 @@ export function InlineCategoryEditor({ productId }: InlineCategoryEditorProps) {
           onOpenChange={setIsAddDialogOpen}
           onSuccess={handleAddCategorySuccess}
         />
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog
+          open={!!categoryToDelete}
+          onOpenChange={(open) => !open && handleCancelDelete()}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remover categoria</AlertDialogTitle>
+              <AlertDialogDescription>
+                Tem certeza que deseja remover a categoria{" "}
+                <span className="font-semibold">
+                  "{categoryToDelete?.TAXONOMIA}"
+                </span>{" "}
+                deste produto?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeleting}>
+                Cancelar
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Removendo...
+                  </>
+                ) : (
+                  "Remover"
+                )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </SheetContent>
     </Sheet>
   );
