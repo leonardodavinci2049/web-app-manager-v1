@@ -1,6 +1,8 @@
 "use client";
 
 import { Edit2, Plus, Tag, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { fetchProductCategories } from "@/app/actions/action-taxonomy";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -9,6 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -21,13 +24,48 @@ import type { ProductCategory } from "../../../../types/types";
 
 interface InlineCategoryEditorProps {
   productId: number;
-  categories?: ProductCategory[];
 }
 
-export function InlineCategoryEditor({
-  productId,
-  categories = [],
-}: InlineCategoryEditorProps) {
+export function InlineCategoryEditor({ productId }: InlineCategoryEditorProps) {
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+
+  // Load categories only when Sheet is opened
+  const loadCategories = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await fetchProductCategories(productId);
+
+      if (result.success) {
+        setCategories(result.data);
+        setHasLoadedOnce(true);
+      } else {
+        setError(result.message);
+        setCategories([]);
+      }
+    } catch {
+      setError("Erro ao carregar categorias");
+      setCategories([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle Sheet open state change
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+
+    // Load categories when opening the sheet for the first time
+    if (open && !hasLoadedOnce) {
+      loadCategories();
+    }
+  };
+
   const handleAddCategory = () => {
     console.log("Add category to product", productId);
   };
@@ -37,7 +75,7 @@ export function InlineCategoryEditor({
   };
 
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
         <button
           type="button"
@@ -65,34 +103,88 @@ export function InlineCategoryEditor({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[80px]">ID</TableHead>
+                  <TableHead className="w-20">ID</TableHead>
                   <TableHead>Nome da Categoria</TableHead>
-                  <TableHead className="w-[80px] text-right">Ações</TableHead>
+                  <TableHead className="w-[100px]">Nível</TableHead>
+                  <TableHead className="w-20 text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {categories.length === 0 ? (
+                {isLoading ? (
+                  // Loading skeleton
+                  [1, 2, 3].map((skeletonId) => (
+                    <TableRow key={`skeleton-${skeletonId}`}>
+                      <TableCell>
+                        <Skeleton className="h-4 w-12" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-full max-w-[200px]" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-8" />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Skeleton className="h-8 w-8 ml-auto" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : error ? (
+                  // Error state
                   <TableRow>
                     <TableCell
-                      colSpan={3}
+                      colSpan={4}
+                      className="text-center text-destructive h-24"
+                    >
+                      {error}
+                      <Button
+                        variant="link"
+                        size="sm"
+                        onClick={loadCategories}
+                        className="ml-2"
+                      >
+                        Tentar novamente
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ) : categories.length === 0 ? (
+                  // Empty state
+                  <TableRow>
+                    <TableCell
+                      colSpan={4}
                       className="text-center text-muted-foreground h-24"
                     >
                       Nenhuma categoria vinculada
                     </TableCell>
                   </TableRow>
                 ) : (
+                  // Categories list
                   categories.map((category) => (
                     <TableRow key={category.ID_TAXONOMY}>
                       <TableCell className="font-medium">
                         {category.ID_TAXONOMY}
                       </TableCell>
-                      <TableCell>{category.TAXONOMIA}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {category.LEVEL && category.LEVEL > 1 && (
+                            <span className="text-muted-foreground">
+                              {"└─".repeat(category.LEVEL - 1)}
+                            </span>
+                          )}
+                          <span>{category.TAXONOMIA}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-xs text-muted-foreground">
+                          Nível {category.LEVEL}
+                        </span>
+                      </TableCell>
                       <TableCell className="text-right">
                         <Button
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 text-destructive hover:text-destructive/90"
                           onClick={() =>
+                            category.ID_TAXONOMY &&
                             handleDeleteCategory(category.ID_TAXONOMY)
                           }
                         >
