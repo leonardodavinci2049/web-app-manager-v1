@@ -21,6 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { ProductCategory } from "../../../../types/types";
+import { AddCategoryInlineDialog } from "./AddCategoryInlineDialog";
 
 interface InlineCategoryEditorProps {
   productId: number;
@@ -32,6 +33,7 @@ export function InlineCategoryEditor({ productId }: InlineCategoryEditorProps) {
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   // Load categories only when Sheet is opened
   const loadCategories = async () => {
@@ -67,7 +69,13 @@ export function InlineCategoryEditor({ productId }: InlineCategoryEditorProps) {
   };
 
   const handleAddCategory = () => {
-    console.log("Add category to product", productId);
+    setIsAddDialogOpen(true);
+  };
+
+  // Callback when a category is added successfully
+  const handleAddCategorySuccess = () => {
+    // Reload categories to show the new one
+    loadCategories();
   };
 
   const handleDeleteCategory = (categoryId: number) => {
@@ -199,6 +207,14 @@ export function InlineCategoryEditor({ productId }: InlineCategoryEditorProps) {
             </Table>
           </div>
         </div>
+
+        {/* Add Category Dialog */}
+        <AddCategoryInlineDialog
+          productId={productId}
+          open={isAddDialogOpen}
+          onOpenChange={setIsAddDialogOpen}
+          onSuccess={handleAddCategorySuccess}
+        />
       </SheetContent>
     </Sheet>
   );
