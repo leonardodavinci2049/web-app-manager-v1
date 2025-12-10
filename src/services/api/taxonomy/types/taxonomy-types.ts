@@ -133,9 +133,7 @@ export interface CreateTaxonomyRelRequest extends BaseTaxonomyRequest {
  * Requisição para listar produtos de uma taxonomia
  */
 export interface FindTaxonomyRelProdutoRequest extends BaseTaxonomyRequest {
-  pe_id_taxonomy: number;
-  pe_qt_registros?: number;
-  pe_pagina_id?: number;
+  pe_id_record: number; // ID do produto
 }
 
 /**
@@ -298,14 +296,12 @@ export interface DeleteTaxonomyResponse extends BaseTaxonomyResponse {
  * Estrutura de dados de produto relacionado
  */
 export interface TaxonomyProductData {
-  ID_PRODUTO: number;
-  PRODUTO: string;
+  ID_TAXONOMY?: number;
+  PARENT_ID?: number;
+  TAXONOMIA?: string;
   SLUG?: string | null;
-  PATH_IMAGEM?: string | null;
-  PRECO?: number | null;
-  PRECO_PROMOCIONAL?: number | null;
-  QT_ESTOQUE?: number | null;
-  INATIVO?: number;
+  ORDEM?: number;
+  LEVEL?: number;
 }
 
 /**
@@ -319,7 +315,7 @@ export interface CreateTaxonomyRelResponse extends BaseTaxonomyResponse {
  * Resposta da listagem de produtos relacionados
  */
 export interface FindTaxonomyRelProdutoResponse extends BaseTaxonomyResponse {
-  data: [TaxonomyProductData[], MySQLMetadata];
+  data: [TaxonomyProductData[], [StoredProcedureResponse], MySQLMetadata];
 }
 
 /**

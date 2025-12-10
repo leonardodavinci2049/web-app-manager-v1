@@ -20,7 +20,7 @@ export function CategoryTags({ categories, className }: CategoryTagsProps) {
 
   // Sort categories by ID_TAXONOMY in ascending order
   const sortedCategories = [...categories].sort(
-    (a, b) => a.ID_TAXONOMY - b.ID_TAXONOMY,
+    (a, b) => (a.ID_TAXONOMY ?? 0) - (b.ID_TAXONOMY ?? 0),
   );
 
   return (

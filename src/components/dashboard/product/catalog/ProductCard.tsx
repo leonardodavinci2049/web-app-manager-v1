@@ -136,10 +136,7 @@ export function ProductCard({
               </div>
 
               {/* Categorias */}
-              <InlineCategoryEditor
-                productId={Number(product.id) || 0}
-                categories={product.categories}
-              />
+              <InlineCategoryEditor productId={Number(product.id) || 0} />
               <CategoryTags categories={product.categories} />
 
               {/* Botão - Em linha no desktop, full width no mobile */}
@@ -226,10 +223,7 @@ export function ProductCard({
           </div>
 
           {/* Categorias */}
-          <InlineCategoryEditor
-            productId={Number(product.id) || 0}
-            categories={product.categories}
-          />
+          <InlineCategoryEditor productId={Number(product.id) || 0} />
           <CategoryTags categories={product.categories} />
 
           {/* Espaçador flexível para empurrar o botão para baixo */}

@@ -89,9 +89,7 @@ export const CreateTaxonomyRelSchema = z.object({
  * Schema para listar produtos de uma taxonomia
  */
 export const FindTaxonomyRelProdutoSchema = z.object({
-  pe_id_taxonomy: z.number().int().positive(),
-  pe_qt_registros: z.number().int().min(1).max(100).optional(),
-  pe_pagina_id: z.number().int().min(0).optional(),
+  pe_id_record: z.number().int().positive(), // ID do produto
 });
 
 /**

@@ -485,27 +485,24 @@ export class TaxonomyServiceApi extends BaseApiService {
   }
 
   /**
-   * Endpoint 08 - Lista produtos relacionados a uma taxonomia
-   * @param params - Parâmetros com ID da taxonomia e paginação
-   * @returns Promise com lista de produtos
+   * Endpoint 08 - Lista taxonomias (categorias) relacionadas a um produto
+   * Retorna a hierarquia completa de categorias associadas ao produto (até 3 níveis)
+   * @param params - Parâmetros com ID do produto
+   * @returns Promise com lista hierárquica de taxonomias do produto
    */
   static async findTaxonomyRelProduto(
     params: Partial<FindTaxonomyRelProdutoRequest> & {
-      pe_id_taxonomy: number;
+      pe_id_record: number;
     },
   ): Promise<FindTaxonomyRelProdutoResponse> {
     try {
       // Validar parâmetros
       const validatedParams = FindTaxonomyRelProdutoSchema.parse({
-        pe_id_taxonomy: params.pe_id_taxonomy,
-        pe_qt_registros: params.pe_qt_registros,
-        pe_pagina_id: params.pe_pagina_id,
+        pe_id_record: params.pe_id_record,
       });
 
       const instance = new TaxonomyServiceApi();
       const requestBody = TaxonomyServiceApi.buildBasePayload({
-        pe_qt_registros: 20, // Valor padrão - 20 registros por página
-        pe_pagina_id: 1, // Valor padrão - primeira página
         ...validatedParams,
       });
 
@@ -517,12 +514,12 @@ export class TaxonomyServiceApi extends BaseApiService {
 
       // Verifica se a busca foi bem-sucedida usando função utilitária
       if (isApiError(data.statusCode)) {
-        throw new Error(data.message || "Erro ao buscar produtos da taxonomy");
+        throw new Error(data.message || "Erro ao buscar taxonomias do produto");
       }
 
       return data;
     } catch (error) {
-      logger.error("Erro no serviço de busca de produtos da taxonomy", error);
+      logger.error("Erro no serviço de busca de taxonomias do produto", error);
       throw error;
     }
   }
@@ -890,9 +887,9 @@ export class TaxonomyServiceApi extends BaseApiService {
   }
 
   /**
-   * Extrai lista de produtos relacionados da resposta da API
+   * Extrai lista de taxonomias relacionadas ao produto da resposta da API
    * @param response - Resposta da API
-   * @returns Lista de produtos ou array vazio
+   * @returns Lista de taxonomias ou array vazio
    */
   static extractTaxonomyProductList(
     response: FindTaxonomyRelProdutoResponse,
@@ -1008,7 +1005,7 @@ export class TaxonomyServiceApi extends BaseApiService {
   }
 
   /**
-   * Valida se a resposta de listagem de produtos relacionados é válida
+   * Valida se a resposta de listagem de taxonomias relacionadas ao produto é válida
    * @param response - Resposta da API
    * @returns true se válida, false caso contrário
    */
