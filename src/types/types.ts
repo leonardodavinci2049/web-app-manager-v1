@@ -19,6 +19,7 @@ export interface Product {
   stock: number;
   category: string;
   brand: string; // Changed from optional to required (MARCA_NOME always available)
+  type?: string; // NEW: TIPO field from API
   warrantyDays: number; // NEW: TEMPODEGARANTIA_DIA
   isPromotion: boolean; // NEW: PROMOCAO flag
   isImported: boolean; // NEW: IMPORTADO flag

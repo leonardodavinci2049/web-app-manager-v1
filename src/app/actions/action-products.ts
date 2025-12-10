@@ -77,6 +77,7 @@ function transformApiProductToProduct(
 
     // Category - Use TIPO (product type) instead of brand
     const category = apiProduct.TIPO || "Sem Categoria";
+    const type = apiProduct.TIPO || undefined;
 
     // Brand - Use MARCA_NOME (required field)
     const brand = apiProduct.MARCA_NOME || "Sem Marca";
@@ -134,6 +135,7 @@ function transformApiProductToProduct(
       stock,
       category,
       brand,
+      type,
       warrantyDays,
       isPromotion,
       isImported,
