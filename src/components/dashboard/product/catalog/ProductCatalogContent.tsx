@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { fetchProductsWithFilters } from "@/app/actions/action-products";
 import { createLogger } from "@/lib/logger";
@@ -9,6 +9,9 @@ import { ProductFiltersImproved } from "./ProductFiltersImproved";
 import { ProductGrid } from "./ProductGrid";
 
 const logger = createLogger("ProductCatalogContent");
+
+// Key for sessionStorage
+const CATALOG_FILTERS_KEY = "product-catalog-filters";
 
 interface ProductCatalogContentProps {
   initialProducts: Product[];
@@ -29,19 +32,47 @@ export function ProductCatalogContent({
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [total, setTotal] = useState(initialTotal);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const [filters, setFilters] = useState<FilterOptions>({
-    searchTerm: "",
-    selectedCategory: "all",
-    selectedSubcategory: undefined,
-    selectedSubgroup: undefined,
-    selectedBrand: undefined,
-    selectedPtype: undefined,
-    onlyInStock: false,
-    sortBy: "newest", // Default to newest products first
+  const [filters, setFilters] = useState<FilterOptions>(() => {
+    // Initialize filters from sessionStorage on mount
+    if (typeof window === "undefined") {
+      return {
+        searchTerm: "",
+        selectedCategory: "all",
+        selectedSubcategory: undefined,
+        selectedSubgroup: undefined,
+        selectedBrand: undefined,
+        selectedPtype: undefined,
+        onlyInStock: false,
+        sortBy: "newest",
+      };
+    }
+
+    try {
+      const saved = sessionStorage.getItem(CATALOG_FILTERS_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved) as FilterOptions;
+        logger.info("Restored filters from sessionStorage:", parsed);
+        return parsed;
+      }
+    } catch (error) {
+      logger.error("Error loading saved filters:", error);
+    }
+
+    return {
+      searchTerm: "",
+      selectedCategory: "all",
+      selectedSubcategory: undefined,
+      selectedSubgroup: undefined,
+      selectedBrand: undefined,
+      selectedPtype: undefined,
+      onlyInStock: false,
+      sortBy: "newest",
+    };
   });
   const [loadedQuantity, setLoadedQuantity] = useState(20); // Track total quantity loaded
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [reachedEnd, setReachedEnd] = useState(false); // Track if we reached the end of the list
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // React 18 useTransition for better UX
   const [isPending, startTransition] = useTransition();
@@ -52,47 +83,89 @@ export function ProductCatalogContent({
   }
 
   // Handle filter updates
-  const updateFilters = async (newFilters: FilterOptions) => {
-    startTransition(async () => {
-      try {
-        setFilters(newFilters);
-        setLoadedQuantity(20); // Reset loaded quantity
-        setReachedEnd(false); // Reset end state
+  const updateFilters = useCallback(
+    async (newFilters: FilterOptions) => {
+      startTransition(async () => {
+        try {
+          setFilters(newFilters);
+          setLoadedQuantity(20); // Reset loaded quantity
+          setReachedEnd(false); // Reset end state
 
-        logger.info("Updating filters:", {
-          ...newFilters,
-          categoryFilterActive: newFilters.selectedCategory !== "all",
-        });
+          logger.info("Updating filters:", {
+            ...newFilters,
+            categoryFilterActive: newFilters.selectedCategory !== "all",
+          });
 
-        const result = await fetchProductsWithFilters(
-          newFilters.searchTerm,
-          newFilters.selectedCategory, // This will be the category ID or "all"
-          newFilters.onlyInStock,
-          newFilters.sortBy,
-          1, // First page
-          20, // Products per page
-        );
+          const result = await fetchProductsWithFilters(
+            newFilters.searchTerm,
+            newFilters.selectedCategory, // This will be the category ID or "all"
+            newFilters.onlyInStock,
+            newFilters.sortBy,
+            1, // First page
+            20, // Products per page
+          );
 
-        if (result.success) {
-          setProducts(result.products);
-          setTotal(result.total);
+          if (result.success) {
+            setProducts(result.products);
+            setTotal(result.total);
 
-          // Check if we reached the end on initial load or filter change
-          if (result.products.length < 20) {
-            setReachedEnd(true);
+            // Check if we reached the end on initial load or filter change
+            if (result.products.length < 20) {
+              setReachedEnd(true);
+            } else {
+              setReachedEnd(false);
+            }
           } else {
-            setReachedEnd(false);
+            toast.error(result.error || "Erro ao filtrar produtos");
+            logger.error("Filter error:", result.error);
           }
-        } else {
-          toast.error(result.error || "Erro ao filtrar produtos");
-          logger.error("Filter error:", result.error);
+        } catch (error) {
+          toast.error("Erro inesperado ao filtrar produtos");
+          logger.error("Unexpected filter error:", error);
         }
-      } catch (error) {
-        toast.error("Erro inesperado ao filtrar produtos");
-        logger.error("Unexpected filter error:", error);
-      }
-    });
-  };
+      });
+    },
+    [], // startTransition is stable, no dependencies needed
+  );
+
+  // Restore filters on mount and fetch products if there are saved filters
+  useEffect(() => {
+    if (isInitialized) return;
+
+    const hasActiveFilters =
+      filters.searchTerm !== "" ||
+      filters.selectedCategory !== "all" ||
+      filters.onlyInStock ||
+      filters.sortBy !== "newest";
+
+    if (hasActiveFilters) {
+      logger.info("Restoring active filters and fetching products");
+      // Apply saved filters
+      updateFilters(filters);
+    }
+
+    setIsInitialized(true);
+  }, [
+    isInitialized,
+    filters,
+    filters.searchTerm,
+    filters.selectedCategory,
+    filters.onlyInStock,
+    filters.sortBy,
+    updateFilters,
+  ]);
+
+  // Save filters to sessionStorage whenever they change
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    try {
+      sessionStorage.setItem(CATALOG_FILTERS_KEY, JSON.stringify(filters));
+      logger.info("Saved filters to sessionStorage:", filters);
+    } catch (error) {
+      logger.error("Error saving filters:", error);
+    }
+  }, [filters, isInitialized]);
 
   // Reset filters to default
   const resetFilters = () => {

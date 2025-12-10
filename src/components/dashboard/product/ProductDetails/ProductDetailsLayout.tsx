@@ -1,6 +1,3 @@
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 // Server Component - não usar hooks de cliente
 import type {
@@ -8,6 +5,7 @@ import type {
   ProductRelatedTaxonomy,
 } from "@/services/api/product/types/product-types";
 import { formatCurrency } from "@/utils/common-utils";
+import { BackToCatalogButton } from "./BackToCatalogButton";
 import { ProductDetailsTabs } from "./ProductDetailsTabs";
 import { ProductImageGalleryServer } from "./ProductImageGallery/ProductImageGalleryServer";
 import { ProductInfoDisplay } from "./ProductInfoDisplay";
@@ -127,12 +125,7 @@ export function ProductDetailsLayout({
     <div className="space-y-6">
       {/* Action Buttons */}
       <div className="flex items-center justify-between">
-        <Button asChild variant="outline">
-          <Link href="/dashboard/product/catalog">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Voltar ao Catálogo
-          </Link>
-        </Button>
+        <BackToCatalogButton />
       </div>
 
       {/* Main Product Layout */}
