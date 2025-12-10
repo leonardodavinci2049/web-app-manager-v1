@@ -101,6 +101,11 @@ export function ProductCard({
                           Marca: {product.brand}
                         </p>
                       )}
+                      {product.type && (
+                        <p className="text-muted-foreground">
+                          Tipo: {product.type}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -196,6 +201,9 @@ export function ProductCard({
               <p className="text-muted-foreground">SKU: {product.sku}</p>
               {product.brand && (
                 <p className="text-muted-foreground">Marca: {product.brand}</p>
+              )}
+              {product.type && (
+                <p className="text-muted-foreground">Tipo: {product.type}</p>
               )}
             </div>
           </div>
