@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Edit2, Type, X } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { updateProductName } from "@/app/actions/action-product-updates";
@@ -196,29 +197,27 @@ export function InlineNameEditor({
   }
 
   return (
-    <button
-      type="button"
-      className={`text-left w-full ${className}`}
-      onClick={handleEdit}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          handleEdit();
-        }
-      }}
-      title="Clique para editar o nome do produto"
-    >
+    <div className={`text-left w-full ${className}`}>
       <div className="group/name-editor">
         <div className="flex items-start gap-2">
           <Type className="h-4 w-4 flex-shrink-0 text-muted-foreground mt-0.5" />
           <div className="flex-1 min-w-0">
-            <h3 className="line-clamp-2 text-base font-semibold leading-tight">
-              {productName}
-            </h3>
+            <Link href={`/dashboard/product/${productId}`}>
+              <h3 className="line-clamp-2 text-base font-semibold leading-tight hover:underline hover:text-primary transition-colors">
+                {productName}
+              </h3>
+            </Link>
           </div>
-          <Edit2 className="h-3 w-3 opacity-0 group-hover/name-editor:opacity-100 transition-opacity text-muted-foreground mt-0.5 flex-shrink-0" />
+          <button
+            type="button"
+            onClick={handleEdit}
+            className="opacity-0 group-hover/name-editor:opacity-100 transition-opacity"
+            title="Editar nome do produto"
+          >
+            <Edit2 className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+          </button>
         </div>
       </div>
-    </button>
+    </div>
   );
 }
