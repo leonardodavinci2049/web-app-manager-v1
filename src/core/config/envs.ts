@@ -4,10 +4,10 @@
 import { z } from "zod";
 
 const envsSchema = z.object({
-  APP_PORT: z
+  PORT: z
     .string()
     .transform((val) => parseInt(val, 10))
-    .pipe(z.number().positive("APP_PORT must be a positive number")),
+    .pipe(z.number().positive("PORT must be a positive number")),
 
   SYSTEM_CLIENT_ID: z
     .string()
@@ -133,7 +133,7 @@ if (typeof window === "undefined") {
   // Estamos no cliente - usar valores vazios ou default para variáveis privadas
   // e valores reais para variáveis públicas (NEXT_PUBLIC_*)
   envVars = {
-    APP_PORT: 0,
+    PORT: 0,
 
     SYSTEM_CLIENT_ID: 0,
     STORE_ID: 0,
@@ -189,7 +189,7 @@ if (typeof window === "undefined") {
 }
 
 export const envs = {
-  APP_PORT: envVars.APP_PORT,
+  PORT: envVars.PORT,
 
   SYSTEM_CLIENT_ID: envVars.SYSTEM_CLIENT_ID,
   STORE_ID: envVars.STORE_ID,
