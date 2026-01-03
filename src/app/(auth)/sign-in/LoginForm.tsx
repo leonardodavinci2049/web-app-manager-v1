@@ -18,6 +18,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const { t } = useTranslation();
+  
   const [state, formAction] = useActionState(loginAction, initialState);
 
   // Gerar ID único para cada instância do componente usando useId (SSR-safe)

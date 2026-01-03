@@ -37,6 +37,7 @@ const initialFormData: FormData = {
 const RegisterForm = () => {
   const { t } = useTranslation();
   const [state, formAction] = useActionState(registerAction, initialState);
+  
   const [isPending, startTransition] = useTransition();
   // Estados do formulário
   const [formData, setFormData] = useState<FormData>(initialFormData);
