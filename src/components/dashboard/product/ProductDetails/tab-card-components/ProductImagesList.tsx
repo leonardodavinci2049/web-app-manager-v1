@@ -259,29 +259,27 @@ const ProductImagesList = ({ product, productId }: ProductImagesListProps) => {
                         </a>
                       )}
 
-                      {/* Botão para sincronizar PATH_IMAGEM - só aparece se é imagem principal e há divergência */}
-                      {image.isPrimary &&
-                        syncInfo.hasDivergence &&
-                        image.urls.preview && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              if (image.urls.preview) {
-                                handleSyncPathImagem(image.urls.preview);
-                              }
-                            }}
-                            disabled={isUpdatingPath}
-                            className="text-xs"
-                          >
-                            {isUpdatingPath ? (
-                              <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
-                            ) : (
-                              <Upload className="h-3 w-3 mr-1" />
-                            )}
-                            Atualizar PATH_IMAGEM
-                          </Button>
-                        )}
+                      {/* Botão para sincronizar PATH_IMAGEM - sempre visível para imagem principal */}
+                      {image.isPrimary && image.urls.preview && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            if (image.urls.preview) {
+                              handleSyncPathImagem(image.urls.preview);
+                            }
+                          }}
+                          disabled={isUpdatingPath}
+                          className="text-xs"
+                        >
+                          {isUpdatingPath ? (
+                            <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                          ) : (
+                            <Upload className="h-3 w-3 mr-1" />
+                          )}
+                          Atualizar PATH_IMAGEM
+                        </Button>
+                      )}
                     </div>
                   </div>
                 ))}
