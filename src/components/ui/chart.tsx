@@ -196,6 +196,7 @@ interface TooltipPayloadItem {
   payload?: Record<string, unknown>;
   type?: "none";
   fill?: string;
+  graphicalItemId?: string | number;
 }
 
 function ChartTooltipContent({
@@ -241,7 +242,10 @@ function ChartTooltipContent({
     if (labelFormatter) {
       return (
         <div className={cn("font-medium", labelClassName)}>
-          {labelFormatter(value, payload as TooltipPayloadItem[])}
+          {labelFormatter(
+            value,
+            payload as unknown as Parameters<typeof labelFormatter>[1],
+          )}
         </div>
       );
     }
@@ -295,9 +299,9 @@ function ChartTooltipContent({
                   formatter(
                     item.value,
                     item.name,
-                    item as TooltipPayloadItem,
+                    item as unknown as Parameters<typeof formatter>[2],
                     index,
-                    payload as TooltipPayloadItem[],
+                    payload as unknown as Parameters<typeof formatter>[4],
                   )
                 ) : (
                   <>
