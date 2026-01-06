@@ -4,10 +4,17 @@ import { Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { envs } from "@/core/config/envs";
 
 export default function CompanyFooter() {
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Formatar número do WhatsApp para link (remover caracteres especiais)
   const whatsappNumber = envs.NEXT_PUBLIC_COMPANY_WHATSAPP;
   const whatsappLink = `https://wa.me/${whatsappNumber}`;
@@ -81,7 +88,7 @@ export default function CompanyFooter() {
               >
                 <Image
                   src={
-                    resolvedTheme === "dark"
+                    mounted && resolvedTheme === "dark"
                       ? "/images/developer/logo-developer-dark.png"
                       : "/images/developer/logo-developer-light.png"
                   }

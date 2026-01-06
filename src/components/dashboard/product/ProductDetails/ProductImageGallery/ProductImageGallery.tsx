@@ -246,7 +246,12 @@ export function ProductImageGallery({
         }
 
         // Call server action to delete the image
-        const result = await deleteProductImageAction(imageToDelete.id);
+        // Pass productId and wasPrimary flag to update PATH_IMAGEM if needed
+        const result = await deleteProductImageAction(
+          imageToDelete.id,
+          productId.toString(),
+          imageToDelete.isPrimary,
+        );
 
         if (result.success) {
           if (!imageToDelete.isPrimary) {
@@ -272,7 +277,7 @@ export function ProductImageGallery({
         setDeleteImageIndex(null);
       }
     },
-    [selectedImageIndex, images, onImageUploadSuccess],
+    [selectedImageIndex, images, onImageUploadSuccess, productId],
   );
 
   // Handle setting image as primary

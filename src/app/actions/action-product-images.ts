@@ -10,59 +10,56 @@ import { uploadFileAction } from "./action-test-assets";
 const logger = createLogger("action-product-images");
 
 /**
- * Helper function to update product PATH_IMAGEM only if it's currently empty
- * This ensures we don't override existing main images
+ * Helper function to update product PATH_IMAGEM when a new primary image is set
+ *
+ * This function checks if the uploaded image became the primary image in the gallery
+ * and updates PATH_IMAGEM accordingly. It handles the following scenarios:
+ *
+ * 1. First image uploaded → automatically becomes primary → update PATH_IMAGEM
+ * 2. Additional image uploaded → NOT primary → don't update PATH_IMAGEM
+ * 3. Image replaces deleted primary → becomes primary → update PATH_IMAGEM
  *
  * @param productId - Product ID to update
+ * @param uploadedImageId - The ID of the newly uploaded image
  * @param imageUrl - New image URL to set as PATH_IMAGEM
  */
-async function updateProductImagePathIfEmpty(
+async function updateProductImagePathIfPrimary(
   productId: number,
+  uploadedImageId: string,
   imageUrl: string,
 ): Promise<void> {
   try {
-    // First, fetch current product data to check if PATH_IMAGEM is empty
-    const productResponse = await ProductServiceApi.findProductById({
-      pe_type_business: 1,
-      pe_id_produto: productId,
-      pe_slug_produto: "",
+    // Fetch the gallery to check if the uploaded image is now the primary
+    const galleryResponse = await assetsApiService.getEntityGallery({
+      entityType: "PRODUCT",
+      entityId: productId.toString(),
     });
 
-    // Check if we got a valid response
-    if (!ProductServiceApi.isValidProductDetailResponse(productResponse)) {
+    if (isApiError(galleryResponse)) {
       logger.warn(
-        `Could not fetch product ${productId} for PATH_IMAGEM check:`,
-        productResponse.message,
+        `Could not fetch gallery for product ${productId} to check primary image:`,
+        galleryResponse.message,
       );
       return;
     }
 
-    // Extract product detail
-    const product = ProductServiceApi.extractProductDetail(productResponse);
-    if (!product) {
-      logger.warn(`Product ${productId} not found in response`);
-      return;
-    }
+    // Find the uploaded image in the gallery
+    const uploadedImage = galleryResponse.images?.find(
+      (img) => img.id === uploadedImageId,
+    );
 
-    // Check if PATH_IMAGEM is empty or null
-    const currentPathImagem = product.PATH_IMAGEM;
-    const isPathImagemEmpty =
-      !currentPathImagem ||
-      currentPathImagem.trim() === "" ||
-      currentPathImagem === "null" ||
-      currentPathImagem === "undefined";
-
-    if (!isPathImagemEmpty) {
+    // Only update PATH_IMAGEM if the uploaded image is now the primary image
+    if (!uploadedImage?.isPrimary) {
       logger.debug(
-        `Product ${productId} already has PATH_IMAGEM: ${currentPathImagem}. Skipping update.`,
+        `Uploaded image ${uploadedImageId} is not primary for product ${productId}. Skipping PATH_IMAGEM update.`,
       );
       return;
     }
 
-    // PATH_IMAGEM is empty, update it with the new image URL
-    /*     logger.debug(
-      `Updating PATH_IMAGEM for product ${productId} with URL: ${imageUrl}`,
-    ); */
+    // The uploaded image is the primary image, update PATH_IMAGEM
+    logger.debug(
+      `Uploaded image ${uploadedImageId} is primary for product ${productId}. Updating PATH_IMAGEM.`,
+    );
 
     const updateResponse = await ProductServiceApi.updateProductImagePath({
       pe_id_produto: productId,
@@ -71,7 +68,7 @@ async function updateProductImagePathIfEmpty(
 
     // Check if update was successful
     if (ProductServiceApi.isOperationSuccessful(updateResponse)) {
-      // logger.debug(`Successfully updated PATH_IMAGEM for product ${productId}`);
+      logger.debug(`Successfully updated PATH_IMAGEM for product ${productId}`);
     } else {
       const spResponse =
         ProductServiceApi.extractStoredProcedureResponse(updateResponse);
@@ -160,11 +157,12 @@ export async function uploadProductImageAction(
     // Call the test assets action that we know works
     const result = await uploadFileAction(uploadFormData);
 
-    // If upload was successful, try to update product PATH_IMAGEM if it's empty
-    if (result.success && result.data?.urls?.preview) {
+    // If upload was successful, check if this image became the primary and update PATH_IMAGEM
+    if (result.success && result.data?.id && result.data?.urls?.preview) {
       try {
-        await updateProductImagePathIfEmpty(
+        await updateProductImagePathIfPrimary(
           Number(productId),
+          result.data.id,
           result.data.urls.preview,
         );
       } catch (pathUpdateError) {
@@ -193,10 +191,19 @@ export async function uploadProductImageAction(
  * Delete image from a product gallery
  * Used by ProductImageGallery component to delete product images
  *
+ * This action:
+ * 1. Deletes the image from the Assets API
+ * 2. If the deleted image was primary, gets the new primary image from gallery
+ * 3. Updates PATH_IMAGEM with the new primary image URL (or clears it if no images left)
+ *
  * @param imageId UUID of the image to delete
+ * @param productId Product ID (required to update PATH_IMAGEM if primary image is deleted)
+ * @param wasPrimary Whether the deleted image was the primary image
  */
 export async function deleteProductImageAction(
   imageId: string,
+  productId?: string,
+  wasPrimary?: boolean,
 ): Promise<DeleteProductImageResponse> {
   try {
     // Validate required fields
@@ -206,8 +213,6 @@ export async function deleteProductImageAction(
         error: "ID da imagem é obrigatório",
       };
     }
-
-    // Debug info removed for cleaner console output
 
     // Call the assets API to delete the file
     const result = await assetsApiService.deleteFile({ id: imageId });
@@ -223,7 +228,102 @@ export async function deleteProductImageAction(
       };
     }
 
-    // Success logged via return value
+    // If the deleted image was primary and we have productId, update PATH_IMAGEM
+    if (wasPrimary && productId) {
+      try {
+        // Fetch the updated gallery to get the new primary image
+        const galleryResponse = await assetsApiService.getEntityGallery({
+          entityType: "PRODUCT",
+          entityId: productId,
+        });
+
+        if (!isApiError(galleryResponse)) {
+          // Find the new primary image (the one with isPrimary = true)
+          const newPrimaryImage = galleryResponse.images?.find(
+            (img) => img.isPrimary,
+          );
+
+          if (newPrimaryImage?.urls?.preview) {
+            // Update PATH_IMAGEM with the new primary image URL
+            logger.debug(
+              `Updating PATH_IMAGEM for product ${productId} with new primary image: ${newPrimaryImage.urls.preview}`,
+            );
+            const updateResponse =
+              await ProductServiceApi.updateProductImagePath({
+                pe_id_produto: Number(productId),
+                pe_path_imagem: newPrimaryImage.urls.preview,
+              });
+
+            if (!ProductServiceApi.isOperationSuccessful(updateResponse)) {
+              const spResponse =
+                ProductServiceApi.extractStoredProcedureResponse(
+                  updateResponse,
+                );
+              logger.warn(
+                `Failed to update PATH_IMAGEM for product ${productId}:`,
+                spResponse?.sp_message || updateResponse.message,
+              );
+            }
+          } else if (
+            !galleryResponse.images ||
+            galleryResponse.images.length === 0
+          ) {
+            // No images left, clear PATH_IMAGEM
+            logger.debug(
+              `No images left for product ${productId}. Clearing PATH_IMAGEM.`,
+            );
+            const updateResponse =
+              await ProductServiceApi.updateProductImagePath({
+                pe_id_produto: Number(productId),
+                pe_path_imagem: "",
+              });
+
+            if (!ProductServiceApi.isOperationSuccessful(updateResponse)) {
+              const spResponse =
+                ProductServiceApi.extractStoredProcedureResponse(
+                  updateResponse,
+                );
+              logger.warn(
+                `Failed to clear PATH_IMAGEM for product ${productId}:`,
+                spResponse?.sp_message || updateResponse.message,
+              );
+            }
+          } else {
+            // Images exist but none is primary - this shouldn't happen normally
+            // The Assets API should auto-promote the next image, but let's handle it
+            const firstImage = galleryResponse.images[0];
+            if (firstImage?.urls?.preview) {
+              logger.warn(
+                `No primary image found for product ${productId} after deletion. Using first image as fallback.`,
+              );
+              const updateResponse =
+                await ProductServiceApi.updateProductImagePath({
+                  pe_id_produto: Number(productId),
+                  pe_path_imagem: firstImage.urls.preview,
+                });
+
+              if (!ProductServiceApi.isOperationSuccessful(updateResponse)) {
+                const spResponse =
+                  ProductServiceApi.extractStoredProcedureResponse(
+                    updateResponse,
+                  );
+                logger.warn(
+                  `Failed to update PATH_IMAGEM for product ${productId}:`,
+                  spResponse?.sp_message || updateResponse.message,
+                );
+              }
+            }
+          }
+        }
+      } catch (pathUpdateError) {
+        // Log error but don't fail - the image was deleted successfully
+        logger.warn(
+          `Failed to update PATH_IMAGEM after deleting primary image for product ${productId}:`,
+          pathUpdateError,
+        );
+      }
+    }
+
     return {
       success: true,
     };
@@ -240,6 +340,10 @@ export async function deleteProductImageAction(
  * Set image as primary for a product
  * Used by ProductImageGallery component to promote images to primary
  *
+ * This action:
+ * 1. Sets the image as primary in the Assets API
+ * 2. Updates the product's PATH_IMAGEM field with the new primary image URL
+ *
  * @param productId Product ID
  * @param imageId UUID of the image to set as primary
  */
@@ -255,8 +359,6 @@ export async function setPrimaryImageAction(
         error: "ID do produto e da imagem são obrigatórios",
       };
     }
-
-    // Debug info removed for cleaner console output
 
     // Call the assets API to set primary image
     const result = await assetsApiService.setPrimaryImage({
@@ -277,7 +379,39 @@ export async function setPrimaryImageAction(
       };
     }
 
-    // Success logged via return value
+    // Get the image details to retrieve its URL for PATH_IMAGEM update
+    const imageDetails = await assetsApiService.findFile({ id: imageId });
+
+    if (!isApiError(imageDetails) && imageDetails.urls?.preview) {
+      // Update PATH_IMAGEM with the new primary image URL
+      try {
+        const updateResponse = await ProductServiceApi.updateProductImagePath({
+          pe_id_produto: Number(productId),
+          pe_path_imagem: imageDetails.urls.preview,
+        });
+
+        if (!ProductServiceApi.isOperationSuccessful(updateResponse)) {
+          const spResponse =
+            ProductServiceApi.extractStoredProcedureResponse(updateResponse);
+          logger.warn(
+            `Failed to update PATH_IMAGEM for product ${productId}:`,
+            spResponse?.sp_message || updateResponse.message,
+          );
+          // Don't fail the operation - primary image was set successfully
+        }
+      } catch (pathUpdateError) {
+        // Log error but don't fail - the primary image was set successfully in Assets API
+        logger.warn(
+          `Failed to update PATH_IMAGEM for product ${productId}:`,
+          pathUpdateError,
+        );
+      }
+    } else {
+      logger.warn(
+        `Could not retrieve image details for ${imageId} to update PATH_IMAGEM`,
+      );
+    }
+
     return {
       success: true,
     };
