@@ -6,7 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth/auth-client";
-import type { User } from "../../../../generated/prisma";
+import type { User } from "../../../../generated/prisma/client";
 
 interface AllUsersProps {
   users: User[];

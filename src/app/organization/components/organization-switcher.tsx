@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { authClient } from "@/lib/auth/auth-client";
-import type { Organization } from "../../../../generated/prisma";
+import type { Organization } from "../../../../generated/prisma/client";
 
 interface OrganizationSwitcherProps {
   organizations: Organization[];
