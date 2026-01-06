@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ProductDetail } from "@/services/api/product/types/product-types";
 import { ProductCharacteristicsCard } from "./ProductCharacteristicsCard";
-import { ProductDescriptionEditor } from "./ProductDescriptionEditor";
+import { ProductDescriptionEditor } from "./tab-card-components/ProductDescriptionEditor";
 import { ProductGeneralDataCard } from "./ProductGeneralDataCard";
 import ProductImagesList from "./tab-card-components/ProductImagesList";
 import { ProductMetadataCard } from "./tab-card-components/ProductMetadataCard";
