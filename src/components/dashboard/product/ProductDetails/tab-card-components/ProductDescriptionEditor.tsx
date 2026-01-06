@@ -1,7 +1,8 @@
 "use client";
 
+import DOMPurify from "dompurify";
 import { Pencil, Save, X } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { updateProductDescription } from "@/app/actions/action-product-description";
 import { Button } from "@/components/ui/button";
@@ -20,10 +21,20 @@ export function ProductDescriptionEditor({
   const MAX_CHARACTERS = 10000;
   const [isEditing, setIsEditing] = useState(false);
   const [description, setDescription] = useState(initialDescription || "");
+  const [sanitizedHtml, setSanitizedHtml] = useState("");
   const [isPending, startTransition] = useTransition();
 
   const remainingCharacters = MAX_CHARACTERS - description.length;
   const isOverLimit = description.length > MAX_CHARACTERS;
+
+  // Sanitize HTML on client-side to avoid SSR issues
+  useEffect(() => {
+    if (description) {
+      setSanitizedHtml(DOMPurify.sanitize(description));
+    } else {
+      setSanitizedHtml("");
+    }
+  }, [description]);
 
   // Handle save action
   const handleSave = () => {
@@ -35,9 +46,15 @@ export function ProductDescriptionEditor({
 
     startTransition(async () => {
       try {
-        const result = await updateProductDescription(productId, description);
+        // Sanitize content before saving
+        const sanitizedDescription = DOMPurify.sanitize(description);
+        const result = await updateProductDescription(
+          productId,
+          sanitizedDescription,
+        );
 
         if (result.success) {
+          setDescription(sanitizedDescription);
           toast.success(result.message);
           setIsEditing(false);
         } else {
@@ -142,9 +159,13 @@ export function ProductDescriptionEditor({
         ) : (
           <div>
             {description ? (
-              <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                {description}
-              </p>
+              <div
+                className="prose dark:prose-invert max-w-none text-muted-foreground"
+                // biome-ignore lint/security/noDangerouslySetInnerHtml: Trusted content for admin dashboard
+                dangerouslySetInnerHTML={{
+                  __html: sanitizedHtml,
+                }}
+              />
             ) : (
               <p className="text-muted-foreground italic">
                 Nenhuma descrição disponível para este produto.
