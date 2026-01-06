@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import SubmitButton from "../components/SubmitButton";
-import { loginAction } from "./login-action";
+import loginAction from "./login-action";
 
 // Estado inicial do formulário
 const initialState = null;
