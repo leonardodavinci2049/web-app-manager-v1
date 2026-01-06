@@ -176,7 +176,7 @@ export function ProductCard({
 
   // Grid View
   return (
-    <Card className="group mx-auto w-full max-w-[360px] transition-all duration-200 hover:-translate-y-1 hover:shadow-lg sm:max-w-none">
+    <Card className="group mx-auto sm:mx-0 w-full max-w-[360px] transition-all duration-200 hover:-translate-y-1 hover:shadow-lg sm:max-w-[500px]">
       <CardContent className="flex h-full flex-col p-4">
         {/* Imagem */}
         <ProductCardClient

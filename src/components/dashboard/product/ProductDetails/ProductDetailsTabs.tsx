@@ -6,6 +6,7 @@ import type { ProductDetail } from "@/services/api/product/types/product-types";
 import { ProductCharacteristicsCard } from "./ProductCharacteristicsCard";
 import { ProductDescriptionEditor } from "./ProductDescriptionEditor";
 import { ProductGeneralDataCard } from "./ProductGeneralDataCard";
+import ProductImagesList from "./tab-card-components/ProductImagesList";
 import { ProductMetadataCard } from "./tab-card-components/ProductMetadataCard";
 import { ProductTaxValuesCard } from "./tab-card-components/ProductTaxValuesCard";
 import { ProductTechnicalDataCard } from "./tab-card-components/ProductTechnicalDataCard";
@@ -36,6 +37,13 @@ export function ProductDetailsTabs({
           Descrição
         </TabsTrigger>
         <TabsTrigger
+          value="images"
+          className="flex items-center gap-2 whitespace-nowrap"
+        >
+          Imagens
+        </TabsTrigger>
+
+        <TabsTrigger
           value="specifications"
           className="flex items-center gap-2 whitespace-nowrap"
         >
@@ -60,6 +68,10 @@ export function ProductDetailsTabs({
           productId={productId}
           initialDescription={product.ANOTACOES || ""}
         />
+      </TabsContent>
+
+      <TabsContent value="images" className="space-y-4">
+        <ProductImagesList product={product} productId={productId} />
       </TabsContent>
 
       <TabsContent value="specifications" className="space-y-4">
