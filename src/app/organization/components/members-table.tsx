@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Member, User } from "../../../../generated/prisma";
+import type { Member, User } from "../../../../generated/prisma/client";
 import MembersTableAction from "./members-table-action";
 
 // Type for Member with User relation included
